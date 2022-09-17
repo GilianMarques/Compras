@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Compras</string>
+    <string name="nome">Nome</string>
+    <string name="valor">Valor</string>
+    <string name="quantidade">Quantidade</string>
+    <string name="unidades">Unidade(s)</string>
+    <string name="detalhes">Detalhes</string>
+    <string name="novo_item">Novo item</string>
+    <string name="Compras">Compras</string>
+</resources>
