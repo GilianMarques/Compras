@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tvNome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cbComprado"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Macarrão" />
+
+    <TextView
+        android:id="@+id/tvQtd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/retangulo_arredondado"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="10sp"
+        android:textStyle="italic"
+        app:layout_constraintStart_toEndOf="@+id/cbComprado"
+        app:layout_constraintTop_toBottomOf="@+id/tvNome"
+        tools:text="3un" />
+
+    <TextView
+        android:id="@+id/tvPreco"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/retangulo_arredondado"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="10sp"
+        android:textStyle="italic"
+        app:layout_constraintStart_toEndOf="@+id/tvQtd"
+        app:layout_constraintTop_toBottomOf="@+id/tvNome"
+        tools:text="R$ 2,50" />
+
+
+
+    <CheckBox
+        android:id="@+id/cbComprado"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvQtd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

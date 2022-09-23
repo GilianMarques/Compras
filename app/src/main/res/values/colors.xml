@@ -19,4 +19,7 @@
     <color name="colorOnPrimary">#FFFFFF</color>
     <color name="colorOnSecondary">#000000</color>
 
+
+    <color name="colorSurface">#FAFAFA</color>
+
 </resources>

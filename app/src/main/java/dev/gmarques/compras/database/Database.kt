@@ -32,16 +32,16 @@ class Database private constructor() {
             categorias.add(c)
         }
 
-        for (i in 0 until 10_000) {
+        for (i in 0 until 10) {
             val lista = Lista()
             lista.nome = "Lista#$i"
-            for (j in 0 until 20) {
+            for (j in 0 until 50) {
                 val item = Item()
                 with(item) {
-                    nome = "item#$i"
-                    preco = i * 0.75f
-                    qtd = i
-                    detalhes = "$i itens crados"
+                    nome = "item#$j"
+                    preco = j * 0.75f
+                    qtd = j
+                    detalhes = "$j itens crados"
                 }
                 lista.addItem(item)
             }
