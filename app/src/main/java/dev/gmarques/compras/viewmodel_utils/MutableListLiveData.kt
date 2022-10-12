@@ -25,7 +25,7 @@ class MutableListLiveData<T> : MutableLiveData<MutableListLiveData.DadosEvento<T
     fun itemRemovido(item: T, posicao: Int) =
         despacharEvento(DadosEvento(item, posicao, ITEM_REMOVIDO))
 
-    fun listaAtualizada() = despacharEvento(DadosEvento(evento = LISTA_ATUALIZADA))
+    fun colecaoAtualizada() = despacharEvento(DadosEvento(evento = LISTA_ATUALIZADA))
 
     private fun despacharEvento(evento: DadosEvento<T>) {
 

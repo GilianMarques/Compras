@@ -5,6 +5,4 @@ interface Sinc {
     var ultimaAtualizacao: Long
     var id: String
     var nome: String
-
-
 }

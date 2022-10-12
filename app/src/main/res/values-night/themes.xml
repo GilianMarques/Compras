@@ -1,19 +1,22 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
-    <style name="Theme.Compras" parent="Theme.MaterialComponents.DayNight.Bridge">
+    <style name="Theme.Compras" parent="Theme.Material3.Dark">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/colorPrimaryNight</item>
-        <item name="colorPrimaryVariant">@color/colorPrimaryVariantNight</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
 
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/colorSecondaryNight</item>
-        <item name="colorSecondaryVariant">@color/colorSecondaryVariantNight</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
 
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
-        <item name="android:windowBackground" >@android:color/black</item>
-        <!-- Customize your theme here. -->
+        <item name="colorAccent">@color/colorSecondary</item>
+
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+
     </style>
+
+
 </resources>

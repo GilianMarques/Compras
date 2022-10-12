@@ -1,23 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#5E35B1</color>
-    <color name="colorSecondary">#E91E63</color>
+    <color name="colorPrimary">#4C25D8</color>
+    <color name="colorSecondary">#C912DD</color>
 
-    <color name="colorPrimaryVariant">#4A148C</color>
-    <color name="colorSecondaryVariant">#C2185B</color>
+    <color name="colorPrimaryVariant">#331893</color>
+    <color name="colorSecondaryVariant">#860D93</color>
 
-    <!--night colors-->
-
-    <color name="colorPrimaryNight">#7E57C2</color>
-    <color name="colorSecondaryNight">#AB47BC</color>
-
-    <color name="colorPrimaryVariantNight">#673AB7</color>
-    <color name="colorSecondaryVariantNight">#9C27B0</color>
-
-    <!--text colors-->
 
     <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorOnSecondary">#000000</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+
+    <color name="cinzaClaro">#E1E1E1</color>
 
 
     <color name="colorSurface">#FAFAFA</color>

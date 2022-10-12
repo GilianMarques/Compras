@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/layout_padding"
+        tools:context=".ui.add_item.FragAddItem">
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textFieldNome"
+            style="@style/TextInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/Nome"
+            app:endIconMode="clear_text"
+            app:layout_constraintBottom_toTopOf="@+id/textFieldValor"
+            app:layout_constraintTop_toTopOf="parent"
+            app:startIconDrawable="@drawable/vec_edit"
+            app:startIconTint="?attr/colorPrimary"
+            app:errorEnabled="true">
+
+
+            <AutoCompleteTextView
+                android:id="@+id/edtNome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textAutoComplete"
+                android:lines="1"
+                tools:text="Pão de queijo" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textFieldValor"
+
+            style="@style/TextInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/valor"
+            app:endIconMode="clear_text"
+            app:layout_constraintBottom_toTopOf="@+id/textFieldQtd"
+            app:layout_constraintTop_toBottomOf="@+id/textFieldNome"
+            app:prefixText="R$"
+            app:startIconDrawable="@drawable/vec_money"
+            app:startIconTint="?attr/colorPrimary">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtValor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                tools:text="9,79" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textFieldQtd"
+
+            style="@style/TextInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/Quantidade"
+            app:endIconMode="clear_text"
+            app:layout_constraintBottom_toTopOf="@+id/textFieldDetalhes"
+            app:layout_constraintTop_toBottomOf="@+id/textFieldValor"
+            app:startIconDrawable="@drawable/vec_qtd"
+            app:startIconTint="?attr/colorPrimary"
+            app:suffixText="@string/unidades"
+
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtQtd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                tools:text="3" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textFieldDetalhes"
+
+            style="@style/TextInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/detalhes"
+            app:endIconMode="clear_text"
+            app:layout_constraintBottom_toTopOf="@+id/textFieldNome"
+            app:layout_constraintTop_toBottomOf="@+id/textFieldQtd"
+            app:startIconDrawable="@drawable/vec_info"
+            app:startIconTint="?attr/colorPrimary">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtDetalhes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="pão quentinho da marca tal e qqer outra info util" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_concluir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:clickable="true"
+            android:src="@drawable/vec_check"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,10 +1,16 @@
 package dev.gmarques.compras.objetos
 
-class Lista : Objetos() {
-    fun addItem(item: Item) {
-        itens.add(item)
-        // TODO: add no db
-    }
+import androidx.room.Entity
+import dev.gmarques.compras.App
+import dev.gmarques.compras.R
+import java.util.*
 
-    var itens: ArrayList<Item> = ArrayList<Item>()
+@Entity
+class Lista : Objetos() {
+    companion object {
+        val PADRAO = Lista().also {
+            it.nome = String.format(App.get.applicationContext.getString(R.string.lista),
+                Random().nextInt(999))
+        }
+    }
 }

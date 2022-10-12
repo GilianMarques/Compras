@@ -1,32 +1,24 @@
-package dev.gmarques.compras.lista
+package dev.gmarques.compras.ui.lista_de_compras
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
-import dev.gmarques.compras.Extensions.Companion.emMoeda
 import dev.gmarques.compras.databinding.RvItemViewBinding
 import dev.gmarques.compras.objetos.Item
 
 class ItemAdapter(
     private var itens: MutableList<Item>,
     private val clickCallback: (Item, Int) -> Unit,
-) :
-    Adapter<ItemAdapter.ViewHolder>() {
+) : Adapter<ItemAdapter.ViewHolder>() {
 
 
-    class ViewHolder(val bindingView: RvItemViewBinding, val click: (Item, Int) -> Unit) :
+    class ViewHolder(private val bindingView: RvItemViewBinding, val click: (Item, Int) -> Unit) :
         RecyclerView.ViewHolder(bindingView.root) {
 
-        // TODO: usar binding data
         fun bind(item: Item, position: Int) {
-            bindingView.tvNome.text = item.nome
-            bindingView.tvPreco.text = item.preco.emMoeda()
-            bindingView.tvQtd.text = "${item.qtd}un"
-            bindingView.cbComprado.isChecked = item.comprado
-
-
+            bindingView.item = item
             bindingView.root.setOnClickListener {
                 click(item, position)
             }
@@ -49,5 +41,20 @@ class ItemAdapter(
     fun attLista(itens: ArrayList<Item>) {
         this.itens = itens
         notifyDataSetChanged()
+    }
+
+    fun addItem(item: Item, posicao: Int) {
+        itens.add(posicao, item)
+        notifyItemInserted(posicao)
+    }
+
+    fun attIem(item: Item, posicao: Int) {
+        itens[posicao] = item
+        notifyItemChanged(posicao)
+    }
+
+    fun removerItem(posicao: Int) {
+        itens.removeAt(posicao)
+        notifyItemRemoved(posicao)
     }
 }

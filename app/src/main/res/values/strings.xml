@@ -1,10 +1,20 @@
 <resources>
     <string name="app_name">Compras</string>
-    <string name="nome">Nome</string>
+    <string name="Nome">Nome</string>
     <string name="valor">Valor</string>
-    <string name="quantidade">Quantidade</string>
+    <string name="Quantidade">Quantidade</string>
     <string name="unidades">Unidade(s)</string>
     <string name="detalhes">Detalhes</string>
     <string name="novo_item">Novo item</string>
     <string name="Compras">Compras</string>
+    <string name="un">%1$dun</string>
+    <string name="sem_categoria">Sem categoria</string>
+    <string name="lista">Lista %1$s</string>
+    <string name="campo_nome_deve_ser_preenchido">Campo %1$s deve ser preenchido</string>
+    <string name="preco">preço</string>
+    <string name="nome">nome</string>
+    <string name="quantidade">quantidade</string>
+    <string name="Campo_deve_ser_preenchido">Campo deve ser preenchido</string>
+    <string name="item_ja_existe_na_lista">\"%1$s\" já existe na lista, mude o nome para prosseguir.</string>
+
 </resources>
