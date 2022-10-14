@@ -1,7 +1,6 @@
 package dev.gmarques.compras.ui.lista_de_compras
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dev.gmarques.compras.databinding.FragListaDeComprasBinding
 import dev.gmarques.compras.viewmodel_utils.MutableListLiveData.Evento.*
+
 
 class FragListaDeCompras : Fragment(), LifecycleOwner {
 
@@ -51,7 +51,6 @@ class FragListaDeCompras : Fragment(), LifecycleOwner {
 
     private fun inicializarActionBar() {
         viewModel.listaLiveData.observe(viewLifecycleOwner) {
-            Log.d("USUK", "FragListaDeCompras.".plus("inicializarActionBar() "))
             (activity as AppCompatActivity).supportActionBar?.title = it.nome
         }
     }
@@ -74,7 +73,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner {
     }
 
     private fun inicializarRvDeCategorias() {
-        categoriaAdapter = CategoriaAdapter(viewModel.categorias, viewModel::categoriaClick)
+        categoriaAdapter = CategoriaAdapter(this,viewModel.categorias, viewModel::categoriaClick)
         binding.rvCategorias.adapter = categoriaAdapter
         binding.rvCategorias.layoutManager =
             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)

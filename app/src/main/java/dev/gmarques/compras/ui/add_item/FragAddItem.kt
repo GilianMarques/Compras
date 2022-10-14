@@ -10,11 +10,12 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.Vibrador
 import dev.gmarques.compras.databinding.FragAddItemBinding
-import dev.gmarques.compras.io.repositorios.ItemRepo
 import kotlinx.coroutines.launch
 
 class FragAddItem : Fragment() {
@@ -46,6 +47,7 @@ class FragAddItem : Fragment() {
 
         initEdtNome()
         initFab()
+        initCategorias()
 
         binding.edtNome.addTextChangedListener {
             binding.textFieldNome.error = null
@@ -95,19 +97,29 @@ class FragAddItem : Fragment() {
         } else false
     }
 
+    private fun initEdtNome() = binding.edtNome.addTextChangedListener { it ->
 
-    private fun initEdtNome() {
-        binding.edtNome.addTextChangedListener { it ->
+        if (it?.isNotEmpty() == true) lifecycleScope.launch {
 
-            if (it?.isNotEmpty() == true) lifecycleScope.launch {
-                val items = ItemRepo.getItens(it.toString())
-                val nomes = ArrayList<String>()
-                items.forEach { nomes.add(it.nome) }
-                val adapter = ArrayAdapter(requireContext(), R.layout.list_item, nomes)
-                (binding.textFieldNome.editText as? AutoCompleteTextView)?.setAdapter(adapter)
-            }
+            val adapter = ArrayAdapter(requireContext(),
+                R.layout.list_item,
+                viewModel.carregarSugestoes(it.toString()))
+            (binding.textFieldNome.editText as? AutoCompleteTextView)?.setAdapter(adapter)
         }
     }
+
+
+    private fun initCategorias() = lifecycleScope.launch {
+        val categoriaAdapter =
+            CategoriaAdapter(viewModel.carregarCategorias(), viewModel::categoriaClick)
+        binding.rvCategorias.adapter = categoriaAdapter
+        binding.rvCategorias.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+
+    }
+
+
+
 
     private fun verificarNome(nome: String) = if (nome.isEmpty()) {
         binding.textFieldNome.error = getString(R.string.Campo_deve_ser_preenchido)

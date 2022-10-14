@@ -1,17 +1,19 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Theme.Compras" parent="Theme.Material3.Dark">
+
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorPrimary">@color/colorPrimaryNight</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryNight</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
 
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/colorSecondary</item>
-        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
+        <item name="colorSecondary">@color/colorSecondaryNight</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryNight</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
 
         <item name="colorAccent">@color/colorSecondary</item>
+        <item name="colorOnSurface">@color/colorOnSurfaceNight</item>
 
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:statusBarColor">@android:color/black</item>

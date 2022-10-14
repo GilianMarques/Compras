@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         NavigationUI.setupActionBarWithNavController(this, navController)
         supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        supportActionBar?.setDisplayShowHomeEnabled(true)
     }
 
 

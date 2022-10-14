@@ -4,17 +4,19 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
-        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
-        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
+
+        <item name="colorPrimaryVariant">@color/colorPrimary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondary</item>
 
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
 
-        <item name="colorAccent">@color/colorSecondary</item>
-
         <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
 
-        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:windowBackground">@color/cinzaClaro</item>
+
+        <item name="android:statusBarColor">@color/cinzaClaro</item>
         <item name="android:windowLightStatusBar">true</item>
 
 

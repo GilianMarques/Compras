@@ -17,11 +17,11 @@
             android:layout_height="wrap_content"
             android:hint="@string/Nome"
             app:endIconMode="clear_text"
+            app:errorEnabled="true"
             app:layout_constraintBottom_toTopOf="@+id/textFieldValor"
             app:layout_constraintTop_toTopOf="parent"
             app:startIconDrawable="@drawable/vec_edit"
-            app:startIconTint="?attr/colorPrimary"
-            app:errorEnabled="true">
+            app:startIconTint="?attr/colorPrimary">
 
 
             <AutoCompleteTextView
@@ -102,6 +102,14 @@
                 tools:text="pão quentinho da marca tal e qqer outra info util" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCategorias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/textFieldDetalhes" />
+
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_concluir"

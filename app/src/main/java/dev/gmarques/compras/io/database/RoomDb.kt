@@ -1,6 +1,7 @@
 package dev.gmarques.compras.io.database
 
 import android.graphics.Color
+import androidx.room.AutoMigration
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import dev.gmarques.compras.App
@@ -9,7 +10,8 @@ import dev.gmarques.compras.objetos.Item
 import dev.gmarques.compras.objetos.Lista
 import java.util.*
 
-@androidx.room.Database(entities = [Item::class, Categoria::class, Lista::class], version = 1)
+@androidx.room.Database(entities = [Item::class, Categoria::class, Lista::class],
+    autoMigrations = [AutoMigration(from = 1, to = 2)], version = 2, exportSchema = true)
 abstract class RoomDb : RoomDatabase() {
 
     abstract fun itemDao(): ItemDao
@@ -26,6 +28,7 @@ abstract class RoomDb : RoomDatabase() {
         private fun criarDb() = Room.databaseBuilder(App.get.applicationContext,
             RoomDb::class.java,
             "database.sql")
+
             .build()
 
 

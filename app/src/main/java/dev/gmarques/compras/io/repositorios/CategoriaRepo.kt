@@ -22,4 +22,9 @@ object CategoriaRepo : BaseRepo() {
 
         return c!!
     }
+
+    suspend fun getCategorias() = RoomDb.getInstancia().categoriaDao().getTodas().onEach {
+        InMemoryCache.Singleton.saveCategoria(it.id, it)
+    }
+
 }

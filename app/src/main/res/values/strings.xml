@@ -16,5 +16,6 @@
     <string name="quantidade">quantidade</string>
     <string name="Campo_deve_ser_preenchido">Campo deve ser preenchido</string>
     <string name="item_ja_existe_na_lista">\"%1$s\" já existe na lista, mude o nome para prosseguir.</string>
+    <string name="Categoria">Categoria</string>
 
 </resources>

@@ -60,8 +60,6 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
             categorias = carregarCategorias()
 
             withContext(Dispatchers.Main) {
-
-
                 _listaLiveData.value = lista
                 _itensLiveData.colecaoAtualizada()// notifica Ui
                 _categoriasLiveData.colecaoAtualizada()// notifica Ui
