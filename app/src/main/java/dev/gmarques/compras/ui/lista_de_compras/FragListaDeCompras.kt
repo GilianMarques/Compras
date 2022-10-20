@@ -79,16 +79,16 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
     private fun inicializarRvDeItens() {
 
-        itemAdapter = ItemAdapter(this, viewModel.itens, this)
+        itemAdapter = ItemAdapter(this, this)
         binding.rvItens.adapter = itemAdapter
         binding.rvItens.layoutManager = LinearLayoutManager(requireContext())
-
+        itemAdapter.submitList(viewModel.itens)
         viewModel.itensLiveData.observe(viewLifecycleOwner) {
             if (it != null) when (it.evento) {
                 ITEM_ADICIONADO -> itemAdapter.notifyItemInserted(it.posicao)
                 ITEM_ATUALIZADO -> itemAdapter.notifyItemChanged(it.posicao)
                 ITEM_REMOVIDO -> itemAdapter.notifyItemRemoved(it.posicao)
-                LISTA_ATUALIZADA -> itemAdapter.attLista(viewModel.itens)
+                LISTA_ATUALIZADA -> itemAdapter.submitList(viewModel.itens)
             }
         }
     }

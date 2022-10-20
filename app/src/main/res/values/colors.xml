@@ -7,21 +7,31 @@
     <color name="colorPrimaryLight">#967AFB</color>
 
     <color name="colorSecondary">#A114FF</color>
-    <color name="corCategoriaSelecionada">#5ADCC9</color>
-
-
     <color name="background">#EEEAFA</color>
     <color name="itemCardComprado">#99FFFFFF</color>
     <color name="itemCardNormal">#FFFFFF</color>
-
-    <color name="colorOnPrimary">#EEEAFA</color>
-    <color name="colorOnSecondary">#EEEAFA</color>
     <color name="colorSurface">#5423ff</color>
     <color name="colorOnSurface">#5423ff</color>
 
+    <!--tema escuro-->
 
+    <color name="colorPrimaryDarkNight">#6034FF</color>
     <color name="colorPrimaryNight">#734FF4</color>
-    <color name="colorSecondaryNight">#E153F1</color>
-    <color name="colorOnSurfaceNight">#C7B7FF</color>
+    <color name="colorPrimaryLightNight">#A389FF</color>
+
+    <color name="colorSecondaryNight">#C151CD</color>
+    <color name="backgroundNight">#0C081B</color>
+    <color name="colorSurfaceNight">#252525</color>
+    <color name="colorOnSurfaceNight">#E0D7FF</color>
+    <color name="itemCardCompradoNight">#120C29</color>
+    <color name="itemCardNormalNight">#201549</color>
+    <color name="textcolorPrimaryNight">#E5DEFF</color>
+    <color name="textcolorSecondaryNight">#FBD5FF</color>
+
+    <!--cores usadas em amobos os temas-->
+
+    <color name="corCategoriaSelecionada">#4DD5C1</color>
+    <color name="colorOnPrimary">#EEEAFA</color>
+    <color name="colorOnSecondary">#EEEAFA</color>
 
 </resources>

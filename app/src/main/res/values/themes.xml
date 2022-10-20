@@ -13,6 +13,8 @@
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
 
+        <item name="colorAccent">@color/colorSecondary</item>
+
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
 
@@ -29,8 +31,6 @@
         <item name="android:textColorSecondary">@color/colorSecondary</item>
 
         <item name="android:fontFamily">@font/quicksand_bold</item>
-
-
 
     </style>
 
