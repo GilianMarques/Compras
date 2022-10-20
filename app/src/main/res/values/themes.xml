@@ -1,8 +1,10 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.Compras" parent="Theme.Material3.Light">
+    <style name="Theme.Compras" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorSecondary">@color/colorSecondary</item>
 
         <item name="colorPrimaryVariant">@color/colorPrimary</item>
@@ -14,10 +16,20 @@
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
 
-        <item name="android:windowBackground">@color/cinzaClaro</item>
+        <item name="android:windowBackground">@color/background</item>
 
-        <item name="android:statusBarColor">@color/cinzaClaro</item>
+        <item name="itemCardComprado">@color/itemCardComprado</item>
+        <item name="itemCardNormal">@color/itemCardNormal</item>
+
+        <item name="android:statusBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/colorPrimary</item>
+        <item name="android:textColorSecondary">@color/colorSecondary</item>
+
+        <item name="android:fontFamily">@font/quicksand_bold</item>
+
 
 
     </style>

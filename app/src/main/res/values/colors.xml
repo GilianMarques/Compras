@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--tema claro-->
-    <color name="colorPrimary">#B39DDB</color>
-    <color name="colorSecondary">#EDE7F6</color>
+    <!--https://mobilepalette.netlify.app/?color=5423ff-->
+    <color name="colorPrimaryDark">#1C0C55</color>
+    <color name="colorPrimary">#5423ff</color>
+    <color name="colorPrimaryLight">#967AFB</color>
+
+    <color name="colorSecondary">#A114FF</color>
+    <color name="corCategoriaSelecionada">#5ADCC9</color>
+
+
+    <color name="background">#EEEAFA</color>
+    <color name="itemCardComprado">#99FFFFFF</color>
+    <color name="itemCardNormal">#FFFFFF</color>
+
+    <color name="colorOnPrimary">#EEEAFA</color>
+    <color name="colorOnSecondary">#EEEAFA</color>
+    <color name="colorSurface">#5423ff</color>
+    <color name="colorOnSurface">#5423ff</color>
+
 
     <color name="colorPrimaryNight">#734FF4</color>
     <color name="colorSecondaryNight">#E153F1</color>
-
-
-    <color name="colorOnPrimary">#150942</color>
-    <color name="colorOnSecondary">#1E0E5A</color>
-
-    <color name="cinzaClaro">#F9F9F9</color>
-
-    <color name="colorSurface">#FAFAFA</color>
-
-    <color name="colorOnSurface">#150942</color>
     <color name="colorOnSurfaceNight">#C7B7FF</color>
-
-    <color name="categoriaSelecionada">#CDFCF6</color>
 
 </resources>

@@ -1,12 +1,10 @@
 package dev.gmarques.compras.ui.lista_de_compras
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import dev.gmarques.compras.io.database.RoomDb
 import dev.gmarques.compras.io.repositorios.CategoriaRepo
 import dev.gmarques.compras.io.repositorios.ItemRepo
 import dev.gmarques.compras.io.repositorios.ListaRepo
@@ -36,15 +34,12 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
     // lista de categorias exibida no recyclerview
     var categorias: ArrayList<Categoria> = ArrayList()
 
-    // lista itens exibida no recyclerview, qdo uma categoria é selecionada
-    // os itens dessa lista sofrem alteração
-    var itensCategoria: ArrayList<Item> = ArrayList()
-
-    // lista de todos os itens
-    private var todosItens: ArrayList<Item> = ArrayList()
+    // lista dos itens sendo exibidos
+    var itens: ArrayList<Item> = ArrayList()
 
     // categoria selecionada no recyclerview de categorias
     private var categoriaSelecionada: Categoria? = null
+
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -55,9 +50,8 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
                 // TODO: criar uma lista a partir daqui
             }
 
-            todosItens = ArrayList(RoomDb.getInstancia().itemDao().getTodos(lista.id))
-            itensCategoria = ArrayList(todosItens)
-            categorias = carregarCategorias()
+            carregarItens(lista.id)
+            carregarCategorias(lista.id)
 
             withContext(Dispatchers.Main) {
                 _listaLiveData.value = lista
@@ -67,45 +61,68 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         }
     }
 
-    private fun carregarCategorias(): java.util.ArrayList<Categoria> {
+    private suspend fun carregarItens(listaId: String = _listaLiveData.value?.id!!) {
+        itens = if (categoriaSelecionada != null)
+            ArrayList(ItemRepo.getItensNaListaPorCategoria(listaId, categoriaSelecionada!!.id))
+        else ArrayList(ItemRepo.getItensNaLista(listaId))
+
+        ordenarLista()
+    }
+
+    private suspend fun carregarCategorias(listaId: String = _listaLiveData.value?.id!!) {
         val tempData: HashMap<String, Categoria> = HashMap()
-        for (item in itensCategoria) tempData[item.categoriaId] = CategoriaRepo.getCategoria(item)
-        return ArrayList(tempData.values)
+        val itens = ItemRepo.getItensNaLista(listaId)
+        for (item in itens) tempData[item.categoriaId] = CategoriaRepo.getCategoria(item)
+
+        categorias = ArrayList(tempData.values)
     }
 
-    fun itemClick(item: Item, posicao: Int) {
-        Log.d("USUK",
-            "FragListaDeComprasViewModel.".plus("itemClick() item = $item, posicao = $posicao"))
-    }
 
-    fun categoriaClick(categoria: Categoria) {
+    fun categoriaSelecionada(categoria: Categoria) = viewModelScope.launch {
         categoriaSelecionada = if (categoria == categoriaSelecionada) null else categoria
-
-        itensCategoria.clear()
-
-        if (categoriaSelecionada != null) {
-            for (item: Item in todosItens)
-                if (item.categoriaId == categoria.id) itensCategoria.add(item)
-        } else itensCategoria = ArrayList(todosItens)
-
+        carregarItens()
         _itensLiveData.colecaoAtualizada()
-
     }
 
-    fun addItem() {
+    fun getCategoriaSelecionada() = categoriaSelecionada?.id
 
-    }
 
-    private fun addItem(item: Item) {
+    fun addItem(item: Item) {
 
-        todosItens.add(0, item)
+        ItemRepo.addOuAtualizar(item)
+        val categoria = CategoriaRepo.getCategoria(item)
 
         if (categoriaSelecionada?.id == item.categoriaId || categoriaSelecionada == null) {
-            itensCategoria.add(0, item)
+            itens.add(0, item)
             _itensLiveData.itemAdicionado(item, 0)
         }
-        ItemRepo.addOuAtualizar(item)
+
+        // adiciono uma categoria ao Rv de categorias se o novo item for de uma categoria nao presente na lista até o momento
+        if (!categorias.contains(categoria)) {
+            categorias.add(categoria)
+            _categoriasLiveData.itemAdicionado(categoria, categorias.size - 1)// notifica Ui
+        }
 
     }
+
+    fun itemComprado(item: Item): Pair<Int, Int> {
+        // salvar no DB
+        ItemRepo.addOuAtualizar(item)
+
+        /*essa funçao sera diferente quando a alteraçao for feita na nuvem pq o item pode nao estar na tela desse aparelho quando a outra pessoa fizer a alteraçao*/
+        /*mover item pro final da lista*/
+        val copia = ArrayList(itens)
+        ordenarLista()
+        return copia.indexOf(item) to itens.indexOf(item)
+    }
+
+    private fun ordenarLista() {
+        var x: List<Item> = itens.sortedWith(compareBy { it.nome })
+        x = x.sortedWith(compareBy { it.comprado })
+        itens.clear()
+        itens.addAll(x)
+
+    }
+
 
 }

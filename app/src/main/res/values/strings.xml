@@ -7,7 +7,7 @@
     <string name="detalhes">Detalhes</string>
     <string name="novo_item">Novo item</string>
     <string name="Compras">Compras</string>
-    <string name="un">%1$dun</string>
+    <string name="un">%1$d UN</string>
     <string name="sem_categoria">Sem categoria</string>
     <string name="lista">Lista %1$s</string>
     <string name="campo_nome_deve_ser_preenchido">Campo %1$s deve ser preenchido</string>
@@ -17,5 +17,6 @@
     <string name="Campo_deve_ser_preenchido">Campo deve ser preenchido</string>
     <string name="item_ja_existe_na_lista">\"%1$s\" já existe na lista, mude o nome para prosseguir.</string>
     <string name="Categoria">Categoria</string>
+    <string name="selecione_uma_categoria">Selecione uma categoria para o item</string>
 
 </resources>

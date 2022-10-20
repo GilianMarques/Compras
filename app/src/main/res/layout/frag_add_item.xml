@@ -6,22 +6,34 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/layout_padding"
+        android:animateLayoutChanges="true"
         tools:context=".ui.add_item.FragAddItem">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/novo_item"
+            app:titleTextColor="?colorPrimary"
+            app:navigationIcon="@drawable/vec_arrow_back"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textFieldNome"
             style="@style/TextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="4dp"
             android:hint="@string/Nome"
             app:endIconMode="clear_text"
-            app:errorEnabled="true"
+            app:errorEnabled="false"
             app:layout_constraintBottom_toTopOf="@+id/textFieldValor"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:startIconDrawable="@drawable/vec_edit"
-            app:startIconTint="?attr/colorPrimary">
+            app:startIconTint="?attr/colorPrimary"
+            tools:layout_editor_absoluteX="8dp">
 
 
             <AutoCompleteTextView
@@ -30,6 +42,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textAutoComplete"
                 android:lines="1"
+                android:minHeight="56dp"
                 tools:text="Pão de queijo" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -40,19 +53,22 @@
             style="@style/TextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="4dp"
             android:hint="@string/valor"
             app:endIconMode="clear_text"
             app:layout_constraintBottom_toTopOf="@+id/textFieldQtd"
             app:layout_constraintTop_toBottomOf="@+id/textFieldNome"
             app:prefixText="R$"
             app:startIconDrawable="@drawable/vec_money"
-            app:startIconTint="?attr/colorPrimary">
+            app:startIconTint="?attr/colorPrimary"
+            tools:layout_editor_absoluteX="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtValor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
+                android:minHeight="56dp"
                 tools:text="9,79" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -63,21 +79,23 @@
             style="@style/TextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="4dp"
             android:hint="@string/Quantidade"
             app:endIconMode="clear_text"
             app:layout_constraintBottom_toTopOf="@+id/textFieldDetalhes"
             app:layout_constraintTop_toBottomOf="@+id/textFieldValor"
             app:startIconDrawable="@drawable/vec_qtd"
             app:startIconTint="?attr/colorPrimary"
-            app:suffixText="@string/unidades"
 
-            >
+            app:suffixText="@string/unidades"
+            tools:layout_editor_absoluteX="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtQtd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
+                android:minHeight="56dp"
                 tools:text="3" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -88,17 +106,20 @@
             style="@style/TextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="4dp"
             android:hint="@string/detalhes"
             app:endIconMode="clear_text"
             app:layout_constraintBottom_toTopOf="@+id/textFieldNome"
             app:layout_constraintTop_toBottomOf="@+id/textFieldQtd"
             app:startIconDrawable="@drawable/vec_info"
-            app:startIconTint="?attr/colorPrimary">
+            app:startIconTint="?attr/colorPrimary"
+            tools:layout_editor_absoluteX="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtDetalhes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="56dp"
                 tools:text="pão quentinho da marca tal e qqer outra info util" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -108,7 +129,9 @@
             android:id="@+id/rvCategorias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/textFieldDetalhes" />
+            android:layout_margin="4dp"
+            app:layout_constraintTop_toBottomOf="@+id/textFieldDetalhes"
+            tools:layout_editor_absoluteX="8dp" />
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

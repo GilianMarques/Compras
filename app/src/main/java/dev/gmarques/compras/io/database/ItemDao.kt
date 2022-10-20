@@ -8,19 +8,22 @@ import dev.gmarques.compras.objetos.Item
 abstract class ItemDao : BaseDao<Item>() {
 
     @Query("SELECT * FROM item")
-    abstract suspend fun getTodos(): List<Item>
+    abstract suspend fun getItens(): List<Item>
 
     @Query("SELECT * FROM item WHERE listaId = :idLista")
-    abstract suspend fun getTodos(idLista: String): List<Item>
+    abstract suspend fun getItens(idLista: String): List<Item>
 
     /**
      * retorna todos os itens cujo nome começa com o argumento recebido
      */
     @Query("SELECT * FROM item WHERE nome LIKE :nome||'%'")
-    abstract suspend fun getTodosPorNome(nome: String): List<Item>
+    abstract suspend fun getItensPorNome(nome: String): List<Item>
 
     @Query("SELECT * FROM item WHERE listaId = :listaId AND nome = :nome")
-    abstract suspend fun getTodosNaListaPorNome(nome: String, listaId: String): List<Item>
+    abstract suspend fun getItensNaListaPorNome(nome: String, listaId: String): List<Item>
+
+    @Query("SELECT * FROM item WHERE listaId = :listaId AND categoriaId = :categoriaId")
+    abstract suspend fun getItens(listaId: String, categoriaId: String?): List<Item>
 
 
 }

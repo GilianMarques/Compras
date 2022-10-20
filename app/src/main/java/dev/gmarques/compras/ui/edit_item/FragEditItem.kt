@@ -48,7 +48,7 @@ class FragEditItem : Fragment() {
         binding.edtNome.addTextChangedListener { it ->
 
             if (it?.isNotEmpty() == true) lifecycleScope.launch {
-                val items = ItemRepo.getItens(it.toString())
+                val items = ItemRepo.getItensPorNome(it.toString())
                 val nomes = ArrayList<String>()
                 items.forEach { nomes.add(it.nome) }
                 val adapter = ArrayAdapter(requireContext(), R.layout.list_item, nomes)

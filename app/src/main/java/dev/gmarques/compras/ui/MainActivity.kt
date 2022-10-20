@@ -1,14 +1,12 @@
 package dev.gmarques.compras.ui
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.NavigationUI
 import dev.gmarques.compras.R
+import dev.gmarques.compras.Vibrador
 import dev.gmarques.compras.databinding.ActivityMainBinding
 import dev.gmarques.compras.io.database.RoomDb
 import dev.gmarques.compras.io.preferencias.Preferencias
@@ -25,13 +23,19 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         navController = this.findNavController(R.id.navHostFrag)
 
-        NavigationUI.setupActionBarWithNavController(this, navController)
+        /*  NavigationUI.setupActionBarWithNavController(this, navController)
         supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         supportActionBar?.setDisplayShowHomeEnabled(true)
+    */
     }
 
-
     override fun onSupportNavigateUp(): Boolean {
+        Vibrador.vibInteracao()
         return navController.navigateUp()
+    }
+
+    override fun onBackPressed() {
+        Vibrador.vibInteracao()
+        super.onBackPressed()
     }
 }

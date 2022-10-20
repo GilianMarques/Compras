@@ -3,28 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="item"
-            type="dev.gmarques.compras.objetos.Item" />
-
-    </data>
-
     <androidx.cardview.widget.CardView
+        android:id="@+id/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
-        app:cardCornerRadius="4dp"
-        app:cardElevation="3dp">
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="3dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="4dp">
+            android:animateLayoutChanges="true"
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/tvNome"
@@ -35,25 +29,24 @@
                 android:padding="4dp"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
-                android:text="@{item.nome}"
                 android:textSize="18sp"
-                android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@+id/tv_preco_total"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/cbComprado"
+
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Macarrão" />
 
             <TextView
                 android:id="@+id/tv_preco_total"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 android:ellipsize="marquee"
                 android:maxLines="1"
                 android:padding="4dp"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
-                android:text="@{item.valotTotalEmMoeda()}"
                 android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvNome"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="R$ 13,45" />
@@ -61,72 +54,57 @@
             <TextView
                 android:id="@+id/tv_info"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:drawablePadding="4dp"
                 android:ellipsize="marquee"
                 android:fontFamily="@font/quicksand_medium"
+                android:gravity="center|start"
                 android:maxLines="1"
                 android:paddingStart="8dp"
                 android:paddingEnd="4dp"
-                android:paddingBottom="8dp"
-                android:text="@{item.detalhes}"
                 app:drawableStartCompat="@drawable/vec_info_12"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/cbComprado"
-                app:layout_constraintTop_toBottomOf="@id/tvNome"
+                app:layout_constraintBottom_toBottomOf="@+id/tvQtd"
+                app:layout_constraintEnd_toStartOf="@+id/tvQtd"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvQtd"
                 tools:text="teste de texto muito longo pra ver o que vai acontececr no final da linha" />
 
             <TextView
                 android:id="@+id/tvQtd"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:layout_margin="4dp"
-                android:background="@drawable/retangulo_arredondado"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="2dp"
                 android:drawablePadding="4dp"
                 android:elevation="2dp"
                 android:gravity="center"
-                android:paddingStart="8dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="4dp"
-                android:text="@{@string/un(item.qtd)}"
-                android:textAlignment="center"
-                android:textAllCaps="true"
+                android:padding="6dp"
                 android:textColor="?colorPrimary"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                app:drawableStartCompat="@drawable/vec_qtd_16"
-                app:drawableTint="?colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/tvPreco"
-                app:layout_constraintTop_toBottomOf="@+id/tv_info"
+                app:layout_constraintTop_toBottomOf="@id/cbComprado"
                 tools:text="3un" />
 
             <TextView
                 android:id="@+id/tvPreco"
-                android:layout_width="0dp"
-                android:layout_height="30dp"
-                android:layout_margin="4dp"
-                android:background="@drawable/retangulo_arredondado"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="4dp"
                 android:drawablePadding="4dp"
                 android:elevation="2dp"
                 android:gravity="center"
-                android:paddingStart="8dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="4dp"
-                android:text="@{item.emMoeda()}"
-                android:textAlignment="center"
+                android:padding="6dp"
                 android:textAllCaps="true"
-                android:textColor="?colorSecondary"
+                android:textColor="?colorPrimaryLight"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:typeface="normal"
-                app:drawableStartCompat="@drawable/vec_money_16"
-                app:drawableTint="?colorSecondary"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/tvQtd"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_info"
+                app:layout_constraintTop_toTopOf="@id/tvQtd"
                 tools:text="R$ 2,50" />
 
 
@@ -134,10 +112,9 @@
                 android:id="@+id/cbComprado"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:checked="@={item.comprado}"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/tvNome"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_info"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="TouchTargetSizeCheck" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

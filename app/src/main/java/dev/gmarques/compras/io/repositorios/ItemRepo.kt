@@ -10,13 +10,18 @@ object ItemRepo : BaseRepo() {
     fun addOuAtualizar(item: Item) =
         repoScope.launch { RoomDb.getInstancia().itemDao().addOuAtualizar(item) }
 
-    suspend fun getItens() = RoomDb.getInstancia().itemDao().getTodos()
+    @Suppress("unused")
+    suspend fun getTodosItens() = RoomDb.getInstancia().itemDao().getItens()
 
-    suspend fun getItens(nome: String): List<Item> =
-        RoomDb.getInstancia().itemDao().getTodosPorNome(nome)
+    suspend fun getItensPorNome(nome: String): List<Item> =
+        RoomDb.getInstancia().itemDao().getItensPorNome(nome)
 
-    suspend fun getItens(nome: String, listaId: String) =
-        RoomDb.getInstancia().itemDao().getTodosNaListaPorNome(nome, listaId)
+    suspend fun getItensNaListaPorNome(nome: String, listaId: String) =
+        RoomDb.getInstancia().itemDao().getItensNaListaPorNome(nome, listaId)
 
+    suspend fun getItensNaLista(listaId: String) = RoomDb.getInstancia().itemDao().getItens(listaId)
+
+    suspend fun getItensNaListaPorCategoria(listaId: String, categoriaId: String?) =
+        RoomDb.getInstancia().itemDao().getItens(listaId, categoriaId)
 
 }
