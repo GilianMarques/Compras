@@ -105,6 +105,29 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
     }
 
+    fun attItem(item: Item, pos: Int) {
+
+        ItemRepo.addOuAtualizar(item)
+
+        val categoria = CategoriaRepo.getCategoria(item)
+
+        if (categoriaSelecionada?.id == item.categoriaId || categoriaSelecionada == null) {
+            itens[pos] = item
+            _itensLiveData.itemAtualizado(item, pos)
+        } else if ( categoriaSelecionada!!.id != item.categoriaId) {
+            // se o item nao pertence mais a essa categoria remove ele da lista
+            itens.removeAt(pos)
+            _itensLiveData.itemRemovido(item, pos)
+        }
+
+        // adiciono uma categoria ao Rv de categorias se o novo item for de uma categoria nao presente na lista até o momento
+        if (!categorias.contains(categoria)) {
+            categorias.add(categoria)
+            _categoriasLiveData.itemAdicionado(categoria, categorias.size - 1)// notifica Ui
+        }
+
+    }
+
     fun itemComprado(item: Item): Pair<Int, Int> {
         // salvar no DB
         ItemRepo.addOuAtualizar(item)

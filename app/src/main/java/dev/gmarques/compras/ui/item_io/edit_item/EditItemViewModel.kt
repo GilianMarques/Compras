@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.add_item
+package dev.gmarques.compras.ui.item_io.edit_item
 
 import androidx.lifecycle.ViewModel
 import dev.gmarques.compras.io.repositorios.CategoriaRepo
@@ -6,30 +6,26 @@ import dev.gmarques.compras.io.repositorios.ItemRepo
 import dev.gmarques.compras.objetos.Categoria
 import dev.gmarques.compras.objetos.Item
 
-class AddItemViewModel : ViewModel() {
-    internal lateinit var listaId: String
-    internal val item: Item = Item()
+class EditItemViewModel : ViewModel() {
+    lateinit var nomeOriginal: String
+    internal lateinit var item: Item
+    internal var position: Int = -1
     internal var categoriaSelecionada: Categoria? = null
 
-    fun verificarEntradasEFechar() {
-
-
-    }
-
-    suspend fun itemJaExisteNaLista(nome: String) = ItemRepo.getItensNaListaPorNome(nome, listaId).isNotEmpty()
-
-    suspend fun carregarSugestoes(nome: String): ArrayList<String> {
-        val items = ItemRepo.getItensPorNome(nome)
-        val nomes = ArrayList<String>()
-        items.forEach { nomes.add(it.nome) }
-        return nomes
-    }
 
     suspend fun carregarCategorias(): ArrayList<Categoria> =
         CategoriaRepo.getCategorias() as ArrayList<Categoria>
+
 
     fun categoriaSelecionada(categoria: Categoria) {
         categoriaSelecionada = if (categoriaSelecionada?.equals(categoria) == true) null
         else categoria
     }
+
+    fun carregarCategoria() = CategoriaRepo.getCategoria(item)
+
+
+    suspend fun itemJaExisteNaLista(nome: String) =
+        ItemRepo.getItensNaListaPorNome(nome, item.listaId).isNotEmpty()
+
 }

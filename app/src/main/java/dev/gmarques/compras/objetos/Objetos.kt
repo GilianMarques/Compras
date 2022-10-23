@@ -15,7 +15,8 @@ open class Objetos : Sinc, Serializable {
     override var nome: String = ""
         set(value) {
             field = if (value.isEmpty()) ""
-            else value.replace(Regex("[^0-9a-zA-Z ]"), "").replace(Regex("[ ]+"), " ").trim()
+            /*regex para remover caracteres especiais ~`!@#$%^&*()-_+={}'[]|/:;"'<>? */
+            else value.replace(Regex("""[\~\`\!\@\#\{\'$'\}\%\^\&\*\(\)\-\_\+\=\{\}\'\[\]\|\/\:\;\"\'\<\>\?]"""), "").replace(Regex("[ ]+"), " ").trim()
                 .capitalizar()
         }
 

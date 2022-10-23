@@ -7,14 +7,10 @@ import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 
 @Entity
-class Categoria : Objetos() {
-    override var nome: String = ""
-
-    @ColumnInfo(defaultValue = "vec_cat_0")
-    var icone: String = "vec_cat_0"
-
-    @ColorInt
-    var cor: Int = 0
+data class Categoria(
+    @ColorInt var cor: Int = 0, // TODO: remover
+    @ColumnInfo(defaultValue = "vec_cat_0") var icone: String = "vec_cat_0",
+) : Objetos() {
 
 
     companion object {

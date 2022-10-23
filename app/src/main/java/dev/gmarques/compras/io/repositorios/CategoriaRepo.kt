@@ -8,11 +8,16 @@ import kotlinx.coroutines.runBlocking
 
 object CategoriaRepo : BaseRepo() {
 
+    /**
+     * Retorna a categoria do item que pode estar no DB ou em cache na memoria
+     * Não retorna null, se a categoria nao existir, essa funçao retorna a categoria padrao.
+     * */
     fun getCategoria(item: Item): Categoria {
         var c = InMemoryCache.Singleton.getCategoria(item.categoriaId)
 
         if (c == null) runBlocking {
             c = RoomDb.getInstancia().categoriaDao().get(item.categoriaId)
+
             // categoria padrao caso a original tenha sido removida pelo usuario
             @Suppress("KotlinConstantConditions")
             if (c == null) c = Categoria.SEM_CATEGORIA

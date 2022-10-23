@@ -1,6 +1,5 @@
-package dev.gmarques.compras.ui.add_item
+package dev.gmarques.compras.ui.item_io
 
-import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,7 +7,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
-import dev.gmarques.compras.R.*
+import dev.gmarques.compras.R.drawable
 import dev.gmarques.compras.databinding.RvCategoriaViewBinding
 import dev.gmarques.compras.objetos.Categoria
 
@@ -47,6 +46,7 @@ class CategoriaAdapter(
             bindingView.ivIcone.setImageResource(Categoria.intIcone(categoria.icone))
 
             bindingView.rlCard.setOnClickListener {
+
                 selecao?.desSelecionar()
 
                 if (selecao === this) selecao = null
@@ -79,10 +79,7 @@ class CategoriaAdapter(
 
     override fun getItemCount() = categorias.size
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun attLista(categorias: ArrayList<Categoria>) {
-        this.categorias = categorias
-        notifyDataSetChanged()
-    }
+    fun getIndex(it: Categoria): Int = categorias.indexOf(it)
+
 
 }

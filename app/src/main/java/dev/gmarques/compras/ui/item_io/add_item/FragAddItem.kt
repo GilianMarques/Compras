@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.add_item
+package dev.gmarques.compras.ui.item_io.add_item
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,10 +15,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import dev.gmarques.compras.Extensions.Companion.showKeyboard
 import dev.gmarques.compras.R
 import dev.gmarques.compras.Vibrador
 import dev.gmarques.compras.databinding.FragAddItemBinding
 import dev.gmarques.compras.objetos.Categoria
+import dev.gmarques.compras.ui.item_io.CategoriaAdapter
 import kotlinx.coroutines.launch
 
 class FragAddItem : Fragment() {
@@ -38,26 +40,29 @@ class FragAddItem : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this)[AddItemViewModel::class.java]
-        binding.toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
 
-        val args: FragAddItemArgs = FragAddItemArgs.fromBundle(requireArguments())
-        viewModel.listaId = args.listaId
+            viewModel = ViewModelProvider(requireParentFragment())[AddItemViewModel::class.java]
+            binding.toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+
+            val args: FragAddItemArgs = FragAddItemArgs.fromBundle(requireArguments())
+            viewModel.listaId = args.listaId
 
 
-        initEdtNome()
-        initFab()
-        initCategorias()
+            initEdtNome()
+            initFab()
+            initCategorias()
 
-        binding.edtNome.addTextChangedListener {
-            binding.textFieldNome.error = null
-        }
-        binding.edtValor.addTextChangedListener {
-            binding.textFieldValor.error = null
-        }
-        binding.edtQtd.addTextChangedListener {
-            binding.textFieldQtd.error = null
-        }
+            binding.edtNome.addTextChangedListener {
+                binding.textFieldNome.error = null
+            }
+            binding.edtValor.addTextChangedListener {
+                binding.textFieldValor.error = null
+            }
+            binding.edtQtd.addTextChangedListener {
+                binding.textFieldQtd.error = null
+            }
+        binding.edtNome.showKeyboard()
+
     }
 
     private fun initFab() = binding.fabConcluir.setOnClickListener {
@@ -67,11 +72,8 @@ class FragAddItem : Fragment() {
 
         lifecycleScope.launch {
 
-            if (verificarNome(nome)
-                && !itemRepetido(nome)
-                && verificarPreco(preco)
-                && verificarQtd(qtd)
-                && verificarCategoria()
+            if (verificarNome(nome) && !itemRepetido(nome) && verificarPreco(preco) && verificarQtd(
+                    qtd) && verificarCategoria()
             ) {
                 viewModel.item.nome = nome
                 viewModel.item.preco = preco.toFloat()
@@ -89,7 +91,8 @@ class FragAddItem : Fragment() {
     }
 
     private fun verificarCategoria() = if (viewModel.categoriaSelecionada == null) {
-        val bar = Snackbar.make(binding.root, getString(R.string.selecione_uma_categoria),
+        val bar = Snackbar.make(binding.root,
+            getString(R.string.selecione_uma_categoria),
             Snackbar.LENGTH_LONG)
         bar.anchorView = binding.fabConcluir
         bar.show()
@@ -123,10 +126,9 @@ class FragAddItem : Fragment() {
 
 
     private fun initCategorias() = lifecycleScope.launch {
-        val categoriaAdapter =
-            CategoriaAdapter(requireParentFragment(),
-                viewModel.carregarCategorias(),
-                ::categoriaSelecionada)
+        val categoriaAdapter = CategoriaAdapter(requireParentFragment(),
+            viewModel.carregarCategorias(),
+            ::categoriaSelecionada)
         binding.rvCategorias.adapter = categoriaAdapter
         binding.rvCategorias.layoutManager =
             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)

@@ -9,6 +9,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dev.gmarques.compras.R
@@ -46,6 +47,11 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
             viewModel.addItem(bundle.getSerializable("item") as Item)
         }
 
+        //chamado sempre que um novo item é atualizado pelo fragEditItem
+        setFragmentResultListener("itemAtualizado") { _, bundle ->
+            viewModel.attItem(bundle.getSerializable("item") as Item, bundle.getInt("pos"))
+        }
+
         viewModel = ViewModelProvider(this)[FragListaDeComprasViewModel::class.java]
 
 
@@ -56,8 +62,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         binding.fab.setOnClickListener {
             Vibrador.vibInteracao()
             requireView().findNavController()
-                .navigate(FragListaDeComprasDirections
-                    .actionFragListaDeComprasToAddItem(viewModel.listaLiveData.value?.id!!))
+                .navigate(FragListaDeComprasDirections.actionFragListaDeComprasToAddItem(viewModel.listaLiveData.value?.id!!))
         }
 
     }
@@ -123,7 +128,9 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
     override fun itemPressionado(item: Item, position: Int) {
         Vibrador.vibInteracao()
-        // TODO: mostrar menu de opçoes do item
+        findNavController().navigate(FragListaDeComprasDirections.actionFragListaDeComprasToEditItem(
+            item,
+            position))
     }
 
 }

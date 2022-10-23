@@ -18,5 +18,6 @@
     <string name="item_ja_existe_na_lista">\"%1$s\" já existe na lista, mude o nome para prosseguir.</string>
     <string name="Categoria">Categoria</string>
     <string name="selecione_uma_categoria">Selecione uma categoria para o item</string>
+    <string name="Editar_item">Editar %1$s</string>
 
 </resources>

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/addItem"
-        android:name="dev.gmarques.compras.ui.add_item.FragAddItem"
+        android:name="dev.gmarques.compras.ui.item_io.add_item.FragAddItem"
         android:label="@string/novo_item"
         tools:layout="@layout/frag_add_item">
 
@@ -20,12 +20,16 @@
 
     <fragment
         android:id="@+id/editItem"
-        android:name="dev.gmarques.compras.ui.edit_item.FragEditItem"
-        tools:layout="@layout/frag_edit_item">
+        android:name="dev.gmarques.compras.ui.item_io.edit_item.FragEditItem"
+        tools:layout="@layout/frag_add_item">
 
         <argument
             android:name="item"
             app:argType="dev.gmarques.compras.objetos.Item" />
+
+        <argument
+            android:name="position"
+            app:argType="integer" />
 
     </fragment>
 
@@ -35,10 +39,24 @@
         android:label="@string/Compras"
         tools:layout="@layout/frag_lista_de_compras">
 
-
+        <!--app:enterAnim = entrada do novo frag (2)
+            app:exitAnim  = saida do frag que ta na tela (1)
+            app:popEnterAnim = entrada do frag que tava na tela (1)
+            app:popExitAnim = saida do frag que ta na tela (2)-->
         <action
             android:id="@+id/action_fragListaDeCompras_to_addItem"
-            app:destination="@id/addItem" />
+            app:destination="@id/addItem"
+            app:enterAnim="@anim/enter_down_up"
+            app:exitAnim="@anim/exit_up"
+            app:popEnterAnim="@anim/enter_up_down"
+            app:popExitAnim="@anim/exit_down" />
+        <action
+            android:id="@+id/action_fragListaDeCompras_to_editItem"
+            app:destination="@id/editItem"
+            app:enterAnim="@anim/enter_down_up"
+            app:exitAnim="@anim/exit_up"
+            app:popEnterAnim="@anim/enter_up_down"
+            app:popExitAnim="@anim/exit_down" />
 
     </fragment>
 

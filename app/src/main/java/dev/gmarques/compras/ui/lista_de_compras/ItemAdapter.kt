@@ -65,9 +65,9 @@ class ItemAdapter(
 
         private fun aplicarEstilo(item: Item) = with(item.comprado) {
             bindingView.tvNome.strikeThrough(this)
-            bindingView.card.setCardBackgroundColor(if (this) corComprado!! else corNormal!!) // TODO: mudar cor e implementar diff utils
+            bindingView.card.setCardBackgroundColor(if (this) corComprado!! else corNormal!!)
             if (this) bindingView.tvNome.text =
-                HtmlCompat.fromHtml("<i>${item.nome}</i>",
+                HtmlCompat.fromHtml("<i>${item.nome}</i>", /*italico*/
                     HtmlCompat.FROM_HTML_MODE_LEGACY)
             else bindingView.tvNome.text = item.nome
         }
