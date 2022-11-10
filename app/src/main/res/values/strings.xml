@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Compras</string>
     <string name="Nome">Nome</string>
-    <string name="valor">Valor</string>
+    <string name="Preco">Preço</string>
     <string name="Quantidade">Quantidade</string>
     <string name="unidades">Unidade(s)</string>
     <string name="detalhes">Detalhes</string>
@@ -18,6 +18,17 @@
     <string name="item_ja_existe_na_lista">\"%1$s\" já existe na lista, mude o nome para prosseguir.</string>
     <string name="Categoria">Categoria</string>
     <string name="selecione_uma_categoria">Selecione uma categoria para o item</string>
-    <string name="Editar_item">Editar %1$s</string>
+    <string name="Editar_x">Editar %1$s</string>
+    <string name="Remover">Remover</string>
+    <string name="Cancelar">Cancelar</string>
+    <string name="Editar">Editar</string>
+    <string name="Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita"><![CDATA[Deseja mesmo remover <b>%1$s?</b> Essa ação não poderá ser desfeita.]]></string>
+    <string name="Por_favor_confirme">Por favor, confirme</string>
+    <string name="Atualizar_quantidade">Atualizar quantidade</string>
+    <string name="Atualizar_preco">Atualizar preço</string>
+    <string name="Salvar">Salvar</string>
+    <string name="moeda">R$</string>
+    <string name="Historico_de_precos_de_x">Histórico de preços de %1$s</string>
+    <string name="Sugestoes_para_x">Sugestões para %1$s</string>
 
 </resources>

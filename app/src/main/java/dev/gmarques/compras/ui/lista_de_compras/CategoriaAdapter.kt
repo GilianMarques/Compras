@@ -2,6 +2,7 @@ package dev.gmarques.compras.ui.lista_de_compras
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -100,6 +101,13 @@ class CategoriaAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun attLista(categorias: ArrayList<Categoria>) {
         this.categorias = categorias
+        categorias.forEach { Log.d("USUK", "CategoriaAdapter.attLista: ${it.nome}") }
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun removerSelecao() {
+        selecao = null
         notifyDataSetChanged()
     }
 

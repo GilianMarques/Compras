@@ -1,15 +1,16 @@
 package dev.gmarques.compras.ui.lista_de_compras
 
+import android.annotation.SuppressLint
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.text.HtmlCompat
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import dev.gmarques.compras.App
 import dev.gmarques.compras.Extensions.Companion.emMoeda
+import dev.gmarques.compras.Extensions.Companion.fromHtml
 import dev.gmarques.compras.Extensions.Companion.strikeThrough
 import dev.gmarques.compras.R
 import dev.gmarques.compras.databinding.RvItemViewBinding
@@ -18,10 +19,11 @@ import dev.gmarques.compras.objetos.Item
 class ItemAdapter(
     fragListaDeCompras: FragListaDeCompras,
     private val callback: ItemAdapterCallback,
-) : ListAdapter<Item, ItemAdapter.ViewHolder>(ItemDiffUtilCallback()) {
+) : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
 
     private var corNormal: Int? = null
     private var corComprado: Int? = null
+    private var itens: ArrayList<Item> = ArrayList()
 
     init {
 
@@ -41,6 +43,8 @@ class ItemAdapter(
 
         fun bind(item: Item, position: Int) {
 
+            alternarMenu(false)
+
             bindingView.tvNome.text = item.nome
             bindingView.tvPreco.text = item.preco.emMoeda()
             bindingView.tvInfo.text = item.detalhes
@@ -52,23 +56,45 @@ class ItemAdapter(
             aplicarEstilo(item)
 
             bindingView.root.setOnLongClickListener(View.OnLongClickListener {
-                callback.itemPressionado(item, position)
+                alternarMenu(true)
                 return@OnLongClickListener true
             })
 
             bindingView.cbComprado.setOnClickListener {
                 item.comprado = bindingView.cbComprado.isChecked
-                aplicarEstilo(item)
                 callback.itemComprado(item, position)
+                aplicarEstilo(item)
+            }
+
+            bindingView.fabEditar.setOnClickListener {
+                alternarMenu(false)
+                callback.editarItem(item, position)
+            }
+
+            bindingView.fabRemover.setOnClickListener {
+                alternarMenu(false)
+                callback.itemRemovido(item, position)
+            }
+
+            bindingView.tvQtd.setOnClickListener {
+                callback.qtdEditada(item, position)
+            }
+
+            bindingView.tvPreco.setOnClickListener {
+                callback.precoEditado(item, position)
             }
         }
 
+        private fun alternarMenu(mostrar: Boolean) {
+            bindingView.containerDados.visibility = if (mostrar) View.GONE else View.VISIBLE
+            bindingView.containerOpcoes.visibility = if (mostrar) View.VISIBLE else View.GONE
+        }
+
+        @SuppressLint("SetTextI18n")
         private fun aplicarEstilo(item: Item) = with(item.comprado) {
             bindingView.tvNome.strikeThrough(this)
             bindingView.card.setCardBackgroundColor(if (this) corComprado!! else corNormal!!)
-            if (this) bindingView.tvNome.text =
-                HtmlCompat.fromHtml("<i>${item.nome}</i>", /*italico*/
-                    HtmlCompat.FROM_HTML_MODE_LEGACY)
+            if (this) bindingView.tvNome.text = "<i>${item.nome}</i>".fromHtml() /*italico*/
             else bindingView.tvNome.text = item.nome
         }
 
@@ -80,6 +106,17 @@ class ItemAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-        holder.bind(getItem(position), position)
+        holder.bind(itens[position], position)
+
+    override fun getItemCount(): Int = itens.size
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun atualizarColecao(itens: java.util.ArrayList<Item>) {
+        this@ItemAdapter.itens = itens
+        notifyDataSetChanged()
+        Log.d("USUK",
+            "ItemAdapter.".plus("atualizarColecao() views atualizadas: itens = ${itens.size}"))
+    }
+
 
 }

@@ -15,7 +15,7 @@
 
         <item name="colorAccent">@color/colorSecondary</item>
 
-        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorSurface">@color/itemCardNormal</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
 
         <item name="android:windowBackground">@color/background</item>
@@ -32,9 +32,21 @@
 
         <item name="android:fontFamily">@font/quicksand_bold</item>
 
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogStyle</item>
+
     </style>
 
     <style name="TextInputStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="android:padding">@dimen/text_input_padding</item>
     </style>
+
+    <style name="BottomSheetDialogStyle" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorSecondary</item>
+    </style>
+
 </resources>

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -42,7 +43,10 @@ class FragAddItem : Fragment() {
 
 
             viewModel = ViewModelProvider(requireParentFragment())[AddItemViewModel::class.java]
-            binding.toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+              binding.toolbar.setNavigationOnClickListener {
+            Vibrador.vibInteracao()
+            findNavController().popBackStack()
+        }
 
             val args: FragAddItemArgs = FragAddItemArgs.fromBundle(requireArguments())
             viewModel.listaId = args.listaId
@@ -83,7 +87,7 @@ class FragAddItem : Fragment() {
                 viewModel.item.categoriaId = viewModel.categoriaSelecionada!!.id
 
                 setFragmentResult("novoItem", bundleOf("item" to viewModel.item))
-                requireActivity().onBackPressed()
+                findNavController().popBackStack()
                 Vibrador.vibSucesso()
             }
         }
@@ -99,7 +103,6 @@ class FragAddItem : Fragment() {
         Vibrador.vibErro()
         false
     } else true
-
 
     private suspend fun itemRepetido(nome: String): Boolean {
         return if (viewModel.itemJaExisteNaLista(nome)) {
@@ -123,7 +126,6 @@ class FragAddItem : Fragment() {
             (binding.textFieldNome.editText as? AutoCompleteTextView)?.setAdapter(adapter)
         }
     }
-
 
     private fun initCategorias() = lifecycleScope.launch {
         val categoriaAdapter = CategoriaAdapter(requireParentFragment(),

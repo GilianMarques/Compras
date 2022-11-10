@@ -50,6 +50,7 @@
             app:exitAnim="@anim/exit_up"
             app:popEnterAnim="@anim/enter_up_down"
             app:popExitAnim="@anim/exit_down" />
+
         <action
             android:id="@+id/action_fragListaDeCompras_to_editItem"
             app:destination="@id/editItem"

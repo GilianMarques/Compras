@@ -12,12 +12,16 @@ open class Objetos : Sinc, Serializable {
     override var id: String = UUID.randomUUID().toString()
     override var ultimaAtualizacao: Long = System.currentTimeMillis()
 
+    override var removido: Boolean = false
+
     override var nome: String = ""
         set(value) {
             field = if (value.isEmpty()) ""
             /*regex para remover caracteres especiais ~`!@#$%^&*()-_+={}'[]|/:;"'<>? */
-            else value.replace(Regex("""[\~\`\!\@\#\{\'$'\}\%\^\&\*\(\)\-\_\+\=\{\}\'\[\]\|\/\:\;\"\'\<\>\?]"""), "").replace(Regex("[ ]+"), " ").trim()
+            else value.replace(Regex("""[\~\`\!\@\#\{\'$'\}\%\^\&\*\(\)\-\_\+\=\{\}\'\[\]\|\/\:\;\"\'\<\>\?]"""),
+                "").replace(Regex("[ ]+"), " ").trim()
                 .capitalizar()
         }
+
 
 }

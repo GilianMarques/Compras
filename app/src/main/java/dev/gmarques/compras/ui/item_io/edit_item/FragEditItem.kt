@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -39,7 +40,10 @@ class FragEditItem : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProvider(this)[EditItemViewModel::class.java]
-
+          binding.toolbar.setNavigationOnClickListener {
+            Vibrador.vibInteracao()
+            findNavController().popBackStack()
+        }
         val args: FragEditItemArgs = FragEditItemArgs.fromBundle(requireArguments())
         viewModel.item = args.item
         viewModel.nomeOriginal = args.item.nome
@@ -57,7 +61,7 @@ class FragEditItem : Fragment() {
         binding.edtValor.setText(viewModel.item.preco.toString())
         binding.edtQtd.setText(viewModel.item.qtd.toString())
         binding.edtDetalhes.setText(viewModel.item.detalhes)
-        binding.toolbar.title = String.format(getString(R.string.Editar_item), viewModel.item.nome)
+        binding.toolbar.title = String.format(getString(R.string.Editar_x), viewModel.item.nome)
         binding.edtNome.showKeyboard()
     }
 
@@ -122,7 +126,7 @@ class FragEditItem : Fragment() {
                     bundleOf("item" to viewModel.item,
                         "pos" to viewModel.position))
 
-                requireActivity().onBackPressed()
+                findNavController().popBackStack()
                 Vibrador.vibSucesso()
             }
         }

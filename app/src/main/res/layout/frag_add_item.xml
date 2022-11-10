@@ -56,11 +56,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:hint="@string/valor"
+            android:hint="@string/Preco"
             app:endIconMode="clear_text"
             app:layout_constraintBottom_toTopOf="@+id/textFieldQtd"
             app:layout_constraintTop_toBottomOf="@+id/textFieldNome"
-            app:prefixText="R$"
+            app:prefixText="@string/moeda"
             app:startIconDrawable="@drawable/vec_money"
             app:startIconTint="?attr/colorPrimary"
             tools:layout_editor_absoluteX="8dp">

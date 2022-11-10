@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textFieldQtd"
+            style="@style/TextInputStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:hint="@string/Quantidade"
+            android:minWidth="250dp"
+
+            app:endIconMode="clear_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:startIconDrawable="@drawable/vec_qtd"
+            app:startIconTint="?attr/colorPrimary"
+            app:suffixText="@string/unidades">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtQtd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:maxLength="3"
+                android:maxLines="1"
+                android:minHeight="56dp"
+                tools:text="3" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tv_sugestoes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            tools:text="Sugestoes"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textFieldQtd" />
+
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+
+            android:padding="8dp"
+            app:constraint_referenced_ids="chip1,chip2,chip3, chip4, chip5,chip6"
+            app:flow_horizontalGap="16dp"
+            app:flow_horizontalStyle="packed"
+            app:flow_verticalGap="16dp"
+            app:flow_verticalStyle="packed"
+            app:flow_wrapMode="aligned"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_sugestoes" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip1"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:minWidth="80dp"
+            android:textAlignment="center"
+            android:hint="1"
+            android:text="1 UN"
+            android:textColor="?colorOnSurface"
+            app:ensureMinTouchTargetSize="false"
+            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip2"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:minWidth="80dp"
+            android:textAlignment="center"
+            android:hint="2"
+            android:text="2 UN"
+            android:textColor="?colorOnSurface"
+            app:ensureMinTouchTargetSize="false"
+            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip3"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:minWidth="80dp"
+            android:textAlignment="center"
+            android:hint="3"
+            android:text="3 UN"
+            android:textColor="?colorOnSurface"
+            app:ensureMinTouchTargetSize="false"
+            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip4"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:minWidth="80dp"
+            android:textAlignment="center"
+            android:hint="4"
+            android:text="4 UN"
+            android:textColor="?colorOnSurface"
+            app:ensureMinTouchTargetSize="false"
+            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip5"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:minWidth="80dp"
+            android:textAlignment="center"
+            android:hint="5"
+            android:text="5 UN"
+            android:textColor="?colorOnSurface"
+            app:ensureMinTouchTargetSize="false"
+            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip6"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:minWidth="80dp"
+            android:textAlignment="center"
+            android:hint="6"
+            android:text="6 UN"
+            android:textColor="?colorOnSurface"
+            app:ensureMinTouchTargetSize="false"
+            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+
+
+        <Button
+            android:id="@+id/btn_cancelar"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/Cancelar"
+            android:textColor="?colorSecondary"
+            app:icon="@drawable/vec_cancelar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/guideline2"
+            app:layout_constraintTop_toBottomOf="@id/flow" />
+
+        <Button
+            android:id="@+id/btn_salvar"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/Salvar"
+            app:icon="@drawable/vec_check"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline2"
+            app:layout_constraintTop_toBottomOf="@id/flow" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
