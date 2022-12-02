@@ -2,7 +2,7 @@ package dev.gmarques.compras.io.repositorios
 
 import dev.gmarques.compras.io.database.RoomDb
 import dev.gmarques.compras.io.preferencias.Preferencias
-import dev.gmarques.compras.objetos.Lista
+import dev.gmarques.compras.entidades.Lista
 
 
 object ListaRepo : BaseRepo() {

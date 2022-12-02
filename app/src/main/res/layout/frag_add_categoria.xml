@@ -8,74 +8,74 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="8dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="16dp">
+        android:layout_height="match_parent"
+
+        android:animateLayoutChanges="true">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/vec_arrow_back"
+            app:title="@string/Nova_categoria"
+            app:titleTextColor="?colorPrimary" />
+
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textField_valor"
+            android:id="@+id/input_nome"
             style="@style/TextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:layout_marginTop="16dp"
-            android:hint="@string/Preco"
+            android:hint="@string/Nome"
+            app:counterEnabled="true"
+            app:counterMaxLength="24"
             app:endIconMode="clear_text"
-            app:layout_constraintTop_toTopOf="parent"
-            app:prefixText="@string/moeda"
-            app:startIconDrawable="@drawable/vec_money"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:startIconDrawable="@drawable/vec_cat_0"
             app:startIconTint="?attr/colorPrimary">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edt_valor"
+                android:id="@+id/edt_nome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLength="6"
-                android:minHeight="56dp"
-                tools:text="9,79" />
+                android:imeOptions="actionDone"
+                android:inputType="textAutoComplete"
+                android:maxLength="24"
+                android:maxLines="1"
+                tools:text="vegetais" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <TextView
-            android:id="@+id/tv_historico"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            tools:text="Historico de preços"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textField_valor" />
-
-        <androidx.constraintlayout.helper.widget.Flow
-            android:id="@+id/flow"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_icones"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="170dp"
+            android:layout_marginBottom="80dp"
+            android:fadingEdgeLength="16dp"
+            android:fillViewport="true"
             android:padding="8dp"
-            app:flow_horizontalGap="8dp"
-            app:flow_horizontalStyle="packed"
-            app:flow_verticalGap="16dp"
-            app:flow_verticalStyle="packed"
-            app:flow_wrapMode="aligned"
+            android:requiresFadingEdge="horizontal|vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_historico" />
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <Button
             android:id="@+id/btn_cancelar"
             style="@style/Widget.Material3.Button.ElevatedButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:text="@string/Cancelar"
@@ -83,23 +83,25 @@
             app:icon="@drawable/vec_cancelar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/guideline2"
-            app:layout_constraintTop_toBottomOf="@id/flow" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/btn_salvar"
             style="@style/Widget.Material3.Button.ElevatedButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:text="@string/Salvar"
             app:icon="@drawable/vec_check"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/guideline2"
-            app:layout_constraintTop_toBottomOf="@id/flow" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline2" />
+
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
@@ -107,7 +109,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

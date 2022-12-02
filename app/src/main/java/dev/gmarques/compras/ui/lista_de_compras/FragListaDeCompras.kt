@@ -1,5 +1,6 @@
 package dev.gmarques.compras.ui.lista_de_compras
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,21 +19,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dev.gmarques.compras.Extensions.Companion.emMoeda
-import dev.gmarques.compras.Extensions.Companion.fromHtml
-import dev.gmarques.compras.Extensions.Companion.hideSoftKeyboard
-import dev.gmarques.compras.Extensions.Companion.showKeyboard
+import dev.gmarques.compras.Extensions.Companion.formatarHtml
+import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
+import dev.gmarques.compras.Extensions.Companion.ocultarTeclado
 import dev.gmarques.compras.R
 import dev.gmarques.compras.Vibrador
 import dev.gmarques.compras.databinding.DialogEditQtdBinding
 import dev.gmarques.compras.databinding.DialogEditValorBinding
 import dev.gmarques.compras.databinding.DialogEditValorItemBinding
 import dev.gmarques.compras.databinding.FragListaDeComprasBinding
-import dev.gmarques.compras.io.repositorios.CategoriaRepo
-import dev.gmarques.compras.objetos.Categoria
-import dev.gmarques.compras.objetos.Item
-import dev.gmarques.compras.viewmodel_utils.MutableListLiveData
+import dev.gmarques.compras.entidades.Categoria
+import dev.gmarques.compras.entidades.Produto
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 //adb shell setprop log.tag.FragmentManager DEBUG
 
@@ -41,8 +42,6 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
     private lateinit var viewModel: FragListaDeComprasViewModel
     lateinit var binding: FragListaDeComprasBinding
-    private lateinit var itemAdapter: ItemAdapter
-    private lateinit var categoriaAdapter: CategoriaAdapter
 
 
     override fun onCreateView(
@@ -54,20 +53,32 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProvider(this)[FragListaDeComprasViewModel::class.java]
 
-        initFragmentResultAddItem()
-        initFragmentResultAttItem()
-        initRvDeCategorias()
-        initRvDeItens()
-        initObservadores()
-        initFabAddItem()
+        viewModel.listaLiveData.observe(viewLifecycleOwner) {
+            Log.d("USUK", "FragListaDeCompras.onViewCreated: ")
+            binding.toolbar.title = it.nome
+            binding.toolbar.setNavigationIcon(R.drawable.vec_lista_30_primary)
 
+            initRvDeCategorias()
+            initRvDeItens()
+            observarCategoriaSelecionada()
+            initFragmentResultAddItem()
+            initFragmentResultAttItem()
+            initFabAddItem()
+        }
     }
+
+    private fun observarCategoriaSelecionada() = viewModel.categoriaSelecionadaLiveData
+        .observe(viewLifecycleOwner) {
+            if (it != null) (binding.rvCategorias.adapter as CategoriaAdapter)
+                .selecionarItem(it)
+            else (binding.rvCategorias.adapter as CategoriaAdapter)
+                .removerSelecao()
+        }
 
     private fun initFabAddItem() = binding.fab.setOnClickListener {
         Vibrador.vibInteracao()
@@ -76,156 +87,131 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
     }
 
     /**
-     * chamado sempre que um novo item é inserido pelo fragAddItem
+     * chamado sempre que um novo produto é inserido pelo fragAddItem
      * */
-    private fun initFragmentResultAddItem() = setFragmentResultListener("novoItem") { _, bundle ->
-        lifecycleScope.launch {
-            delay(350)
-            val item = bundle.getSerializable("item") as Item
-            viewModel.addItem(item)
-            val posicaoItem = viewModel.ajustarCategoriasItemAdicionado(item)
-            if (posicaoItem != null) itemAdapter.notifyItemInserted(posicaoItem.second)
-            Log.d("USUK", "FragListaDeCompras.".plus("initFragmentResultAddItem() "))
+    private fun initFragmentResultAddItem() =
+        setFragmentResultListener("novoProduto") { _, bundle ->
+            lifecycleScope.launch {
+                val produto = desempacotarProduto(bundle, "produto")
+                viewModel.addItemeAplicarAlteracoes(produto)
+
+            }
         }
-    }
 
     /**
-     *  chamado sempre que um novo item é atualizado pelo fragEditItem
+     *  chamado sempre que um novo produto é atualizado pelo fragEditItem
      */
     private fun initFragmentResultAttItem() =
-        setFragmentResultListener("itemAtualizado") { _, bundle ->
+        setFragmentResultListener("produtoAtualizado") { _, bundle ->
             lifecycleScope.launch {
-                delay(350)//espera a animaçao de transicao de telas acabar pra executar as açoes
-                Log.d("USUK", "FragListaDeCompras.".plus("initFragmentResultAttItem() "))
 
-                viewModel.attItem(bundle.getSerializable("item") as Item/*, bundle.getInt("pos")*/)
-                viewModel.ajustarCategoriasItemEditado()
-                viewModel.carregarItensENotificar()// le os dados do DB
+                val produtoAtualizado = desempacotarProduto(bundle, "produto")
+                val produtoOriginal = desempacotarProduto(bundle, "produtoOriginal")
+
+                viewModel.itemAtualizadoPeloUsuario(produtoAtualizado, produtoOriginal)
 
             }
         }
 
-    private fun initObservadores() {
-
-        viewModel.categoriaselecionadaLiveData.observe(viewLifecycleOwner) {
-            //chamado sempre que a categoriaSelecionada no viewModel fica nula
-            //isso avisa ao adapter para des-selecionar a categoria atualmente selecionada la
-            categoriaAdapter.removerSelecao()
-        }
-
-        viewModel.itensRecarregadosLiveData.observe(viewLifecycleOwner) {
-            itemAdapter.atualizarColecao(viewModel.itens)
-        }
-
-        viewModel.categoriasLiveData.observe(viewLifecycleOwner) {
-            Log.d("USUK",
-                "FragListaDeCompras.initObservadores: categoriasLiveData: ${it.evento.toString()}")
-            when (it.evento) {
-                MutableListLiveData.Evento.ITEM_ADICIONADO -> categoriaAdapter.notifyItemInserted(it.posicao)
-                MutableListLiveData.Evento.ITEM_ATUALIZADO -> categoriaAdapter.notifyItemChanged(it.posicao)
-                MutableListLiveData.Evento.ITEM_REMOVIDO -> categoriaAdapter.notifyItemRemoved(it.posicao)
-                MutableListLiveData.Evento.LISTA_ATUALIZADA -> categoriaAdapter.attLista(viewModel.categorias)
-                else -> {}
-            }
-        }
-
-        viewModel.listaLiveData.observe(viewLifecycleOwner) {
-            binding.toolbar.title = it.nome
-            binding.toolbar.setNavigationIcon(R.drawable.vec_lista_30_primary)
-        }
-    }
-
-    private fun initRvDeItens() = lifecycleScope.launch {
-        itemAdapter = ItemAdapter(this@FragListaDeCompras, this@FragListaDeCompras)
-        binding.rvItens.adapter = itemAdapter
+    private fun initRvDeItens() {
+        val itensAdapter = ItemAdapter(this@FragListaDeCompras, this@FragListaDeCompras)
+        binding.rvItens.setHasFixedSize(true)
+        binding.rvItens.adapter = itensAdapter
         binding.rvItens.layoutManager = LinearLayoutManager(requireContext())
+
+        viewModel.produtosLiveData.observe(viewLifecycleOwner) {
+            Log.d("USUK", "FragListaDeCompras.".plus("itensLiveData() ${it.size}"))
+            itensAdapter.atualizarColecao(it)
+        }
     }
 
     private fun initRvDeCategorias() {
-        categoriaAdapter =
-            CategoriaAdapter(this, viewModel.categorias, ::categoriaSelecionada, viewModel)
-        binding.rvCategorias.adapter = categoriaAdapter
-        binding.rvCategorias.layoutManager =
-            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
-    }
+        val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
-    private fun categoriaSelecionada(categoria: Categoria) {
-        Vibrador.vibInteracao()
-        lifecycleScope.launch {
-            viewModel.categoriaSelecionada(categoria)
-            viewModel.carregarItensENotificar()
+        val categoriasAdapter = CategoriaAdapter(this@FragListaDeCompras,
+            ArrayList(),
+            ::categoriaSelecionadaCallback,
+            viewModel)
+
+        binding.rvCategorias.setHasFixedSize(true)
+        binding.rvCategorias.layoutManager = layoutManager
+        binding.rvCategorias.adapter = categoriasAdapter
+
+        viewModel.categoriasLiveData.observe(viewLifecycleOwner) { dados ->
+            categoriasAdapter.atualizarColecao(dados)
         }
+
     }
 
-    override fun itemComprado(itemAtualizado: Item, position: Int) {
+    private fun categoriaSelecionadaCallback(categoria: Categoria) {
+        Vibrador.vibInteracao()
+        viewModel.selecionarCategoriaPeloUsuario(categoria)
+    }
+
+    override fun produtoComprado(produto: Produto, comprado: Boolean, indice: Int) {
         lifecycleScope.launch {
             Vibrador.vibInteracao()
-            val posicoes = viewModel.itemComprado(itemAtualizado)
-
-            // item comprado vai pro final ad lista (base em ordem alfabetica)
-            itemAdapter.notifyItemMoved(posicoes.first, posicoes.second)
-            // verifico o estado da categoria do item
-            categoriaAdapter.notifyItemChanged(viewModel.categorias.indexOf(CategoriaRepo.getCategoria(
-                itemAtualizado)))
-
-            Log.d("USUK", "FragListaDeCompras.itemComprado: ${posicoes.first}, ${posicoes.second} ")
+            viewModel.produtoComprado(produto, comprado)
         }
     }
 
-    override fun itemRemovido(item: Item, position: Int) {
+    override fun produtoRemovido(produto: Produto, indice: Int) {
         Vibrador.vibInteracao()
 
         val msg =
             String.format(getString(R.string.Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita),
-                item.nome).fromHtml()
+                produto.nome).formatarHtml()
 
         MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Por_favor_confirme))
             .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { _, _ ->
-                lifecycleScope.launch {
-                    val uiTodaAtualizada = viewModel.removerItem(item)
-                    if (!uiTodaAtualizada) itemAdapter.notifyItemRemoved(position)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.removerItem(produto)
                 }
             }.setNegativeButton(getString(R.string.Cancelar)) { _, _ -> }.setCancelable(false)
             .show()
 
     }
 
-    override fun editarItem(item: Item, position: Int) {
+    override fun editarProduto(produto: Produto, indice: Int) {
         Vibrador.vibInteracao()
-        findNavController().navigate(FragListaDeComprasDirections.actionFragListaDeComprasToEditItem(
-            item,
-            position))
+        findNavController().navigate(FragListaDeComprasDirections
+            .actionFragListaDeComprasToEditItem(produto))
     }
 
-    override fun precoEditado(item: Item, position: Int) {
+    /**
+     * Mostra um dialogo de ediçao de preço do produto com historico de preços, baseado no preço
+     * desse produto em outras listas
+     * Se o usuario aplicar a alteraçao, produto e interface sao atualizados
+     * Nota: funçao de callback do recyclerview de itens
+     */
+    override fun precoEditado(produto: Produto, indice: Int) {
         val binding = DialogEditValorBinding.inflate(layoutInflater)
         var dialog: AlertDialog? = null
 
-        binding.edtValor.hint = item.preco.toString()
+        binding.edtValor.hint = produto.preco.toString()
         binding.tvHistorico.text =
-            String.format(getString(R.string.Historico_de_precos_de_x), item.nome)
+            String.format(getString(R.string.Historico_de_precos_de_x), produto.nome)
 
-        // faz a magica (aplica as alteraçoes no ite e fecha o dialogo)
+        // faz a magica (aplica as alteraçoes no produto e fecha o dialogo)
         fun run(preco: Float) = lifecycleScope.launch {
-            binding.edtValor.hideSoftKeyboard()
-            item.preco = preco
-            viewModel.attItem(item)
-            itemAdapter.notifyItemChanged(position)
+            binding.edtValor.ocultarTeclado()
+            viewModel.aplicarPrecoOuQuantidadeeNotificar(produto, preco = preco)
             delay(300)
             dialog!!.dismiss()
             Vibrador.vibInteracao()
         }
+
         // ouve o clique no botao de salvar do layout
         binding.btnSalvar.setOnClickListener {
-            run(binding.edtValor.text.toString().toFloatOrNull() ?: item.preco)
+            run(binding.edtValor.text.toString().toFloatOrNull() ?: produto.preco)
         }
 
         // ouve o clique no botao de cancelar do layout
         binding.btnCancelar.setOnClickListener {
             lifecycleScope.launch {
                 Vibrador.vibInteracao()
-                binding.edtValor.hideSoftKeyboard()
+                binding.edtValor.ocultarTeclado()
                 delay(300)
                 dialog!!.dismiss()
 
@@ -235,50 +221,55 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         // ouve o clique no botao concluir do teclado
         binding.edtValor.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) run(binding.edtValor.text.toString()
-                .toFloatOrNull() ?: item.preco)
+                .toFloatOrNull() ?: produto.preco)
             false
         }
 
         // popula a UI com o historico de preços
-        lifecycleScope.launch {
-            viewModel.precoItem(item).forEach { item ->
-                val itemBinding = DialogEditValorItemBinding.inflate(layoutInflater)
-                itemBinding.chip.id = View.generateViewId()
-                binding.container.addView(itemBinding.root)
-                binding.flow.addView(itemBinding.root)
-                itemBinding.chip.text = item.preco.emMoeda()
-                itemBinding.chip.setOnClickListener { run(item.preco) }
+        lifecycleScope.launch(Dispatchers.IO) {
+            val itens = viewModel.buscaEsteItemEmOutrasListas(produto)
+
+            withContext(Dispatchers.Main) {
+                itens.forEach { produto ->
+                    val produtoBinding = DialogEditValorItemBinding.inflate(layoutInflater)
+                    produtoBinding.chip.id = View.generateViewId()
+                    binding.container.addView(produtoBinding.root)
+                    binding.flow.addView(produtoBinding.root)
+                    produtoBinding.chip.text = produto.preco.emMoeda()
+                    produtoBinding.chip.setOnClickListener { run(produto.preco) }
+                }
             }
         }
 
-        dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.Atualizar_preco))
-            .setView(binding.root)
-            .setCancelable(false)
-            .show()
+        dialog =
+            MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_preco))
+                .setView(binding.root).setCancelable(false).show()
 
         lifecycleScope.launch {
             delay(300)
-            binding.edtValor.showKeyboard()
+            binding.edtValor.mostrarTeclado()
         }
 
 
     }
 
-    override fun qtdEditada(item: Item, position: Int) {
+    /**
+     * Mostra um dialogo de ediçao de quantidade do produto com sugestoes de quantidades
+     * Se o usuario aplicar a alteraçao, produto e interface sao atualizados
+     * Nota: funçao de callback do recyclerview de itens
+     */
+    override fun qtdEditada(produto: Produto, indice: Int) {
         val binding = DialogEditQtdBinding.inflate(layoutInflater)
         var dialog: AlertDialog? = null
 
-        binding.edtQtd.hint = item.qtd.toString()
-        binding.tvSugestoes.text = String.format(getString(R.string.Sugestoes_para_x), item.nome)
+        binding.edtQtd.hint = produto.quantidade.toString()
+        binding.tvSugestoes.text = String.format(getString(R.string.Sugestoes_para_x), produto.nome)
 
 
         // faz a magica (aplica as alteraçoes no ite e fecha o dialogo)
-        fun run(valor: Int) = lifecycleScope.launch {
-            binding.edtQtd.hideSoftKeyboard()
-            item.qtd = valor
-            viewModel.attItem(item)
-            itemAdapter.notifyItemChanged(position)
+        fun run(quantidade: Int) = lifecycleScope.launch {
+            binding.edtQtd.ocultarTeclado()
+            viewModel.aplicarPrecoOuQuantidadeeNotificar(produto, quantidade = quantidade)
             delay(300)
             dialog!!.dismiss()
             Vibrador.vibInteracao()
@@ -292,14 +283,14 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         // ouve o clique no botao de salvar do layout
         binding.btnSalvar.setOnClickListener {
             val qtd = binding.edtQtd.text.toString()
-            run(if (qtd.isEmpty()) item.qtd else qtd.toInt())
+            run(if (qtd.isEmpty()) produto.quantidade else qtd.toInt())
         }
 
         // ouve o clique no botao de cancelar do layout
         binding.btnCancelar.setOnClickListener {
             lifecycleScope.launch {
                 Vibrador.vibInteracao()
-                binding.edtQtd.hideSoftKeyboard()
+                binding.edtQtd.ocultarTeclado()
                 delay(300)
                 dialog!!.dismiss()
 
@@ -310,7 +301,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         binding.edtQtd.setOnEditorActionListener { tv, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val qtd = tv.text.toString()
-                run(if (qtd.isEmpty()) item.qtd else qtd.toInt())
+                run(if (qtd.isEmpty()) produto.quantidade else qtd.toInt())
             }
             false
         }
@@ -322,17 +313,23 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         binding.chip5.setOnClickListener(listener)
         binding.chip6.setOnClickListener(listener)
 
-        dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.Atualizar_quantidade))
-            .setView(binding.root)
-            .setCancelable(false)
-            .show()
+        dialog =
+            MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_quantidade))
+                .setView(binding.root).setCancelable(false).show()
 
         lifecycleScope.launch {
             delay(300)
-            binding.edtQtd.showKeyboard()
+            binding.edtQtd.mostrarTeclado()
         }
     }
+
+    /**
+     * Extrai o objeto do pacote verificando a plataforma e invocando a função correta
+     * */
+    private fun desempacotarProduto(bundle: Bundle, key: String): Produto =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getSerializable(key, Produto::class.java)!!
+        } else bundle.getSerializable(key) as Produto
 
 
 }

@@ -1,12 +1,12 @@
 package dev.gmarques.compras.ui.lista_de_compras
 
-import dev.gmarques.compras.objetos.Item
+import dev.gmarques.compras.entidades.Produto
 
 interface ItemAdapterCallback {
 
-    fun itemComprado(itemAtualizado: Item, position: Int)
-    fun itemRemovido(item: Item, position: Int)
-    fun editarItem(item: Item, position: Int)
-    fun precoEditado(item: Item, position: Int)
-    fun qtdEditada(item: Item, position: Int)
+    fun produtoComprado(produto: Produto, comprado: Boolean, indice: Int)
+    fun produtoRemovido(produto: Produto, indice: Int)
+    fun editarProduto(produto: Produto, indice: Int)
+    fun precoEditado(produto: Produto, indice: Int)
+    fun qtdEditada(produto: Produto, indice: Int)
 }

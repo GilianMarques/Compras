@@ -57,7 +57,7 @@
 
 
             <TextView
-                android:id="@+id/tvNome"
+                android:id="@+id/tv_nome"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:ellipsize="marquee"
@@ -83,7 +83,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@+id/tvNome"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_nome"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="R$ 199.952,35" />
@@ -151,7 +151,7 @@
                 android:id="@+id/cbComprado"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="@+id/tvNome"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_nome"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="TouchTargetSizeCheck" />

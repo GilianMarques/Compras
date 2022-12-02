@@ -7,29 +7,27 @@
 
     <fragment
         android:id="@+id/addItem"
-        android:name="dev.gmarques.compras.ui.item_io.add_item.FragAddItem"
-        android:label="@string/novo_item"
+        android:name="dev.gmarques.compras.ui.produto_io.add_produto.FragAddProduto"
+        android:label="@string/Novo_item"
         tools:layout="@layout/frag_add_item">
 
         <argument
             android:name="listaId"
             app:argType="string" />
 
+
     </fragment>
 
 
     <fragment
         android:id="@+id/editItem"
-        android:name="dev.gmarques.compras.ui.item_io.edit_item.FragEditItem"
+        android:name="dev.gmarques.compras.ui.produto_io.edit_produto.FragEditProduto"
         tools:layout="@layout/frag_add_item">
 
         <argument
-            android:name="item"
-            app:argType="dev.gmarques.compras.objetos.Item" />
+            android:name="produto"
+            app:argType="dev.gmarques.compras.entidades.Produto" />
 
-        <argument
-            android:name="position"
-            app:argType="integer" />
 
     </fragment>
 
@@ -60,5 +58,6 @@
             app:popExitAnim="@anim/exit_down" />
 
     </fragment>
+
 
 </navigation>

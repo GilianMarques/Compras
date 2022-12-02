@@ -4,11 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:background="?android:windowBackground"
-        tools:context=".ui.item_io.add_item.FragAddItem">
+        tools:context=".ui.produto_io.add_produto.FragAddProduto">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -18,111 +19,121 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/vec_arrow_back"
-            app:title="@string/novo_item"
+            app:title="@string/Novo_item"
             app:titleTextColor="?colorPrimary" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textFieldNome"
+            android:id="@+id/textField_nome"
             style="@style/TextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="0dp"
             android:hint="@string/Nome"
-
+            app:counterEnabled="true"
+            app:counterMaxLength="24"
             app:endIconMode="clear_text"
             app:errorEnabled="false"
-            app:layout_constraintBottom_toTopOf="@+id/textFieldValor"
             app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:startIconDrawable="@drawable/vec_edit"
             app:startIconTint="?attr/colorPrimary">
 
 
             <AutoCompleteTextView
-                android:id="@+id/edtNome"
+                android:id="@+id/edt_nome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
                 android:inputType="textAutoComplete"
                 android:lines="1"
-                android:maxLength="26"
+                android:maxLength="24"
                 android:minHeight="56dp"
+                android:text="item 00"
+                tools:ignore="LabelFor"
                 tools:text="Pão de queijo" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textFieldValor"
+            android:id="@+id/textField_valor"
 
             style="@style/TextInputStyle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="4dp"
             android:hint="@string/Preco"
             app:endIconMode="clear_text"
-            app:layout_constraintBottom_toTopOf="@+id/textFieldQtd"
-            app:layout_constraintTop_toBottomOf="@+id/textFieldNome"
+            app:layout_constraintEnd_toStartOf="@+id/guideline3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textField_nome"
             app:prefixText="@string/moeda"
             app:startIconDrawable="@drawable/vec_money"
-            app:startIconTint="?attr/colorPrimary"
-            tools:layout_editor_absoluteX="8dp">
+            app:startIconTint="?attr/colorPrimary">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtValor"
+                android:id="@+id/edt_valor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
                 android:inputType="numberDecimal"
                 android:maxLength="6"
                 android:minHeight="56dp"
+                android:text="1.50"
+
                 tools:text="9,79" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textFieldQtd"
-
+            android:id="@+id/textField_qtd"
             style="@style/TextInputStyle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="4dp"
             android:hint="@string/Quantidade"
             app:endIconMode="clear_text"
-            app:layout_constraintBottom_toTopOf="@+id/textFieldDetalhes"
-            app:layout_constraintTop_toBottomOf="@+id/textFieldValor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/guideline3"
+            app:layout_constraintTop_toBottomOf="@id/textField_nome"
             app:startIconDrawable="@drawable/vec_qtd"
-            app:startIconTint="?attr/colorPrimary"
-
-            app:suffixText="@string/unidades"
-            tools:layout_editor_absoluteX="8dp">
+            app:startIconTint="?attr/colorPrimary">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtQtd"
+                android:id="@+id/edt_qtd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
                 android:inputType="number"
                 android:maxLength="3"
                 android:minHeight="56dp"
+                android:text="2"
+
                 tools:text="3" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textFieldDetalhes"
+            android:id="@+id/textField_detalhes"
 
             style="@style/TextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:hint="@string/detalhes"
-
+            android:layout_marginTop="8dp"
+            android:hint="@string/Detalhes"
             app:counterEnabled="true"
             app:counterMaxLength="100"
             app:endIconMode="clear_text"
-            app:layout_constraintBottom_toTopOf="@+id/textFieldNome"
-            app:layout_constraintTop_toBottomOf="@+id/textFieldQtd"
+            app:layout_constraintTop_toBottomOf="@id/textField_valor"
             app:startIconDrawable="@drawable/vec_info"
             app:startIconTint="?attr/colorPrimary">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtDetalhes"
+                android:id="@+id/edt_detalhes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLength="100"
@@ -131,14 +142,12 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvCategorias"
+            android:id="@+id/rv_categorias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            app:layout_constraintTop_toBottomOf="@+id/textFieldDetalhes" />
-
+            app:layout_constraintTop_toBottomOf="@+id/textField_detalhes" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_concluir"
@@ -149,7 +158,15 @@
             android:src="@drawable/vec_check"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.575" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

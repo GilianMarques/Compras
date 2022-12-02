@@ -2,28 +2,28 @@ package dev.gmarques.compras.ui.lista_de_compras
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import dev.gmarques.compras.App
 import dev.gmarques.compras.Extensions.Companion.emMoeda
-import dev.gmarques.compras.Extensions.Companion.fromHtml
-import dev.gmarques.compras.Extensions.Companion.strikeThrough
+import dev.gmarques.compras.Extensions.Companion.formatarHtml
+import dev.gmarques.compras.Extensions.Companion.riscarTexto
 import dev.gmarques.compras.R
-import dev.gmarques.compras.databinding.RvItemViewBinding
-import dev.gmarques.compras.objetos.Item
+import dev.gmarques.compras.databinding.ItemRvViewBinding
+import dev.gmarques.compras.entidades.Produto
 
 class ItemAdapter(
     fragListaDeCompras: FragListaDeCompras,
     private val callback: ItemAdapterCallback,
-) : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var corNormal: Int? = null
     private var corComprado: Int? = null
-    private var itens: ArrayList<Item> = ArrayList()
+    private val itens: ArrayList<Produto> = ArrayList()
 
     init {
 
@@ -36,24 +36,42 @@ class ItemAdapter(
             Color.LTGRAY)
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemRvViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding, callback)
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, indice: Int) =
+        (holder as ViewHolder).bind(itens[indice], indice)
+
+    override fun getItemCount(): Int = itens.size
+
+    fun atualizarColecao(novosItens: ArrayList<Produto>) {
+        val mItemDiffCallback = ItemDiffCallback(itens, novosItens)
+        val resultado = DiffUtil.calculateDiff(mItemDiffCallback)
+        itens.clear()
+        itens.addAll(novosItens)
+        resultado.dispatchUpdatesTo(this)
+    }
+
     inner class ViewHolder(
-        private val bindingView: RvItemViewBinding,
+        private val bindingView: ItemRvViewBinding,
         private val callback: ItemAdapterCallback,
     ) : RecyclerView.ViewHolder(bindingView.root) {
 
-        fun bind(item: Item, position: Int) {
+        fun bind(produto: Produto, indice: Int) {
 
             alternarMenu(false)
 
-            bindingView.tvNome.text = item.nome
-            bindingView.tvPreco.text = item.preco.emMoeda()
-            bindingView.tvInfo.text = item.detalhes
+            bindingView.tvNome.text = produto.nome
+            bindingView.tvPreco.text = produto.preco.emMoeda()
+            bindingView.tvInfo.text = produto.detalhes
             bindingView.tvQtd.text =
-                String.format(App.get.applicationContext.getString(R.string.un), item.qtd)
-            bindingView.tvPrecoTotal.text = item.valorTotal().emMoeda()
-            bindingView.cbComprado.isChecked = item.comprado
+                String.format(App.get.applicationContext.getString(R.string.un), produto.quantidade)
+            bindingView.tvPrecoTotal.text = produto.valorTotal().emMoeda()
+            bindingView.cbComprado.isChecked = produto.comprado
 
-            aplicarEstilo(item)
+            aplicarEstilo(produto)
 
             bindingView.root.setOnLongClickListener(View.OnLongClickListener {
                 alternarMenu(true)
@@ -61,27 +79,25 @@ class ItemAdapter(
             })
 
             bindingView.cbComprado.setOnClickListener {
-                item.comprado = bindingView.cbComprado.isChecked
-                callback.itemComprado(item, position)
-                aplicarEstilo(item)
+                callback.produtoComprado(produto, bindingView.cbComprado.isChecked, indice)
             }
 
             bindingView.fabEditar.setOnClickListener {
                 alternarMenu(false)
-                callback.editarItem(item, position)
+                callback.editarProduto(produto, indice)
             }
 
             bindingView.fabRemover.setOnClickListener {
                 alternarMenu(false)
-                callback.itemRemovido(item, position)
+                callback.produtoRemovido(produto, indice)
             }
 
             bindingView.tvQtd.setOnClickListener {
-                callback.qtdEditada(item, position)
+                callback.qtdEditada(produto, indice)
             }
 
             bindingView.tvPreco.setOnClickListener {
-                callback.precoEditado(item, position)
+                callback.precoEditado(produto, indice)
             }
         }
 
@@ -91,32 +107,12 @@ class ItemAdapter(
         }
 
         @SuppressLint("SetTextI18n")
-        private fun aplicarEstilo(item: Item) = with(item.comprado) {
-            bindingView.tvNome.strikeThrough(this)
+        private fun aplicarEstilo(produto: Produto) = with(produto.comprado) {
+            bindingView.tvNome.riscarTexto(this)
             bindingView.card.setCardBackgroundColor(if (this) corComprado!! else corNormal!!)
-            if (this) bindingView.tvNome.text = "<i>${item.nome}</i>".fromHtml() /*italico*/
-            else bindingView.tvNome.text = item.nome
+            if (this) bindingView.tvNome.text = "<i>${produto.nome}</i>".formatarHtml() /*italico*/
+            else bindingView.tvNome.text = produto.nome
         }
 
     }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = RvItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding, callback)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-        holder.bind(itens[position], position)
-
-    override fun getItemCount(): Int = itens.size
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun atualizarColecao(itens: java.util.ArrayList<Item>) {
-        this@ItemAdapter.itens = itens
-        notifyDataSetChanged()
-        Log.d("USUK",
-            "ItemAdapter.".plus("atualizarColecao() views atualizadas: itens = ${itens.size}"))
-    }
-
-
 }

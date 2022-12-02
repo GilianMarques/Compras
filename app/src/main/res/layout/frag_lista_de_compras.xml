@@ -33,10 +33,10 @@
                     android:layout_height="?attr/actionBarSize" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvCategorias"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/rv_categorias"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
+                     />
 
             </LinearLayout>
 
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:text="@string/novo_item"
+        android:text="@string/Novo_item"
         app:icon="@drawable/vec_add" />
 
 
@@ -63,10 +63,9 @@
         tools:context=".ui.lista_de_compras.FragListaDeCompras">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvItens"
+            android:id="@+id/rv_itens"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 

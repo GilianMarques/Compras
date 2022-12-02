@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         if (Preferencias().primeiroBoot()) runBlocking { RoomDb.criarListasItensEcategorias() }
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        navController = this.findNavController(R.id.navHostFrag)
+        navController = this.findNavController(R.id.nav_host_frag)
 
         /*  NavigationUI.setupActionBarWithNavController(this, navController)
         supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
