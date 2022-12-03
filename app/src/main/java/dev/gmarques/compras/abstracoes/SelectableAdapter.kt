@@ -4,7 +4,7 @@ package dev.gmarques.compras.abstracoes
  * Extenda um adapter dessa classe para ter itens selecionaves
  * @see SelectableViewHolder
  * */
-abstract class SelectableAdapter<T>(itens: ArrayList<T>, val callback: Callback<T>?=null) :
+abstract class SelectableAdapter<T>(itens: ArrayList<T>, val callback: Callback<T>? = null) :
     BaseAdapter<T>(itens) {
 
     /**
@@ -133,7 +133,10 @@ abstract class SelectableAdapter<T>(itens: ArrayList<T>, val callback: Callback<
 
         if (indice >= 0 /*&& lManager.getChildAt(indice) != null*/) notifyItemChanged(indice)
         else {
-            throw IllegalArgumentException("O objeto deve estar presente na lista de itens antes de ser definido como selecionado ($indice)")
+            throw IllegalArgumentException("O objeto deve estar presente na lista de itens antes de ser definido como selecionado." +
+                    "\nindice: $indice" +
+                    "\ntamanho lista: ${itens.size}" +
+                    "\nconteudo da lista:\n${itens.joinToString(separator = "\n")}")
         }
     }
 

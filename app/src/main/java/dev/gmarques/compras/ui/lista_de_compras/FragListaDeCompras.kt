@@ -39,7 +39,6 @@ import kotlinx.coroutines.withContext
 
 class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
-
     private lateinit var viewModel: FragListaDeComprasViewModel
     lateinit var binding: FragListaDeComprasBinding
 
@@ -91,11 +90,10 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
      * */
     private fun initFragmentResultAddItem() =
         setFragmentResultListener("novoProduto") { _, bundle ->
-            lifecycleScope.launch {
-                val produto = desempacotarProduto(bundle, "produto")
-                viewModel.addItemeAplicarAlteracoes(produto)
+            val produto = desempacotarProduto(bundle, "produto")
+            viewModel.addItemeAplicarAlteracoes(produto)
 
-            }
+
         }
 
     /**
@@ -114,7 +112,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         }
 
     private fun initRvDeItens() {
-        val itensAdapter = ItemAdapter(this@FragListaDeCompras, this@FragListaDeCompras)
+        val itensAdapter = ProdutoAdapter(this@FragListaDeCompras, this@FragListaDeCompras)
         binding.rvItens.setHasFixedSize(true)
         binding.rvItens.adapter = itensAdapter
         binding.rvItens.layoutManager = LinearLayoutManager(requireContext())
@@ -130,17 +128,17 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
         val categoriasAdapter = CategoriaAdapter(this@FragListaDeCompras,
-            ArrayList(),
-            ::categoriaSelecionadaCallback,
-            viewModel)
+            ArrayList(), ::categoriaSelecionadaCallback, viewModel)
 
         binding.rvCategorias.setHasFixedSize(true)
-        binding.rvCategorias.layoutManager = layoutManager
         binding.rvCategorias.adapter = categoriasAdapter
 
         viewModel.categoriasLiveData.observe(viewLifecycleOwner) { dados ->
-            categoriasAdapter.atualizarColecao(dados)
+            categoriasAdapter.atualizarColecaoDIff(dados)
+            if (binding.rvCategorias.layoutManager == null) binding.rvCategorias.layoutManager =
+                layoutManager
         }
+
 
     }
 
@@ -150,11 +148,9 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
     }
 
     override fun produtoComprado(produto: Produto, comprado: Boolean, indice: Int) {
-        lifecycleScope.launch {
             Vibrador.vibInteracao()
             viewModel.produtoComprado(produto, comprado)
-        }
-    }
+            }
 
     override fun produtoRemovido(produto: Produto, indice: Int) {
         Vibrador.vibInteracao()

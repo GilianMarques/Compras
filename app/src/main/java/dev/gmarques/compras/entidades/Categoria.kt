@@ -3,16 +3,26 @@ package dev.gmarques.compras.entidades
 import android.annotation.SuppressLint
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import com.google.gson.GsonBuilder
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 
 @Entity
- class Categoria(
+class Categoria(
     @ColumnInfo(defaultValue = "vec_cat_0")
     var icone: String = "vec_cat_0",
 ) : Entidade() {
 
+    @Ignore
+    var prop = 0
+
+    /**
+     * unico proposito da funçãoe variavel é servir de gatilho para as atualizaçoes
+     * via livedata*/
+    fun attPropLiveData() {
+        prop++
+    }
 
     companion object {
         @SuppressLint("DiscouragedApi")
@@ -43,6 +53,7 @@ import dev.gmarques.compras.R
         if (removido != other.removido) return false
         if (nome != other.nome) return false
         if (icone != other.icone) return false
+        if (prop != other.prop) return false
 
         return true
     }
@@ -53,7 +64,15 @@ import dev.gmarques.compras.R
         result = 31 * result + removido.hashCode()
         result = 31 * result + nome.hashCode()
         result = 31 * result + icone.hashCode()
+        result = 31 * result + prop.hashCode()
         return result
     }
+
+    override fun toString(): String {
+        return "nome='$nome, icone='$icone, id='$id', ultimaAtualizacao=$ultimaAtualizacao, removido=$removido"
+    }
+
+
+
 
 }

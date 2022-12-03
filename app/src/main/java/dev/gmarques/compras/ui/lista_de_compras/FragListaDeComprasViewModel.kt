@@ -74,7 +74,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         _categoriasLiveData.postValue(resultado)
     }
 
-    private suspend fun getCategoriaDoDB(produto: Produto): Categoria =
+    private suspend fun receberCategoriaDoDB(produto: Produto): Categoria =
         CategoriaRepo.getCategoriaPorId(produto.categoriaId)
 
     private suspend fun attItemNoBancoDeDados(produto: Produto) = ItemRepo.addOuAtualizar(produto)
@@ -83,19 +83,20 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
      * Faz as verificaçoes e aplica as alteraçoes necessarias para refletir  a inserçao de um
      * novo produto na interface
      */
-    suspend fun addItemeAplicarAlteracoes(
+    fun addItemeAplicarAlteracoes(
         produto: Produto,
-    ) {
+    ) = viewModelScope.launch(Dispatchers.IO) {
 
         attItemNoBancoDeDados(produto) // add ao db
 
-        val categoria = getCategoriaDoDB(produto)
-        val categorias = _categoriasLiveData.value!!
+        val categoria = receberCategoriaDoDB(produto)
+        // modifico uma copia da lista para ser comparada com a versao anterior pelo DIfUtils no adapter
+        val categorias = ArrayList(_categoriasLiveData.value!!)
 
         // produto pertence a uma categoria que ainda nao faz parte da lista
         if (!categorias.contains(categoria)) {
             categorias.add(categoria)
-            _categoriasLiveData.value = categorias
+            _categoriasLiveData.postValue(categorias)
         } else {
             //se o produto é da sub-lista sendo exibida, mando a UI add ele nela
             val catSelecionada = _categoriaSelecionadaLiveData.value
@@ -103,7 +104,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
                 val itens = _produtosLiveData.value!!
                 itens.add(produto)
                 ordenarLista(itens)
-                _produtosLiveData.value = itens
+                _produtosLiveData.postValue(itens)
             }
         }
     }
@@ -125,12 +126,12 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         produtoOriginal: Produto,
     ) {
 
-         attItemNoBancoDeDados(produtoAtualizado)
+        attItemNoBancoDeDados(produtoAtualizado)
 
         // categoria mudou?
         if (produtoOriginal.categoriaId != produtoAtualizado.categoriaId) {
             carregarCategoriasNaLista().join() // trabalho pesado feito na IO
-            _categoriaSelecionadaLiveData.value = getCategoriaDoDB(produtoAtualizado)
+            _categoriaSelecionadaLiveData.value = receberCategoriaDoDB(produtoAtualizado)
             carregarItens().join()  // trabalho pesado feito na IO
         } else {
             // o produto que o usuario editou saiu dessa lista, logo ela nao é nula
@@ -151,22 +152,27 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
     }
 
-    suspend fun produtoComprado(alvo: Produto, comprado: Boolean) {
+    fun produtoComprado(produtoOriginal: Produto, comprado: Boolean) = viewModelScope.launch {
 
-        val produto = alvo.clonar()
-        produto.comprado = comprado
+        val novoProduto = produtoOriginal.clonar()
+        novoProduto.comprado = comprado
 
         // salva no DB
-        attItemNoBancoDeDados(produto)
+        attItemNoBancoDeDados(novoProduto)
 
         val itensLista = _produtosLiveData.value!!
-        itensLista[itensLista.indexOf(alvo)] = produto
+        itensLista[itensLista.indexOf(produtoOriginal)] = novoProduto
         ordenarLista(itensLista)
         _produtosLiveData.value = itensLista
 
-        // atualizo todas as categorias
-        _categoriasLiveData.value = categoriasLiveData.value
-
+        // atualizo a categoria
+        val categorias = _categoriasLiveData.value!!
+// TODO: remover prop de att do livedata e embrulhar categoria  em objeto pra usar no adapter 
+        val categoria = receberCategoriaDoDB(novoProduto)
+        val indice = categorias.indexOf(categoria)
+        categoria.attPropLiveData()
+        categorias[indice] = categoria
+        _categoriasLiveData.value = categorias
     }
 
     private fun ordenarLista(itens: ArrayList<Produto>) {
@@ -187,7 +193,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         produto.removido = true
         attItemNoBancoDeDados(produto)
 
-        val categoriaItem = getCategoriaDoDB(produto)
+        val categoriaItem = receberCategoriaDoDB(produto)
         val categorias = _categoriasLiveData.value!!
 
         // era o ultimo produto da categoria?

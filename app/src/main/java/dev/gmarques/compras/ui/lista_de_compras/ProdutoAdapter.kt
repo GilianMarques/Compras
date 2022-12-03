@@ -16,7 +16,7 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.databinding.ItemRvViewBinding
 import dev.gmarques.compras.entidades.Produto
 
-class ItemAdapter(
+class ProdutoAdapter(
     fragListaDeCompras: FragListaDeCompras,
     private val callback: ItemAdapterCallback,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -46,13 +46,32 @@ class ItemAdapter(
 
     override fun getItemCount(): Int = itens.size
 
+    /**
+     * Usa Diffutils para comparar as listas e propagar as alteraçoes automaticamente
+     * @throws IllegalArgumentException se o conteudo da nova lista for identico ao da lista atual.
+     *
+     */
     fun atualizarColecao(novosItens: ArrayList<Produto>) {
+
+        // se o conteudo as listas antiga e nova são iguais, o conteudo da nova lista é limpo
+        // pelo DiffUtil isso faz com que a lista de itens atual fique vazia se tornando inicio
+        // de uma grande dor de cabeça. Embora seja possivel verificar se a nova lista esta vazia
+        // antes de chamar clear() na lista atual, isso nao deve ser feito por que em nenhum cenario
+        // receber uma lista identica a que ja existe é um comportamento desejavel.
+        val tamanhonovosItens = novosItens.size
+
         val mItemDiffCallback = ItemDiffCallback(itens, novosItens)
         val resultado = DiffUtil.calculateDiff(mItemDiffCallback)
         itens.clear()
         itens.addAll(novosItens)
         resultado.dispatchUpdatesTo(this)
+
+        if (tamanhonovosItens > 0 && novosItens.size == 0) throw java.lang.IllegalArgumentException(
+            "A nova lista tinha $tamanhonovosItens itens e agora tem 0, isso significa que seu " +
+                    "conteudo era identico ao conteudo da lista atual do adapter. Corrija isso editando " +
+                    "uma copia da lista original, nao a lista original em si.")
     }
+
 
     inner class ViewHolder(
         private val bindingView: ItemRvViewBinding,
