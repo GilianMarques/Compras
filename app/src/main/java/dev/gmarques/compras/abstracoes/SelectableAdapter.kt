@@ -1,5 +1,7 @@
 package dev.gmarques.compras.abstracoes
 
+import android.util.Log
+
 /**
  * Extenda um adapter dessa classe para ter itens selecionaves
  * @see SelectableViewHolder
@@ -50,7 +52,9 @@ abstract class SelectableAdapter<T>(itens: ArrayList<T>, val callback: Callback<
         //item esta selecionado mas viewholder nao
         if (!viewHolder.selecionado) {
             //listener para o viewHolder se desselecionar qdo o itemSelecionado == null
-            itemNuloListener = { desfazerSelecao(viewHolder) }
+            itemNuloListener = {
+                desfazerSelecao(viewHolder)
+            }
             viewHolder.selecionado = true
             viewHolder.itemSelecionado()
         }
@@ -68,7 +72,7 @@ abstract class SelectableAdapter<T>(itens: ArrayList<T>, val callback: Callback<
         if (viewHolder.selecionado) {
             viewHolder.selecionado = false
             viewHolder.itemDesselecionado()
-        }
+        }else Log.d("USUK", "SelectableAdapter.desfazerSelecao: nenhuma categoria selecionada")
     }
 
     /**

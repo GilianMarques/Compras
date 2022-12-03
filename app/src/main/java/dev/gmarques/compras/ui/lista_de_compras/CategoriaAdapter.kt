@@ -1,22 +1,18 @@
 package dev.gmarques.compras.ui.lista_de_compras
 
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import dev.gmarques.compras.R.drawable
-import dev.gmarques.compras.abstracoes.SelectableAdapter
-import dev.gmarques.compras.abstracoes.SelectableViewHolder
 import dev.gmarques.compras.databinding.ItemRvCategoriaViewBinding
 import dev.gmarques.compras.entidades.Categoria
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import dev.gmarques.compras.entidades.helpers.CategoriaHolder
 
 /*
  * Tentei fazer a implementação desse adapter no Fragmento de lista de compras funcionar no padrao do MVVM
@@ -30,10 +26,9 @@ import kotlinx.coroutines.withContext
  * */
 class CategoriaAdapter(
     fragment: Fragment,
-    itens: ArrayList<Categoria>,
-    private val clickCallback: (Categoria) -> Unit,
-    private var viewModel: FragListaDeComprasViewModel,
-) : SelectableAdapter<Categoria>(itens, null) {
+    val itens: ArrayList<CategoriaHolder>,
+    private val clickCallback: (CategoriaHolder) -> Unit,
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var selecaoBackground: Drawable
     private var originalBackground: Drawable
@@ -53,9 +48,9 @@ class CategoriaAdapter(
      * @throws IllegalArgumentException se o conteudo da nova lista for identico ao da lista atual.
      *
      */
-    fun atualizarColecaoDIff(novasCategorias: ArrayList<Categoria>) {
+    fun atualizarColecaoDiff(novasCategorias: ArrayList<CategoriaHolder>) {
 
-        // se o conteudo as listas antiga e nova são iguais, o conteudo da nova lista é limpo
+        // se o conteudo das listas antiga e nova são iguais, o conteudo da nova lista é limpo
         // pelo DiffUtil isso faz com que a lista de itens atual fique vazia se tornando inicio
         // de uma grande dor de cabeça. Embora seja possivel verificar se a nova lista esta vazia
         // antes de chamar clear() na lista atual, isso nao deve ser feito por que em nenhum cenario
@@ -76,43 +71,40 @@ class CategoriaAdapter(
 
     inner class ViewHolder(
         private val bindingView: ItemRvCategoriaViewBinding,
-        private val click: (Categoria) -> Unit,
-    ) : SelectableViewHolder<Categoria>(bindingView.root) {
+        private val click: (CategoriaHolder) -> Unit,
+    ) : RecyclerView.ViewHolder(bindingView.root) {
 
 
-        override fun carregarView(indice: Int) {
-            val categoria = itens[indice]
+         fun carregarView(indice: Int) {
+
+            val cHolder = itens[indice]
+            val categoria = cHolder.categoria
 
             bindingView.tvNome.text = categoria.nome
             bindingView.ivIcone.setImageResource(Categoria.intIcone(categoria.icone))
 
             bindingView.rlCard.setOnClickListener {
 
-                click(categoria)
-                /*alternarSelecaoPorClique(this, categoria, indice) - nao usar essa funçao no MVVM*/
+                click(cHolder)
+                // alternarSelecaoPorClique(this, categoria, indice) - nao usar essa funçao no MVVM
                 // nao chamo o 'alternarSelecaoPorClique' a partir do adapter porque no MVVM a interface deve reagir as atualizacoes dos dados
-                //a abordagem adequada é avisar o fragmento que vai avisar o viewmodel que vai decidir o que fazer e atualizar
+                // a abordagem adequada é avisar o fragmento que vai avisar o viewmodel que vai decidir o que fazer e atualizar
                 // o livedata que vai avisar o fragmento que por fim vai atualizar o recyclerview com o valor adequado
             }
 
-            viewModel.viewModelScope.launch(Dispatchers.IO) {
-                val itensComprados = viewModel.todosOsItensDaCategoriaForamComprados(categoria)
+            Log.d("USUK", "ViewHolder.".plus("carregarView() indice = $indice cat: $cHolder"))
+            if (cHolder.itensComprados) bindingView.ivTudoComprado.visibility = View.VISIBLE
+            else bindingView.ivTudoComprado.visibility = View.GONE
 
-                withContext(Dispatchers.Main) {
-                    if (itensComprados) bindingView.ivTudoComprado.visibility = View.VISIBLE
-                    else bindingView.ivTudoComprado.visibility = View.GONE
-                }
-            }
-
-            viewCarregada(this, categoria)
-
+            if (cHolder.selecionada) itemSelecionado()
+            else itemDesselecionado()
         }
 
-        override fun itemSelecionado() {
+         fun itemSelecionado() {
             bindingView.rlCard.background = selecaoBackground
         }
 
-        override fun itemDesselecionado() {
+         fun itemDesselecionado() {
             bindingView.rlCard.background = originalBackground
         }
     }
@@ -120,13 +112,13 @@ class CategoriaAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
         (holder as ViewHolder).carregarView(position)
 
-    override fun itensSaoIguais(obj: Categoria, obj2: Categoria): Boolean = obj.id == obj2.id
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
             ItemRvCategoriaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding, clickCallback)
     }
+
+    override fun getItemCount(): Int = itens.size
 
 
 }

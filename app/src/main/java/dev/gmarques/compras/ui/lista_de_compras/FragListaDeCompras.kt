@@ -28,8 +28,8 @@ import dev.gmarques.compras.databinding.DialogEditQtdBinding
 import dev.gmarques.compras.databinding.DialogEditValorBinding
 import dev.gmarques.compras.databinding.DialogEditValorItemBinding
 import dev.gmarques.compras.databinding.FragListaDeComprasBinding
-import dev.gmarques.compras.entidades.Categoria
 import dev.gmarques.compras.entidades.Produto
+import dev.gmarques.compras.entidades.helpers.CategoriaHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,20 +64,12 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
             initRvDeCategorias()
             initRvDeItens()
-            observarCategoriaSelecionada()
             initFragmentResultAddItem()
             initFragmentResultAttItem()
             initFabAddItem()
         }
     }
 
-    private fun observarCategoriaSelecionada() = viewModel.categoriaSelecionadaLiveData
-        .observe(viewLifecycleOwner) {
-            if (it != null) (binding.rvCategorias.adapter as CategoriaAdapter)
-                .selecionarItem(it)
-            else (binding.rvCategorias.adapter as CategoriaAdapter)
-                .removerSelecao()
-        }
 
     private fun initFabAddItem() = binding.fab.setOnClickListener {
         Vibrador.vibInteracao()
@@ -101,14 +93,9 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
      */
     private fun initFragmentResultAttItem() =
         setFragmentResultListener("produtoAtualizado") { _, bundle ->
-            lifecycleScope.launch {
-
-                val produtoAtualizado = desempacotarProduto(bundle, "produto")
-                val produtoOriginal = desempacotarProduto(bundle, "produtoOriginal")
-
-                viewModel.itemAtualizadoPeloUsuario(produtoAtualizado, produtoOriginal)
-
-            }
+            val produtoAtualizado = desempacotarProduto(bundle, "produto")
+            val produtoOriginal = desempacotarProduto(bundle, "produtoOriginal")
+            viewModel.itemAtualizadoPeloUsuario(produtoAtualizado, produtoOriginal)
         }
 
     private fun initRvDeItens() {
@@ -118,7 +105,6 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         binding.rvItens.layoutManager = LinearLayoutManager(requireContext())
 
         viewModel.produtosLiveData.observe(viewLifecycleOwner) {
-            Log.d("USUK", "FragListaDeCompras.".plus("itensLiveData() ${it.size}"))
             itensAdapter.atualizarColecao(it)
         }
     }
@@ -127,14 +113,14 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
-        val categoriasAdapter = CategoriaAdapter(this@FragListaDeCompras,
-            ArrayList(), ::categoriaSelecionadaCallback, viewModel)
+        val categoriasAdapter =
+            CategoriaAdapter(this@FragListaDeCompras, ArrayList(), ::categoriaSelecionadaCallback)
 
         binding.rvCategorias.setHasFixedSize(true)
         binding.rvCategorias.adapter = categoriasAdapter
 
         viewModel.categoriasLiveData.observe(viewLifecycleOwner) { dados ->
-            categoriasAdapter.atualizarColecaoDIff(dados)
+            categoriasAdapter.atualizarColecaoDiff(dados)
             if (binding.rvCategorias.layoutManager == null) binding.rvCategorias.layoutManager =
                 layoutManager
         }
@@ -142,15 +128,15 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
     }
 
-    private fun categoriaSelecionadaCallback(categoria: Categoria) {
+    private fun categoriaSelecionadaCallback(categoria: CategoriaHolder) {
         Vibrador.vibInteracao()
         viewModel.selecionarCategoriaPeloUsuario(categoria)
     }
 
     override fun produtoComprado(produto: Produto, comprado: Boolean, indice: Int) {
-            Vibrador.vibInteracao()
-            viewModel.produtoComprado(produto, comprado)
-            }
+        Vibrador.vibInteracao()
+        viewModel.produtoComprado(produto, comprado)
+    }
 
     override fun produtoRemovido(produto: Produto, indice: Int) {
         Vibrador.vibInteracao()
@@ -171,8 +157,8 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
     override fun editarProduto(produto: Produto, indice: Int) {
         Vibrador.vibInteracao()
-        findNavController().navigate(FragListaDeComprasDirections
-            .actionFragListaDeComprasToEditItem(produto))
+        findNavController().navigate(FragListaDeComprasDirections.actionFragListaDeComprasToEditItem(
+            produto))
     }
 
     /**
@@ -223,7 +209,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
         // popula a UI com o historico de preços
         lifecycleScope.launch(Dispatchers.IO) {
-            val itens = viewModel.buscaEsteItemEmOutrasListas(produto)
+            val itens = viewModel.buscarItemEmOutrasListas(produto)
 
             withContext(Dispatchers.Main) {
                 itens.forEach { produto ->

@@ -53,7 +53,7 @@ class ProdutoAdapter(
      */
     fun atualizarColecao(novosItens: ArrayList<Produto>) {
 
-        // se o conteudo as listas antiga e nova são iguais, o conteudo da nova lista é limpo
+        // se o conteudo das listas antiga e nova são iguais, o conteudo da nova lista é limpo
         // pelo DiffUtil isso faz com que a lista de itens atual fique vazia se tornando inicio
         // de uma grande dor de cabeça. Embora seja possivel verificar se a nova lista esta vazia
         // antes de chamar clear() na lista atual, isso nao deve ser feito por que em nenhum cenario
