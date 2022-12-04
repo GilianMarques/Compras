@@ -14,16 +14,6 @@ import dev.gmarques.compras.databinding.ItemRvCategoriaViewBinding
 import dev.gmarques.compras.entidades.Categoria
 import dev.gmarques.compras.entidades.helpers.CategoriaHolder
 
-/*
- * Tentei fazer a implementação desse adapter no Fragmento de lista de compras funcionar no padrao do MVVM
- * mas por conta da função de selecionar categoria e os problemas pra implementar DiffUtils nesse
- * adapter em especifico (problema que nao fui capaz de resolver mesmo tendo implementado a soluçao
- * corretamente no Adapter de itens do mesmo fragmento) acabei tendo que optar por desviar um pouco
- * a implementação. Quando uma categorias é selecionada seja pelo viewmodel ou pela UI (usuario)
- * um Livedata especifico recebe o novo valor e o listener no fragmento solicita ao adapter que aplique a
- * nova categoria selecionada. No final das contas ainda é MVVM mas o ideal era nao ter uma LiveData
- * só para categoria selecionada
- * */
 class CategoriaAdapter(
     fragment: Fragment,
     val itens: ArrayList<CategoriaHolder>,

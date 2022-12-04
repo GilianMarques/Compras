@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:background="?android:windowBackground">
@@ -11,15 +10,17 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:elevation="5dp"
+        >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?android:attr/windowBackground"
+            android:background="?colorSurface"
             app:contentScrim="@android:color/transparent"
             app:layout_scrollFlags="scroll|snap|enterAlwaysCollapsed|exitUntilCollapsed|snapMargins|enterAlways"
-            app:layout_scrollInterpolator="@android:anim/accelerate_decelerate_interpolator">
+            app:layout_scrollInterpolator="@android:anim/linear_interpolator">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -32,16 +33,44 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_categorias"
+                <EditText
+                    android:id="@+id/edt_pesquisa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                     />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/bacground_campo_busca"
+                    android:drawableStart="@drawable/vec_busca_30"
+                    android:drawableEnd="@drawable/vec_limpar_pesquisa_20"
+                    android:drawablePadding="8dp"
+                    android:ems="10"
+                    android:hint="@string/Digite_o_nome_do_produto"
+                    android:imeOptions="actionSearch"
+                    android:inputType="textAutoComplete"
+                    android:minHeight="48dp"
+                    android:padding="8dp" />
+
 
             </LinearLayout>
 
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_categorias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?colorSurface"
+            android:paddingTop="24dp" />
+
+        <include
+            android:id="@+id/valores"
+            layout="@layout/frag_lista_de_compras_valores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?colorSurface"
+            app:layout_constraintTop_toBottomOf="@+id/rv_categorias" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -62,10 +91,12 @@
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         tools:context=".ui.lista_de_compras.FragListaDeCompras">
 
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_itens"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 

@@ -40,5 +40,6 @@
     <string name="Essa_categoria_ja_existe_mude">Essa categoria já existe, mude o nome para prosseguir</string>
     <string name="Digite_um_nome_valido">Digite um nome válido</string>
     <string name="Selecione_um_icone_para">Selecione um ícone para prosseguir</string>
+    <string name="Digite_o_nome_do_produto">Digite o nome do produto...</string>
 
 </resources>

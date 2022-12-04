@@ -10,7 +10,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId 'gmarques.compras'
+        applicationId 'gmarques.compras2'
         minSdk 28
         targetSdk 33
         versionCode 1

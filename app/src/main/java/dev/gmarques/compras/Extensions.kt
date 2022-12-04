@@ -34,7 +34,7 @@ class Extensions {
          * do que ele digitou.
          * */
         fun String.formatarComoNomeValido() = this
-            .replace(Regex("""[^a-zA-Z0-9.]"""), "")
+            .replace(Regex("""[^a-zA-Z0-9. ]"""), "")
             .replace(Regex("[ ]+"), " ")
             .trim().capitalizar()
 
@@ -75,7 +75,7 @@ class Extensions {
                 override fun getVerticalSnapPreference(): Int = snapMode
                 override fun getHorizontalSnapPreference(): Int = snapMode
                 override fun calculateTimeForScrolling(dx: Int): Int {
-                    return 1000 / childCount
+                    return 65//.coerceAtLeast(100 / childCount)
                 }
             }
 

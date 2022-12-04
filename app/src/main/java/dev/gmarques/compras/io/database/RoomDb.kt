@@ -38,11 +38,11 @@ abstract class RoomDb : RoomDatabase() {
 
             for (i in 0 until 10) {
                 val lista = Lista()
-                lista.nome = "Lista#$i"
+                lista.nome = "Lista #$i"
                 for (j in 0 until 35) {
                     val produto = Produto()
                     with(produto) {
-                        nome = "produto#$j"
+                        nome = "produto #$j"
                         preco = j * 0.75f
                         quantidade = j
                         detalhes = "$j itens criados"
@@ -69,7 +69,7 @@ abstract class RoomDb : RoomDatabase() {
                 val c = Categoria()
                 with(c) {
                     nome = "categ #$i"
-                    icone = "vec_cat_$i"
+                    icone = "vec_cat_${i+10}"
                 }
                 categorias.add(c)
                 getInstancia().categoriaDao().addOuAtualizar(c)

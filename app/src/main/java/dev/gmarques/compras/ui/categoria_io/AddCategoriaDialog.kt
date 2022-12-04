@@ -14,9 +14,9 @@ import dev.gmarques.compras.Extensions.Companion.formatarComoNomeValido
 import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
 import dev.gmarques.compras.R
 import dev.gmarques.compras.Vibrador
-import dev.gmarques.compras.databinding.FragAddCategoriaBinding
-import dev.gmarques.compras.io.repositorios.CategoriaRepo
+import dev.gmarques.compras.databinding.DialogAddCategoriaBinding
 import dev.gmarques.compras.entidades.Categoria
+import dev.gmarques.compras.io.repositorios.CategoriaRepo
 import kotlinx.coroutines.runBlocking
 
 class AddCategoriaDialog(
@@ -25,13 +25,13 @@ class AddCategoriaDialog(
 ) {
 
     @Suppress("JoinDeclarationAndAssignment")
-    private val binding: FragAddCategoriaBinding
+    private val binding: DialogAddCategoriaBinding
     private val dialog: BottomSheetDialog
     private val categoria = Categoria()
     private lateinit var adapter: IconesAdapter
 
     init {
-        binding = FragAddCategoriaBinding.inflate(fragment.layoutInflater)
+        binding = DialogAddCategoriaBinding.inflate(fragment.layoutInflater)
 
         dialog = BottomSheetDialog(fragment.requireContext())
         dialog.setContentView(binding.root)
