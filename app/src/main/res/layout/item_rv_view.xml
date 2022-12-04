@@ -24,7 +24,7 @@
             android:elevation="5dp"
             android:padding="8dp"
             android:visibility="gone"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/fab_editar"

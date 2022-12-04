@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.lista_de_compras
+package dev.gmarques.compras.ui.lista_de_compras.adapters
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -15,10 +15,11 @@ import dev.gmarques.compras.Extensions.Companion.riscarTexto
 import dev.gmarques.compras.R
 import dev.gmarques.compras.databinding.ItemRvViewBinding
 import dev.gmarques.compras.entidades.Produto
+import dev.gmarques.compras.ui.lista_de_compras.FragListaDeCompras
 
 class ProdutoAdapter(
     fragListaDeCompras: FragListaDeCompras,
-    private val callback: ItemAdapterCallback,
+    private val callback: ProdutoAdapterCallback,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var corNormal: Int? = null
@@ -75,7 +76,7 @@ class ProdutoAdapter(
 
     inner class ViewHolder(
         private val bindingView: ItemRvViewBinding,
-        private val callback: ItemAdapterCallback,
+        private val callback: ProdutoAdapterCallback,
     ) : RecyclerView.ViewHolder(bindingView.root) {
 
         fun bind(produto: Produto, indice: Int) {
@@ -98,25 +99,25 @@ class ProdutoAdapter(
             })
 
             bindingView.cbComprado.setOnClickListener {
-                callback.produtoComprado(produto, bindingView.cbComprado.isChecked, indice)
+                callback.produtoComprado(produto, bindingView.cbComprado.isChecked)
             }
 
             bindingView.fabEditar.setOnClickListener {
                 alternarMenu(false)
-                callback.editarProduto(produto, indice)
+                callback.editarProduto(produto)
             }
 
             bindingView.fabRemover.setOnClickListener {
                 alternarMenu(false)
-                callback.produtoRemovido(produto, indice)
+                callback.produtoRemovido(produto)
             }
 
             bindingView.tvQtd.setOnClickListener {
-                callback.qtdEditada(produto, indice)
+                callback.qtdEditada(produto)
             }
 
             bindingView.tvPreco.setOnClickListener {
-                callback.precoEditado(produto, indice)
+                callback.precoEditado(produto)
             }
         }
 

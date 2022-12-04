@@ -6,83 +6,112 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?colorSurface"
+    android:layout_marginBottom="8dp"
+    android:animateLayoutChanges="true"
+    android:baselineAligned="false"
+    android:background="?android:windowBackground"
+    android:elevation="8dp"
     android:orientation="horizontal"
     android:paddingStart="2dp"
     android:paddingTop="16dp"
     android:paddingEnd="2dp"
-    android:paddingBottom="16dp">
+    android:paddingBottom="4dp">
 
-    <TextView
-        android:id="@+id/tvValorCarrinho"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        android:layout_weight="1"
-        android:autoSizeMaxTextSize="14sp"
-        android:autoSizeMinTextSize="10sp"
-        android:autoSizeTextType="uniform"
-        android:background="@drawable/background_valores_lista"
-        android:drawablePadding="12dp"
-        android:elevation="2dp"
-        android:gravity="center_vertical"
-        android:maxLines="1"
-        android:paddingStart="8dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="8dp"
-        android:text="R$1.450,22"
-        android:textAlignment="gravity"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/vec_carrinho"
-        tools:ignore="HardcodedText" />
 
-    <TextView
-        android:id="@+id/tvValorCategoria"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:animateLayoutChanges="true"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvValorCarrinho"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:autoSizeMaxTextSize="14sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/background_valores_lista"
+            android:drawablePadding="12dp"
+            android:elevation="0dp"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
+            android:text="R$1.450,22"
+            android:textAlignment="gravity"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/vec_carrinho"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
+        android:id="@+id/ll_valor_categorias"
+
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-
         android:layout_weight="1"
-        android:autoSizeMaxTextSize="14sp"
-        android:autoSizeMinTextSize="10sp"
-        android:autoSizeTextType="uniform"
-        android:background="@drawable/background_valores_lista"
-        android:drawablePadding="12dp"
-        android:elevation="2dp"
-        android:gravity="center_vertical"
-        android:maxLines="1"
-        android:paddingStart="8dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="8dp"
-        android:text="R$999.22"
-        android:textAlignment="gravity"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/vec_categoria" />
+        android:animateLayoutChanges="true"
+        android:gravity="center">
 
-    <TextView
-        android:id="@+id/tvValorLista"
+        <TextView
+            android:id="@+id/tvValorCategoria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:autoSizeMaxTextSize="14sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/background_valores_lista"
+            android:drawablePadding="12dp"
+            android:elevation="0dp"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
+            tools:text="R$999.22"
+            android:textAlignment="gravity"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/vec_categoria" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="2dp"
 
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:autoSizeMaxTextSize="14sp"
-        android:autoSizeMinTextSize="10sp"
-        android:autoSizeTextType="uniform"
-        android:background="@drawable/background_valores_lista"
-        android:drawablePadding="12dp"
-        android:elevation="2dp"
-        android:gravity="center_vertical"
-        android:maxLines="1"
-        android:paddingStart="8dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="8dp"
-        android:text="R$1.450,22"
-        android:textAlignment="gravity"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/vec_lista" />
+        android:animateLayoutChanges="true"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvValorLista"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:autoSizeMaxTextSize="14sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/background_valores_lista"
+            android:drawablePadding="12dp"
+            android:elevation="0dp"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
+            tools:text="R$1.450,22"
+            android:textAlignment="gravity"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/vec_lista" />
+    </LinearLayout>
+
+
 </LinearLayout>
 

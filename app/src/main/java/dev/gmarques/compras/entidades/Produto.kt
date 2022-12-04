@@ -18,9 +18,9 @@ import java.math.MathContext
 
     fun emMoeda(): String = preco.emMoeda()
 
-    fun valorTotal(): Float =
+    fun valorTotal(): Double =
         BigDecimal(preco.toDouble()).multiply(BigDecimal(quantidade)).round(MathContext.DECIMAL32)
-            .toFloat()
+            .toDouble()
 
     fun valotTotalEmMoeda(): String =
         BigDecimal(preco.toDouble()).multiply(BigDecimal(quantidade)).round(MathContext.DECIMAL32)

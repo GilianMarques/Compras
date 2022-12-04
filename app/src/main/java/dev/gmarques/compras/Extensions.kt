@@ -39,6 +39,7 @@ class Extensions {
             .trim().capitalizar()
 
         fun Float.emMoeda(): String = NumberFormat.getCurrencyInstance().format(this)
+        fun Double.emMoeda(): String = NumberFormat.getCurrencyInstance().format(this)
 
         fun TextView.riscarTexto(shouldStrike: Boolean) {
             paintFlags = if (shouldStrike) {

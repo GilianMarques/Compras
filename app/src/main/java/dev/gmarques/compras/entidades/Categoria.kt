@@ -8,18 +8,19 @@ import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 
 @Entity
-class Categoria(
+class Categoria() : Entidade() {
+
     @ColumnInfo(defaultValue = "vec_cat_0")
-    var icone: String = "vec_cat_0",
-) : Entidade() {
+    var icone: String = "vec_cat_0"
+
+    @SuppressLint("DiscouragedApi")
+    fun intIcone() = App.get.resources.getIdentifier(icone, "drawable", App.get.packageName)
+
+    fun setIcone(intIcone: Int) {
+        icone = App.get.resources.getResourceEntryName(intIcone)
+    }
 
     companion object {
-        @SuppressLint("DiscouragedApi")
-        fun intIcone(icone: String) =
-            App.get.resources.getIdentifier(icone, "drawable", App.get.packageName)
-
-        fun stringIcone(icone: Int): String = App.get.resources.getResourceEntryName(icone)
-
         val SEM_CATEGORIA = Categoria().also {
             it.nome = App.get.applicationContext.getString(R.string.Sem_categoria)
             it.id = "999"
@@ -58,8 +59,6 @@ class Categoria(
     override fun toString(): String {
         return "nome='$nome', icone='$icone', id='$id', ultimaAtualizacao=$ultimaAtualizacao, removido=$removido"
     }
-
-
 
 
 }

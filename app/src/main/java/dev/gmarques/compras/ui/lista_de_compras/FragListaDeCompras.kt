@@ -31,6 +31,10 @@ import dev.gmarques.compras.databinding.DialogEditValorItemBinding
 import dev.gmarques.compras.databinding.FragListaDeComprasBinding
 import dev.gmarques.compras.entidades.Produto
 import dev.gmarques.compras.entidades.helpers.CategoriaHolder
+import dev.gmarques.compras.ui.lista_de_compras.adapters.CategoriaAdapter
+import dev.gmarques.compras.ui.lista_de_compras.adapters.CategoriaAdapterCallback
+import dev.gmarques.compras.ui.lista_de_compras.adapters.ProdutoAdapter
+import dev.gmarques.compras.ui.lista_de_compras.adapters.ProdutoAdapterCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,7 +42,8 @@ import kotlinx.coroutines.withContext
 
 //adb shell setprop log.tag.FragmentManager DEBUG
 
-class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
+class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
+    CategoriaAdapterCallback {
 
     private lateinit var viewModel: FragListaDeComprasViewModel
     lateinit var binding: FragListaDeComprasBinding
@@ -62,7 +67,9 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
             Log.d("USUK", "FragListaDeCompras.onViewCreated: ")
             binding.toolbar.title = it.nome
             binding.toolbar.setNavigationIcon(R.drawable.vec_lista_30_primary)
+            binding.toolbar.inflateMenu(R.menu.menu_principal)
 
+            obervarPrecos()
             initRvDeCategorias()
             initRvDeItens()
             initFragmentResultAddItem()
@@ -71,6 +78,17 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         }
     }
 
+    private fun obervarPrecos() {
+        viewModel.valoresLiveData.observe(viewLifecycleOwner) {
+            binding.valores.tvValorCarrinho.text = it.first.emMoeda()
+            binding.valores.tvValorCategoria.text = it.second.emMoeda()
+            binding.valores.tvValorLista.text = it.third.emMoeda()
+
+            binding.valores.llValorCategorias.visibility =
+                    if (it.second > 0) View.VISIBLE else View.GONE
+        }
+
+    }
 
     private fun initFabAddItem() = binding.fab.setOnClickListener {
         Vibrador.vibInteracao()
@@ -115,7 +133,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
         val categoriasAdapter =
-                CategoriaAdapter(this@FragListaDeCompras, ArrayList(), ::categoriaSelecionadaCallback)
+                CategoriaAdapter(this@FragListaDeCompras, ArrayList(), this@FragListaDeCompras)
 
         binding.rvCategorias.setHasFixedSize(true)
         binding.rvCategorias.adapter = categoriasAdapter
@@ -127,24 +145,19 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
             lifecycleScope.launch {
                 delay(300)
                 val indice = viewModel.indiceDaCategoriaSelecionada()
-                if (indice > 0) binding.rvCategorias.smoothScroolToPosition(indice)
+                if (indice >= 0) binding.rvCategorias.smoothScroolToPosition(indice)
             }
         }
 
 
     }
 
-    private fun categoriaSelecionadaCallback(categoria: CategoriaHolder) {
-        Vibrador.vibInteracao()
-        viewModel.selecionarCategoriaPeloUsuario(categoria)
-    }
-
-    override fun produtoComprado(produto: Produto, comprado: Boolean, indice: Int) {
+    override fun produtoComprado(produto: Produto, comprado: Boolean) {
         Vibrador.vibInteracao()
         viewModel.produtoComprado(produto, comprado)
     }
 
-    override fun produtoRemovido(produto: Produto, indice: Int) {
+    override fun produtoRemovido(produto: Produto) {
         Vibrador.vibInteracao()
 
         val msg =
@@ -160,7 +173,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
     }
 
-    override fun editarProduto(produto: Produto, indice: Int) {
+    override fun editarProduto(produto: Produto) {
         Vibrador.vibInteracao()
         findNavController().navigate(FragListaDeComprasDirections.actionFragListaDeComprasToEditItem(
             produto))
@@ -172,7 +185,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
      * Se o usuario aplicar a alteraçao, produto e interface sao atualizados
      * Nota: funçao de callback do recyclerview de itens
      */
-    override fun precoEditado(produto: Produto, indice: Int) {
+    override fun precoEditado(produto: Produto) {
         val binding = DialogEditValorBinding.inflate(layoutInflater)
         var dialog: AlertDialog? = null
 
@@ -245,7 +258,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
      * Se o usuario aplicar a alteraçao, produto e interface sao atualizados
      * Nota: funçao de callback do recyclerview de itens
      */
-    override fun qtdEditada(produto: Produto, indice: Int) {
+    override fun qtdEditada(produto: Produto) {
         val binding = DialogEditQtdBinding.inflate(layoutInflater)
         var dialog: AlertDialog? = null
 
@@ -310,13 +323,48 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         }
     }
 
+    override fun categoriaSelecionada(holderCategoria: CategoriaHolder) {
+        Vibrador.vibInteracao()
+        viewModel.selecionarCategoriaPeloUsuario(holderCategoria)
+    }
+
+    override fun categoriaPressionada(holderCategoria: CategoriaHolder) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.Como_deseja_prosseguir))
+            .setMessage(String.format(getString(R.string.O_que_deseja_fazer_com_x), holderCategoria.categoria.nome)
+                .formatarHtml())
+            .setPositiveButton(getString(R.string.Editar)) { dialog, which -> /*TODO("Not yet implemented") */ }
+            .setNegativeButton(getString(R.string.Remover)) { dialog, which -> confirmarRemocao(holderCategoria)}
+            .setNeutralButton(getString(R.string.Cancelar)) { dialog, which -> /*TODO("Not yet implemented") */ }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun confirmarRemocao(holderCategoria: CategoriaHolder) {
+        Vibrador.vibInteracao()
+
+        val msg =
+                String.format(getString(R.string.Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita),
+                    holderCategoria.categoria.nome).formatarHtml()
+
+        MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Por_favor_confirme))
+            .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { _, _ ->
+                // TODO:   viewModel.removerProduto(produto)
+
+            }.setNegativeButton(getString(R.string.Cancelar)) { _, _ -> }.setCancelable(false)
+            .show()
+
+    }
+
     /**
      * Extrai o objeto do pacote verificando a plataforma e invocando a função correta
      * */
     private fun desempacotarProduto(bundle: Bundle, key: String): Produto =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 bundle.getSerializable(key, Produto::class.java)!!
-            } else bundle.getSerializable(key) as Produto
+            } else {
+                bundle.getSerializable(key) as Produto
+            }
 
 
 }

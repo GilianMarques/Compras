@@ -34,7 +34,7 @@ class EditProdutoViewModel : ViewModel() {
     suspend fun carregarCategorias() = ArrayList<Categoria>().also {
 
         val categoria = Categoria().apply {
-            icone = Categoria.stringIcone(R.drawable.vec_add)
+            setIcone(R.drawable.vec_add)
             nome = App.get.applicationContext.getString(R.string.Nova_categoria)
         }
 

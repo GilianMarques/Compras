@@ -40,6 +40,9 @@
     <string name="Essa_categoria_ja_existe_mude">Essa categoria já existe, mude o nome para prosseguir</string>
     <string name="Digite_um_nome_valido">Digite um nome válido</string>
     <string name="Selecione_um_icone_para">Selecione um ícone para prosseguir</string>
-    <string name="Digite_o_nome_do_produto">Digite o nome do produto...</string>
+    <string name="Digite_o_nome_do_produto">Digite o nome do produto…</string>
+    <string name="Nova_lista_de_compras">Nova lista de compras</string>
+    <string name="Como_deseja_prosseguir">Como deseja prosseguir?</string>
+    <string name="O_que_deseja_fazer_com_x"><![CDATA[O que deseja fazer com <b>%1$s?</b>]]></string>
 
 </resources>

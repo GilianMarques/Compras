@@ -26,11 +26,11 @@ class CategoriaAdapter(
 
     init {
         selecaoBackground = ResourcesCompat.getDrawable(fragment.resources,
-            drawable.vec_categoria_rv_selecionada,
+            drawable.background_categoria_rv_selecionada,
             fragment.activity?.theme)!!
 
         originalBackground = ResourcesCompat.getDrawable(fragment.resources,
-            drawable.vec_categoria_rv,
+            drawable.background_categoria_rv,
             fragment.activity?.theme)!!
     }
 
@@ -42,7 +42,7 @@ class CategoriaAdapter(
             val categoria = itens[indice]
 
             bindingView.tvNome.text = categoria.nome
-            bindingView.ivIcone.setImageResource(Categoria.intIcone(categoria.icone))
+            bindingView.ivIcone.setImageResource(categoria.intIcone())
 
             bindingView.rlCard.setOnClickListener {
                 if (indice > 0) adapterCallback.categoriaSelecionada(categoria)

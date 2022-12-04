@@ -17,7 +17,7 @@ class AddProdutoViewModel : ViewModel() {
     val categoriaSelecionada get() = _categoriaSelecionada
 
     suspend fun produtoJaExisteNaLista(nome: String) =
-        ItemRepo.getItensNaListaPorNome(nome, listaId).isNotEmpty()
+            ItemRepo.getItensNaListaPorNome(nome, listaId).isNotEmpty()
 
     suspend fun carregarSugestoes(nome: String): ArrayList<String> {
         val produtos = ItemRepo.getItensPorNome(nome)
@@ -33,7 +33,7 @@ class AddProdutoViewModel : ViewModel() {
     suspend fun carregarCategorias() = ArrayList<Categoria>().also {
 
         val categoria = Categoria().apply {
-            icone = Categoria.stringIcone(R.drawable.vec_add)
+            setIcone(R.drawable.vec_add)
             nome = App.get.applicationContext.getString(R.string.Nova_categoria)
         }
 

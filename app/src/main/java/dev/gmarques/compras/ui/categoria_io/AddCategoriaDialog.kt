@@ -254,7 +254,7 @@ class AddCategoriaDialog(
         else if (categoriaRepetida(nome)) notificarErro(R.string.Essa_categoria_ja_existe_mude)
         else if (iconeNaoSelecionado()) notificarErro(R.string.Selecione_um_icone_para)
         else runBlocking {
-            categoria.icone = Categoria.stringIcone(adapter.receberItemSelecionado()!!)
+            categoria.setIcone(adapter.receberItemSelecionado()!!)
             categoria.nome = nome
             CategoriaRepo.addCategoria(categoria)
             dialog.dismiss()

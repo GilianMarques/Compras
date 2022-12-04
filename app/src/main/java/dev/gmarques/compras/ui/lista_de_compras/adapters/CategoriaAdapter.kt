@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.lista_de_compras
+package dev.gmarques.compras.ui.lista_de_compras.adapters
 
 import android.graphics.drawable.Drawable
 import android.util.Log
@@ -11,13 +11,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import dev.gmarques.compras.R.drawable
 import dev.gmarques.compras.databinding.ItemRvCategoriaViewBinding
-import dev.gmarques.compras.entidades.Categoria
 import dev.gmarques.compras.entidades.helpers.CategoriaHolder
 
 class CategoriaAdapter(
     fragment: Fragment,
     val itens: ArrayList<CategoriaHolder>,
-    private val clickCallback: (CategoriaHolder) -> Unit,
+    private val clickCallback: CategoriaAdapterCallback,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var selecaoBackground: Drawable
@@ -25,11 +24,11 @@ class CategoriaAdapter(
 
     init {
         selecaoBackground = ResourcesCompat.getDrawable(fragment.resources,
-            drawable.vec_categoria_rv_selecionada,
+            drawable.background_categoria_rv_selecionada,
             fragment.activity?.theme)!!
 
         originalBackground = ResourcesCompat.getDrawable(fragment.resources,
-            drawable.vec_categoria_rv,
+            drawable.background_categoria_rv,
             fragment.activity?.theme)!!
     }
 
@@ -61,25 +60,25 @@ class CategoriaAdapter(
 
     inner class ViewHolder(
         private val bindingView: ItemRvCategoriaViewBinding,
-        private val click: (CategoriaHolder) -> Unit,
+        private val callback: CategoriaAdapterCallback,
     ) : RecyclerView.ViewHolder(bindingView.root) {
 
 
-         fun carregarView(indice: Int) {
+        fun carregarView(indice: Int) {
 
             val cHolder = itens[indice]
             val categoria = cHolder.categoria
 
             bindingView.tvNome.text = categoria.nome
-            bindingView.ivIcone.setImageResource(Categoria.intIcone(categoria.icone))
+            bindingView.ivIcone.setImageResource(categoria.intIcone())
 
             bindingView.rlCard.setOnClickListener {
+                callback.categoriaSelecionada(cHolder)
+            }
 
-                click(cHolder)
-                // alternarSelecaoPorClique(this, categoria, indice) - nao usar essa funçao no MVVM
-                // nao chamo o 'alternarSelecaoPorClique' a partir do adapter porque no MVVM a interface deve reagir as atualizacoes dos dados
-                // a abordagem adequada é avisar o fragmento que vai avisar o viewmodel que vai decidir o que fazer e atualizar
-                // o livedata que vai avisar o fragmento que por fim vai atualizar o recyclerview com o valor adequado
+            bindingView.rlCard.setOnLongClickListener {
+                callback.categoriaPressionada(cHolder)
+                return@setOnLongClickListener true
             }
 
             Log.d("USUK", "ViewHolder.".plus("carregarView() indice = $indice cat: $cHolder"))
@@ -90,21 +89,21 @@ class CategoriaAdapter(
             else itemDesselecionado()
         }
 
-         fun itemSelecionado() {
+        fun itemSelecionado() {
             bindingView.rlCard.background = selecaoBackground
         }
 
-         fun itemDesselecionado() {
+        fun itemDesselecionado() {
             bindingView.rlCard.background = originalBackground
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
-        (holder as ViewHolder).carregarView(position)
+            (holder as ViewHolder).carregarView(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
-            ItemRvCategoriaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ItemRvCategoriaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding, clickCallback)
     }
 

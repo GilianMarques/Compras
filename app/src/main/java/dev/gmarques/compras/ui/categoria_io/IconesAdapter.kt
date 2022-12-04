@@ -20,11 +20,11 @@ class IconesAdapter(itens: ArrayList<Int>, fragment: Fragment) :
 
     init {
         selecaoBackground = ResourcesCompat.getDrawable(fragment.resources,
-            R.drawable.vec_categoria_rv_selecionada,
+            R.drawable.background_categoria_rv_selecionada,
             fragment.activity?.theme)!!
 
         originalBackground = ResourcesCompat.getDrawable(fragment.resources,
-            R.drawable.vec_categoria_rv,
+            R.drawable.background_categoria_rv,
             fragment.activity?.theme)!!
     }
 

@@ -29,6 +29,9 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
     private val _listaLiveData = MutableLiveData<Lista>()
     val listaLiveData: LiveData<Lista> get() = _listaLiveData
 
+    private val _valoresLiveData = MutableLiveData<Triple<Double, Double, Double>>()
+    val valoresLiveData: LiveData<Triple<Double, Double, Double>> get() = _valoresLiveData
+
     /**
      * Esta é uma referencia à categoria selecionada dentro do array no
      * _categoriasLiveData, seu proposito é evitar iteraçoes desnecessarias
@@ -45,6 +48,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
             carregarCategoriasNaLista()
             carregarItens()
+            calcularValores()
         }
 
 
@@ -183,8 +187,9 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
                 ordenarProdutos(itens)
                 _produtosLiveData.postValue(itens)
                 //se nao seleciono a categoria dele
-            }else selecionarCategoria(receberHolderDaCategoria(categoriaDoProduto).first)
+            } else selecionarCategoria(receberHolderDaCategoria(categoriaDoProduto).first)
         }
+        calcularValores()
     }
 
     fun attProduto(
@@ -214,7 +219,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
                 throw java.lang.Exception("Situação estranha... a categoria selecionada deve ser nula ou  == a categoria do produtoOriginal" + "se não é nenhuma das 2 o que esta definido como categoria selecionada? e porque?")
             }
         }
-
+        if (produtoAtualizado.valorTotal() != produtoOriginal.valorTotal()) calcularValores()
     }
 
     fun produtoComprado(produtoOriginal: Produto, comprado: Boolean) = viewModelScope.launch {
@@ -239,6 +244,8 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         categorias[indice] = holder
         ordenarCategorias(categorias)
         _categoriasLiveData.value = categorias
+
+        calcularValores()
     }
 
     /**
@@ -286,7 +293,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
             _categoriasLiveData.postValue(categorias)
         }
 
-
+        calcularValores()
     }
 
     suspend fun buscarItemEmOutrasListas(produto: Produto): ArrayList<Produto> =
@@ -315,6 +322,8 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
         _categoriasLiveData.postValue(ArrayList(categorias))
         carregarItens()
+        calcularValores()
+
     }
 
     private suspend fun selecionarCategoria(novaSelecao: CategoriaHolder) = withContext(IO) {
@@ -328,7 +337,10 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         }
 
         _categoriasLiveData.postValue(ArrayList(categorias))
+       
         carregarItens()
+        calcularValores()
+
     }
 
     /**
@@ -350,10 +362,36 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         val itens = _produtosLiveData.value!!
         itens[itens.indexOf(alvo)] = clone
         _produtosLiveData.postValue(itens)
+        calcularValores()
     }
 
     fun indiceDaCategoriaSelecionada() =
             if (categSelecHolder != null) receberHolderDaCategoria(categSelecHolder!!.categoria).second else -1
+
+    /**
+     * Calcula os valores dos itens na lista de compras atual
+     * Despacha um Triple com a soma dos valores dos produtos por (COMPRADOS - CATEGORIA - LISTA)
+     * */
+    private suspend fun calcularValores() = withContext(IO) {
+
+        val produtosDaCategoria = ArrayList<Produto>()
+        val produtosComprados = ArrayList<Produto>()
+        val produtosDaLista = ItemRepo.getItensNaLista(_listaLiveData.value?.id!!)
+
+        for (produto in produtosDaLista) {
+            if (produto.categoriaId == categSelecHolder?.categoria?.id) produtosDaCategoria.add(produto)
+            if (produto.comprado) produtosComprados.add(produto)
+        }
+
+
+        val valores = Triple(
+            produtosComprados.sumOf { it.valorTotal() },
+            produtosDaCategoria.sumOf { it.valorTotal() },
+            produtosDaLista.sumOf { it.valorTotal() },
+        )
+
+        _valoresLiveData.postValue(valores)
+    }
 
 
 }
