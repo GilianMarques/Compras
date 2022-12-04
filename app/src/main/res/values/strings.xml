@@ -3,21 +3,21 @@
     <string name="Nome">Nome</string>
     <string name="Preco">Preço</string>
     <string name="Quantidade">Quantidade</string>
-    <string name="unidades">Unidade(s)</string>
-    <string name="detalhes">Detalhes</string>
-    <string name="novo_item">Novo item</string>
+    <string name="Unidades">Unidade(s)</string>
+    <string name="Detalhes">Detalhes</string>
+    <string name="Novo_item">Novo item</string>
     <string name="Compras">Compras</string>
     <string name="un">%1$d UN</string>
-    <string name="sem_categoria">Sem categoria</string>
-    <string name="lista">Lista %1$s</string>
-    <string name="campo_nome_deve_ser_preenchido">Campo %1$s deve ser preenchido</string>
+    <string name="Sem_categoria">Sem categoria</string>
+    <string name="Lista">Lista %1$s</string>
     <string name="preco">preço</string>
     <string name="nome">nome</string>
     <string name="quantidade">quantidade</string>
-    <string name="Campo_deve_ser_preenchido">Campo deve ser preenchido</string>
-    <string name="item_ja_existe_na_lista">\"%1$s\" já existe na lista, mude o nome para prosseguir.</string>
+    <string name="Campo_deve_ser_preenchido">Campo deve ser preenchido corretamente</string>
+    <string name="Campo_x_deve_ser_preenchido"><![CDATA[Campo \"<b>%1$s</b>\" deve ser preenchido corretamente]]></string>
+    <string name="produto_ja_existe_na_lista">\"%1$s\" já existe na lista, mude o nome para prosseguir.</string>
     <string name="Categoria">Categoria</string>
-    <string name="selecione_uma_categoria">Selecione uma categoria para o item</string>
+    <string name="Selecione_uma_categoria">Selecione uma categoria para o item</string>
     <string name="Editar_x">Editar %1$s</string>
     <string name="Remover">Remover</string>
     <string name="Cancelar">Cancelar</string>
@@ -30,5 +30,15 @@
     <string name="moeda">R$</string>
     <string name="Historico_de_precos_de_x">Histórico de preços de %1$s</string>
     <string name="Sugestoes_para_x">Sugestões para %1$s</string>
+    <string name="Nova_categoria">Nova categoria</string>
+    <string name="_1_un">1 UN</string>
+    <string name="_2_un">2 UN</string>
+    <string name="_3_un">3 UN</string>
+    <string name="_4_un">4 UN</string>
+    <string name="_5_un">5 UN</string>
+    <string name="_6_un">6 UN</string>
+    <string name="Essa_categoria_ja_existe_mude">Essa categoria já existe, mude o nome para prosseguir</string>
+    <string name="Digite_um_nome_valido">Digite um nome válido</string>
+    <string name="Selecione_um_icone_para">Selecione um ícone para prosseguir</string>
 
 </resources>

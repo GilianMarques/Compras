@@ -7,9 +7,9 @@
         android:id="@+id/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="3dp"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="12dp"
         android:layout_marginBottom="3dp"
         android:animateLayoutChanges="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
@@ -24,7 +24,7 @@
             android:elevation="5dp"
             android:padding="8dp"
             android:visibility="gone"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/fab_editar"
@@ -53,11 +53,11 @@
             android:animateLayoutChanges="true"
             android:padding="8dp"
             android:visibility="visible"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
 
             <TextView
-                android:id="@+id/tvNome"
+                android:id="@+id/tv_nome"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:ellipsize="marquee"
@@ -83,7 +83,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@+id/tvNome"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_nome"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="R$ 199.952,35" />
@@ -151,7 +151,7 @@
                 android:id="@+id/cbComprado"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="@+id/tvNome"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_nome"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="TouchTargetSizeCheck" />

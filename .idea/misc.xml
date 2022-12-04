@@ -14,6 +14,9 @@
       </map>
     </option>
   </component>
+  <component name="EntryPointsManager">
+    <pattern value="dev.gmarques.compras.objetos.Objetos" method="setNome" />
+  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/../../javadoc" />
     <option name="OPTION_INCLUDE_LIBS" value="true" />

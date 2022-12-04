@@ -16,7 +16,7 @@
         android:paddingBottom="16dp">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textFieldQtd"
+            android:id="@+id/textField_qtd"
             style="@style/TextInputStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,10 +32,10 @@
             app:layout_constraintTop_toTopOf="parent"
             app:startIconDrawable="@drawable/vec_qtd"
             app:startIconTint="?attr/colorPrimary"
-            app:suffixText="@string/unidades">
+            app:suffixText="@string/Unidades">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtQtd"
+                android:id="@+id/edt_qtd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionDone"
@@ -53,9 +53,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
-            tools:text="Sugestoes"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textFieldQtd" />
+            app:layout_constraintTop_toBottomOf="@id/textField_qtd"
+            tools:text="Sugestoes" />
 
 
         <androidx.constraintlayout.helper.widget.Flow
@@ -63,10 +63,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-
             android:padding="8dp"
             app:constraint_referenced_ids="chip1,chip2,chip3, chip4, chip5,chip6"
-            app:flow_horizontalGap="16dp"
+            app:flow_horizontalGap="8dp"
             app:flow_horizontalStyle="packed"
             app:flow_verticalGap="16dp"
             app:flow_verticalStyle="packed"
@@ -81,10 +80,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:minWidth="80dp"
-            android:textAlignment="center"
             android:hint="1"
-            android:text="1 UN"
+            android:minWidth="80dp"
+            android:text="@string/_1_un"
+            android:textAlignment="center"
             android:textColor="?colorOnSurface"
             app:ensureMinTouchTargetSize="false"
             tools:ignore="HardcodedText,TouchTargetSizeCheck" />
@@ -95,10 +94,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:minWidth="80dp"
-            android:textAlignment="center"
             android:hint="2"
-            android:text="2 UN"
+            android:minWidth="80dp"
+            android:text="@string/_2_un"
+            android:textAlignment="center"
             android:textColor="?colorOnSurface"
             app:ensureMinTouchTargetSize="false"
             tools:ignore="HardcodedText,TouchTargetSizeCheck" />
@@ -109,10 +108,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:minWidth="80dp"
-            android:textAlignment="center"
             android:hint="3"
-            android:text="3 UN"
+            android:minWidth="80dp"
+            android:text="@string/_3_un"
+            android:textAlignment="center"
             android:textColor="?colorOnSurface"
             app:ensureMinTouchTargetSize="false"
             tools:ignore="HardcodedText,TouchTargetSizeCheck" />
@@ -123,13 +122,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:minWidth="80dp"
-            android:textAlignment="center"
             android:hint="4"
-            android:text="4 UN"
+            android:minWidth="80dp"
+            android:text="@string/_4_un"
+            android:textAlignment="center"
             android:textColor="?colorOnSurface"
             app:ensureMinTouchTargetSize="false"
-            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+            tools:ignore="MissingConstraints,HardcodedText,TouchTargetSizeCheck" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip5"
@@ -137,13 +136,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:minWidth="80dp"
-            android:textAlignment="center"
             android:hint="5"
-            android:text="5 UN"
+            android:minWidth="80dp"
+            android:text="@string/_5_un"
+            android:textAlignment="center"
             android:textColor="?colorOnSurface"
             app:ensureMinTouchTargetSize="false"
-            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+            tools:ignore="MissingConstraints,HardcodedText,TouchTargetSizeCheck" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip6"
@@ -151,10 +150,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:minWidth="80dp"
-            android:textAlignment="center"
             android:hint="6"
-            android:text="6 UN"
+            android:minWidth="80dp"
+            android:text="@string/_6_un"
+            android:textAlignment="center"
             android:textColor="?colorOnSurface"
             app:ensureMinTouchTargetSize="false"
             tools:ignore="HardcodedText,TouchTargetSizeCheck" />
@@ -165,7 +164,7 @@
             style="@style/Widget.Material3.Button.ElevatedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:paddingStart="16dp"
@@ -183,7 +182,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"

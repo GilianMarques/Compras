@@ -1,28 +1,30 @@
 package dev.gmarques.compras.io.repositorios
 
 import dev.gmarques.compras.io.database.RoomDb
-import dev.gmarques.compras.objetos.Item
+import dev.gmarques.compras.entidades.Produto
 
 
 object ItemRepo : BaseRepo() {
 
-    suspend fun addOuAtualizar(item: Item) = RoomDb.getInstancia().itemDao().addOuAtualizar(item)
+    suspend fun addOuAtualizar(produto: Produto) = RoomDb.getInstancia().produtoDao().addOuAtualizar(produto)
 
     @Suppress("unused")
-    suspend fun getTodosItens() = RoomDb.getInstancia().itemDao().getItens()
+    suspend fun getTodosItens() = RoomDb.getInstancia().produtoDao().getItens()
 
-    suspend fun getItensPorNome(nome: String): List<Item> =
-        RoomDb.getInstancia().itemDao().getItensPorNomeIniciado(nome)
+    suspend fun getItensPorNome(nome: String): List<Produto> =
+        RoomDb.getInstancia().produtoDao().getItensPorNomeIniciado(nome)
 
     suspend fun getItensNaListaPorNome(nome: String, listaId: String) =
-        RoomDb.getInstancia().itemDao().getItensNaListaPorNome(nome, listaId)
+        RoomDb.getInstancia().produtoDao().getItensNaListaPorNome(nome, listaId)
 
-    suspend fun getItensNaLista(listaId: String) = RoomDb.getInstancia().itemDao().getItens(listaId)
+    suspend fun getItensNaLista(listaId: String) = RoomDb.getInstancia().produtoDao().getItens(listaId)
 
-    suspend fun getItensNaListaPorCategoria(listaId: String, categoriaId: String?) =
-        RoomDb.getInstancia().itemDao().getItens(listaId, categoriaId)
+    suspend fun getItensNaListaPorCategoria(
+        listaId: String,
+        categoriaId: String?,
+    ) = ArrayList(RoomDb.getInstancia().produtoDao().getItens(listaId, categoriaId))
 
-    suspend fun getItensPorNomeExato(item: Item, limiteResultados: Int) =
-        RoomDb.getInstancia().itemDao().getItensPorNomeExato(item.nome,limiteResultados)
+    suspend fun getItensPorNomeExato(produto: Produto, limiteResultados: Int) =
+        RoomDb.getInstancia().produtoDao().getItensPorNomeExato(produto.nome, limiteResultados)
 
 }

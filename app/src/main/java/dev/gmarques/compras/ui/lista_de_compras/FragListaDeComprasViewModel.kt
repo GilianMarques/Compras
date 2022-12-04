@@ -2,194 +2,358 @@ package dev.gmarques.compras.ui.lista_de_compras
 
 import android.app.Application
 import android.util.Log
-import androidx.annotation.MainThread
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import dev.gmarques.compras.entidades.Categoria
+import dev.gmarques.compras.entidades.Lista
+import dev.gmarques.compras.entidades.Produto
+import dev.gmarques.compras.entidades.helpers.CategoriaHolder
 import dev.gmarques.compras.io.repositorios.CategoriaRepo
 import dev.gmarques.compras.io.repositorios.ItemRepo
 import dev.gmarques.compras.io.repositorios.ListaRepo
-import dev.gmarques.compras.objetos.Categoria
-import dev.gmarques.compras.objetos.Item
-import dev.gmarques.compras.objetos.Lista
-import dev.gmarques.compras.viewmodel_utils.MutableListLiveData
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 
 
 class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(appContext) {
 
-
-    //liveData pra notificar o ui controller sobre alteraçoes na lista
-    private val _categoriasLiveData = MutableListLiveData<Categoria>()
+    /**liveData pra notificar o ui controller sobre alteraçoes na lista de categorias*/
+    private val _categoriasLiveData = MutableLiveData<ArrayList<CategoriaHolder>>()
     val categoriasLiveData get() = _categoriasLiveData
 
-    //liveData pra notificar o ui controller se a categoriaAtual ficar nula por ficar sem itens, ou outro motivo qqer
-    private val _categoriaselecionadaLiveData = MutableLiveData<Int>()
-    val categoriaselecionadaLiveData get() = _categoriaselecionadaLiveData
+    /**liveData pra notificar o ui controller sobre alteraçoes na lista de itens*/
+    private val _produtosLiveData = MutableLiveData<ArrayList<Produto>>()
+    val produtosLiveData get() = _produtosLiveData
 
-    //liveData pra notificar o ui controller se os itens forem atualizados (pra recarregar o recyclerview)
-    private val _itensRecarregadosLiveData = MutableLiveData<Int>()
-    val itensRecarregadosLiveData get() = _itensRecarregadosLiveData
-
-    // lista de compras atual
+    /** lista de compras atual*/
     private val _listaLiveData = MutableLiveData<Lista>()
     val listaLiveData: LiveData<Lista> get() = _listaLiveData
 
-    // lista de categorias exibida no recyclerview
-    var categorias: ArrayList<Categoria> = ArrayList()
-
-    // categoria selecionada no recyclerview de categorias
-    private var categoriaSelecionada: Categoria? = null
-
-    val itens: ArrayList<Item> = ArrayList()
+    /**
+     * Esta é uma referencia à categoria selecionada dentro do array no
+     * _categoriasLiveData, seu proposito é evitar iteraçoes desnecessarias
+     * no array sempre que necessario acessar a categoria selecionada.
+     * Alteraçoes nessa variavel se refletem na lista de categorias dentro do array.
+     */
+    private var categSelecHolder: CategoriaHolder? = null
 
     init {
-        viewModelScope.launch {
+        runBlocking {
             _listaLiveData.value = ListaRepo.getUtimaOuQualquerLista() ?: Lista.PADRAO
-
             @Suppress("ControlFlowWithEmptyBody") if (Lista.PADRAO == _listaLiveData.value) {
             } // TODO: criar uma lista a partir daqui
 
-            carregarCategoriasPresentesNaListaENotificar()
-            carregarItensENotificar()
-
+            carregarCategoriasNaLista()
+            carregarItens()
         }
+
+
+    }
+
+
+    /**
+     * carrega os itens da lista  de acordo com a categoria selecionada
+     * no momento
+     * @return os itens direto do DB
+     * */
+    private suspend fun carregarItens() = withContext(IO) {
+        Log.d("USUK", "FragListaDeComprasViewModel.".plus("carregarItens() "))
+
+        val listaId = _listaLiveData.value!!.id
+        val holder = categSelecHolder
+        val itens = if (holder != null) {
+            ArrayList(ItemRepo.getItensNaListaPorCategoria(listaId, holder.categoria.id))
+        } else ArrayList(ItemRepo.getItensNaLista(listaId))
+
+        ordenarProdutos(itens)
+        _produtosLiveData.postValue(itens)
+    }
+
+    private suspend fun carregarCategoriasNaLista() = withContext(IO) {
+        val map: HashMap<String, CategoriaHolder> = HashMap()
+        val itens = ItemRepo.getItensNaLista(_listaLiveData.value?.id!!)
+
+        for (produto in itens) {
+            val categoria = CategoriaRepo.getCategoriaPorId(produto.categoriaId)
+            map[produto.categoriaId] =
+                    CategoriaHolder(categoria, todosOsItensForamComprados(categoria))
+        }
+
+        val resultado = ArrayList(map.values.toList())
+        ordenarCategorias(resultado)
+        _categoriasLiveData.postValue(resultado)
+    }
+
+    private suspend fun receberCategoriaDoDB(produto: Produto): Categoria = withContext(IO) {
+        CategoriaRepo.getCategoriaPorId(produto.categoriaId)
+    }
+
+    private suspend fun attItemNoBancoDeDados(produto: Produto) =
+            withContext(IO) { ItemRepo.addOuAtualizar(produto) }
+
+    /**
+     * @return Um par com uma copia editavel de CategoriaHolder e seu indice
+     * @throws Exception caso o objeto não seja encontrado na lista
+     * */
+    private fun receberHolderDaCategoria(alvo: Categoria): Pair<CategoriaHolder, Int> {
+        val lista = _categoriasLiveData.value!!
+        for (i in 0 until lista.size) {
+            val holder = lista[i]
+            if (holder.categoria.id == alvo.id) return holder.clonar() to i
+        }
+
+        throw java.lang.Exception("${alvo.nome} nao foi encontrada na lista" +
+                "\nalvo = $alvo" +
+                "\nTamanho da lista: ${_categoriasLiveData.value?.size}, Conteudo:" +
+                "\n${_categoriasLiveData.value?.joinToString(separator = "\n")}")
     }
 
     /**
-     * carrega os itens da lista recebida de acordo com a categoria selecionada
-     * no momento
-     * @return os itens direto do DB*/
-    suspend fun carregarItensENotificar() {
-        //se der pau aqui tem que verificar no metodo chamador o estado da lista
-        val listaId = _listaLiveData.value!!.id
-        val data = if (categoriaSelecionada != null) ArrayList(ItemRepo.getItensNaListaPorCategoria(
-            listaId,
-            categoriaSelecionada!!.id))
-        else ArrayList(ItemRepo.getItensNaLista(listaId))
-
-        itens.clear()
-        itens.addAll(data)
-        ordenarLista()
-        Log.d("USUK", "FragListaDeComprasViewModel.carregarItensENotificar: lendo do db ")
-        // avisa que houve atualizaçao (pela MainThread)
-        _itensRecarregadosLiveData.postValue(1)
-
+     * Verifica se a categoria recebida existe na lista de categorias sendo exibidea para o usuario
+     * Atente-se ao nome da função.
+     * @return false se a categoria existe na lista caso contrario true
+     * */
+    private fun categoriaNaoExisteNalista(categoria: Categoria): Boolean {
+        for (holder in categoriasLiveData.value!!) if (categoria.id == holder.categoria.id) return false
+        return true
     }
 
-    @MainThread
-    private suspend fun carregarCategoriasPresentesNaListaENotificar() {
-        Log.d("USUK", "FragListaDeComprasViewModel.carregarCategoriasPresentesNaListaENotificar: ")
-        val tempData: HashMap<String, Categoria> = HashMap()
-        val itens = ItemRepo.getItensNaLista(_listaLiveData.value?.id!!)
-        for (item in itens) tempData[item.categoriaId] = CategoriaRepo.getCategoria(item)
-
-        categorias = ArrayList(tempData.values.sortedWith(compareBy { it.nome }))
-        _categoriasLiveData.colecaoAtualizada()// notifica Ui
-    }
-
-    fun categoriaSelecionada(categoria: Categoria?) {
-        Log.d("USUK",
-            "FragListaDeComprasViewModel.".plus("categoriaSelecionada() atual ${categoriaSelecionada?.nome} nova = ${categoria?.nome}"))
-        categoriaSelecionada = if (categoria == categoriaSelecionada) null else categoria
-    }
-
-    fun getCategoriaSelecionada() = categoriaSelecionada?.id
-
-    suspend fun addItem(item: Item) = ItemRepo.addOuAtualizar(item)
-
-    /***
-     * atualiza as categorias pra refletir a inserçao de um item
-     */
-    fun ajustarCategoriasItemAdicionado(item: Item): Pair<Int, Int>? {
-        val categoria = CategoriaRepo.getCategoria(item)
-
-        if (!categorias.contains(categoria)) {
-            // adiciono uma categoria ao Rv de categorias se o novo item for de uma categoria nao presente na lista até o momento
-            categorias.add(categoria)
-            _categoriasLiveData.itemAdicionado(categoria, categorias.size - 1)// notifica Ui
-        }
-
-        if (categoriaSelecionada?.id == item.categoriaId || categoriaSelecionada == null) {
-            itens.add(0, item)
-            return ordenarItem(item)
-        } else return null
-
-    }
-
-    suspend fun attItem(item: Item) = ItemRepo.addOuAtualizar(item)
-
-    /***
-     * atualiza as categorias pra refletir a atualizacao de um item
-     * um item atualizado pode ter side movido para outra categoria, essa deve ser
-     * adicionada na lista de categorias caso ja nao estaja la, uma categoria vazia
-     * deve ser removida da lista de categorias existem outras alteraçoes que devem
-     * ser feitas e podem ser causadas pela simples alteraçaod e um item, essa funçao
-     * busca fazer isso de maneira simples ja que as coleçoes sao itens e categorias sao pequenas*/
-    @MainThread
-    suspend fun ajustarCategoriasItemEditado() {
-        Log.d("USUK", "FragListaDeComprasViewModel.ajustarCategorias: ")
-        //atualizo as categorias caso o item tenha tido sua categotia alterada
-        carregarCategoriasPresentesNaListaENotificar()
-
-        // se a categoriaSelecionada ja nao tem nenhum item des-seleciono ela
-        if (!categorias.contains(categoriaSelecionada)) {
-            categoriaSelecionada(null)
-            // avisa a ui que a categoriaSelecionada agora é nula
-            _categoriaselecionadaLiveData.postValue(1)
-        }
-
-    }
-
-
-    suspend fun itemComprado(item: Item): Pair<Int, Int> {
-        // salvar no DB
-        ItemRepo.addOuAtualizar(item)
-        return ordenarItem(item)
-    }
-
-    private fun ordenarItem(item: Item): Pair<Int, Int> {
-        val copia = ArrayList(itens)
-        ordenarLista()
-
-        /* for (i in 0 until itens.size) {
-             Log.d("USUK",
-                 "FragListaDeComprasViewModel.ordenarItem: $i:   ${copia[i].nome} -> ${itens[i].nome}")
-         }*/
-        return copia.indexOf(item) to itens.indexOf(item)
-    }
-
-    private fun ordenarLista() {
-        var data: List<Item> = itens.sortedWith(compareBy { it.nome })
+    private fun ordenarProdutos(itens: ArrayList<Produto>) {
+        var data: List<Produto> = itens.sortedWith(compareBy { it.nome })
         data = data.sortedWith(compareBy { it.comprado })
         itens.clear()
         itens.addAll(data)
-
     }
 
-    suspend fun removerItem(item: Item): Boolean {
-        item.removido = true
-        ItemRepo.addOuAtualizar(item)
+    private fun ordenarCategorias(itens: ArrayList<CategoriaHolder>) {
+        var data: List<CategoriaHolder> = itens.sortedWith(compareBy { it.categoria.nome })
+        data = data.sortedWith(compareBy { it.itensComprados })
+        itens.clear()
+        itens.addAll(data)
+    }
 
-        if (categoriaSelecionada != null
-            && categoriaSelecionada!!.id == item.categoriaId
-            && ItemRepo.getItensNaListaPorCategoria(_listaLiveData.value!!.id, item.categoriaId)
-                .isEmpty()
-        ) {
-            ajustarCategoriasItemEditado() // vai recarregar as categorias, removendo a que esta vazia
-            categoriaSelecionada(null) // remove a categoria selecionada
-            _categoriaselecionadaLiveData.postValue(1) // avisa a ui que a categoriaSelecionada agora é nula
-            carregarItensENotificar() // recarrega todos os itens da lista do DB
-            return true // tudo foi atualizado
+    /**
+     * Verifica se todos os itens de uma determibnada categoria foram comprados.
+     * Os itens verificados sao carregados diretamente do Banco de dados.
+     * */
+    private suspend fun todosOsItensForamComprados(categoria: Categoria) =
+            ItemRepo.getItensNaListaPorCategoria(listaLiveData.value!!.id, categoria.id)
+                .all { it.comprado }
+
+    /**
+     * Faz as verificaçoes e aplica as alteraçoes necessarias para refletir a inserçao de um
+     * novo produto na interface
+     */
+    fun addProduto(
+        produto: Produto,
+    ) = viewModelScope.launch(IO) {
+
+        attItemNoBancoDeDados(produto) // add ao db
+
+        val categoriaDoProduto = receberCategoriaDoDB(produto)
+
+        // modifico uma copia da lista para ser comparada com a versao anterior pelo DIfUtils no adapter
+        val categorias = ArrayList(_categoriasLiveData.value!!)
+
+        // produto pertence a uma categoria que ainda nao faz parte da lista
+        if (categoriaNaoExisteNalista(categoriaDoProduto)) {
+            val holder = CategoriaHolder(categoriaDoProduto)
+            categorias.add(holder)
+            ordenarCategorias(categorias)
+            withContext(Main) {
+                _categoriasLiveData.value = categorias
+                selecionarCategoria(holder)
+            }
         } else {
-            itens.remove(item)
-            return false // remover o item do rv manualmente
+
+            // a categoria do produto ja esta sendo exibida pro usuario entao preciso atualizar
+            // a UI pra caso a categoria ja nao tenha mais todos os seus itens comprados
+            val (holder: CategoriaHolder, indice: Int) = receberHolderDaCategoria(categoriaDoProduto)
+            holder.itensComprados = todosOsItensForamComprados(categoriaDoProduto)
+            categorias[indice] = holder
+
+            withContext(Main) {
+                _categoriasLiveData.value = categorias
+            }
+
+            //se o novo produto é da sub-lista sendo exibida, atualizo a UI
+            if (categSelecHolder?.categoria?.id == produto.categoriaId || categSelecHolder == null) {
+                val itens = ArrayList(_produtosLiveData.value!!)
+                itens.add(produto)
+                ordenarProdutos(itens)
+                _produtosLiveData.postValue(itens)
+                //se nao seleciono a categoria dele
+            }else selecionarCategoria(receberHolderDaCategoria(categoriaDoProduto).first)
         }
     }
 
-    suspend fun precoItem(item: Item): ArrayList<Item> =
-        ArrayList(ItemRepo.getItensPorNomeExato(item,6))
+    fun attProduto(
+        produtoAtualizado: Produto,
+        produtoOriginal: Produto,
+    ) = viewModelScope.launch {
+
+        attItemNoBancoDeDados(produtoAtualizado)
+
+        // categoria mudou?
+        if (produtoOriginal.categoriaId != produtoAtualizado.categoriaId) {
+            carregarCategoriasNaLista()// trabalho pesado feito na IO
+            val categoria = receberCategoriaDoDB(produtoAtualizado)
+            selecionarCategoria(receberHolderDaCategoria(categoria).first)
+        } else {
+            // o produto que o usuario editou saiu dessa lista, logo ela nao é nula
+            val produtos = _produtosLiveData.value!!
+            val categoriaSelecionada = categSelecHolder?.categoria
+
+            if (categoriaSelecionada == null || categoriaSelecionada.id == produtoOriginal.categoriaId) {
+                produtos[produtos.indexOf(produtoOriginal)] = produtoAtualizado
+                ordenarProdutos(produtos)
+                _produtosLiveData.value = produtos
+
+            } else {
+                //Se o novo item nao estiver na tela, tem coisa errada
+                throw java.lang.Exception("Situação estranha... a categoria selecionada deve ser nula ou  == a categoria do produtoOriginal" + "se não é nenhuma das 2 o que esta definido como categoria selecionada? e porque?")
+            }
+        }
+
+    }
+
+    fun produtoComprado(produtoOriginal: Produto, comprado: Boolean) = viewModelScope.launch {
+
+        val novoProduto = produtoOriginal.clonar()
+        novoProduto.comprado = comprado
+
+        // salva no DB
+        attItemNoBancoDeDados(novoProduto)
+
+        //atualizo a lista de itens
+        val itensLista = ArrayList(_produtosLiveData.value!!)
+        itensLista[itensLista.indexOf(produtoOriginal)] = novoProduto
+        ordenarProdutos(itensLista)
+        _produtosLiveData.value = itensLista
+
+        // atualizo a categoria
+        val categorias = ArrayList(_categoriasLiveData.value!!)
+        val (holder: CategoriaHolder, indice: Int) = receberHolderDaCategoria(receberCategoriaDoDB(novoProduto))
+        holder.itensComprados = todosOsItensForamComprados(holder.categoria)
+
+        categorias[indice] = holder
+        ordenarCategorias(categorias)
+        _categoriasLiveData.value = categorias
+    }
+
+    /**
+     * remove o produto da lista de itens, atualiza o objeto no DB e verifica quais dados precisam
+     * ser atualizados nos recyclerviews de itens e categorias com base nas condiçoes de exclusao
+     * Nota:  Expera-se que o produto removido, tenha sido removido pelo usuario.
+     * TODO: corrigir comportamento de exclusao de ultimo produto
+     * */
+    fun removerProduto(produto: Produto) = viewModelScope.launch(IO) {
+
+        produto.removido = true
+
+        attItemNoBancoDeDados(produto)
+
+        val categoriaDoProduto = receberCategoriaDoDB(produto)
+        val categorias = ArrayList(_categoriasLiveData.value!!)
+
+        val itensDb = ItemRepo
+            .getItensNaListaPorCategoria(listaLiveData.value!!.id, produto.categoriaId)
+        itensDb.retainAll { it.categoriaId == produto.categoriaId } // ficam só os itens da categoria
+        itensDb.removeAll { it.id == produto.id } // removo agora o produto removido pelo usuario
+
+        // era o ultimo produto da categoria?
+        if (itensDb.size == 0) {
+            val (holder: CategoriaHolder, indice: Int) = receberHolderDaCategoria(categoriaDoProduto)
+            categorias.remove(holder)
+            withContext(Main) { _categoriasLiveData.value = categorias }
+            // ao remover o ultimo produto de uma categoria, uma outra categoria sera
+            // definida como selecionada mesmo se nao tivesse nenhuma categoria selecionada
+            // antes da exclusao. Esse nao é o comportamento ideal e sera corrigido no futuro.
+            val indiceSeguro = indice.coerceAtMost(categorias.size - 1)
+            selecionarCategoria(categorias[indiceSeguro])
+
+        } else {
+            //  removo o item da lista
+            val itensRv = ArrayList(_produtosLiveData.value!!)
+            itensRv.remove(produto)
+            _produtosLiveData.postValue(itensRv)
+
+            // verifico se todos os itens foram comprados
+            val (holder: CategoriaHolder, indice: Int) = receberHolderDaCategoria(categoriaDoProduto)
+            holder.itensComprados = todosOsItensForamComprados(categoriaDoProduto)
+            categorias[indice] = holder
+
+            _categoriasLiveData.postValue(categorias)
+        }
+
+
+    }
+
+    suspend fun buscarItemEmOutrasListas(produto: Produto): ArrayList<Produto> =
+            ArrayList(ItemRepo.getItensPorNomeExato(produto, 6))
+
+    /**
+     * Verifica a categoria selecionada para saber se o usuario esta selecionando
+     * uma nova categoria ou apenas desselecionando a atual.
+     * @see FragListaDeCompras.initRvDeCategorias
+     * */
+    fun selecionarCategoriaPeloUsuario(novaSelecao: CategoriaHolder) = viewModelScope.launch(IO) {
+
+        val categorias = _categoriasLiveData.value!!.map { it.clonar() } // deep copy
+
+        if (novaSelecao.categoria.id == categSelecHolder?.categoria?.id) {
+            // desseleciono todas as categorias
+            categorias.forEach { it.selecionada = false }
+                .also { categSelecHolder = null }
+
+        } else {
+            for (holder in categorias) {
+                holder.selecionada = holder.categoria.id == novaSelecao.categoria.id
+                if (holder.selecionada) categSelecHolder = holder
+            }
+        }
+
+        _categoriasLiveData.postValue(ArrayList(categorias))
+        carregarItens()
+    }
+
+    private suspend fun selecionarCategoria(novaSelecao: CategoriaHolder) = withContext(IO) {
+        if (novaSelecao.categoria.id == categSelecHolder?.categoria?.id) return@withContext
+
+        val categorias = _categoriasLiveData.value!!.map { it.clonar() } // deep copy
+
+        for (holder in categorias) {
+            holder.selecionada = holder.categoria.id == novaSelecao.categoria.id
+            if (holder.selecionada) categSelecHolder = holder
+        }
+
+        _categoriasLiveData.postValue(ArrayList(categorias))
+        carregarItens()
+    }
+
+    /**
+     * Essa funçao é chamada sempre que um produto tem seu preço ou quantidade atualizados pelos dialogos
+     * de ediçao rapida no fragmento de lista de compras, serve apenas para salvar o produto no banco
+     * e notificar a alteraçao para a UI*/
+    suspend fun aplicarPrecoOuQuantidadeeNotificar(
+        alvo: Produto,
+        preco: Float? = null,
+        quantidade: Int? = null,
+    ) = withContext(IO) {
+
+        val clone = alvo.clonar()
+        if (preco != null) clone.preco = preco
+        if (quantidade != null) clone.quantidade = quantidade
+
+        attItemNoBancoDeDados(clone)
+
+        val itens = _produtosLiveData.value!!
+        itens[itens.indexOf(alvo)] = clone
+        _produtosLiveData.postValue(itens)
+    }
+
+    fun indiceDaCategoriaSelecionada() =
+            if (categSelecHolder != null) receberHolderDaCategoria(categSelecHolder!!.categoria).second else -1
 
 
 }

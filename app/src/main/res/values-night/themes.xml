@@ -29,7 +29,6 @@
 
         <item name="android:fontFamily">@font/quicksand_bold</item>
 
-
     </style>
 
 </resources>

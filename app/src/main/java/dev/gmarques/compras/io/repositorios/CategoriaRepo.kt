@@ -1,35 +1,29 @@
 package dev.gmarques.compras.io.repositorios
 
-import dev.gmarques.compras.io.cache.InMemoryCache
 import dev.gmarques.compras.io.database.RoomDb
-import dev.gmarques.compras.objetos.Categoria
-import dev.gmarques.compras.objetos.Item
-import kotlinx.coroutines.runBlocking
+import dev.gmarques.compras.entidades.Categoria as Categoria1
 
 object CategoriaRepo : BaseRepo() {
 
     /**
-     * Retorna a categoria do item que pode estar no DB ou em cache na memoria
+     * Retorna a categoria do produto
      * Não retorna null, se a categoria nao existir, essa funçao retorna a categoria padrao.
      * */
-    fun getCategoria(item: Item): Categoria {
-        var c = InMemoryCache.Singleton.getCategoria(item.categoriaId)
+    suspend fun getCategoriaPorId(id: String): Categoria1 =
+        RoomDb.getInstancia().categoriaDao().get(id)
+            ?: Categoria1.SEM_CATEGORIA
 
-        if (c == null) runBlocking {
-            c = RoomDb.getInstancia().categoriaDao().get(item.categoriaId)
+    suspend fun getCategoriaPorNome(nome: String): Categoria1? {
 
-            // categoria padrao caso a original tenha sido removida pelo usuario
-            @Suppress("KotlinConstantConditions")
-            if (c == null) c = Categoria.SEM_CATEGORIA
-
-            InMemoryCache.Singleton.saveCategoria(item.categoriaId, c!!)
+        getCategorias().forEach {
+            if (it.nome == nome) return it
         }
-
-        return c!!
+        return null
     }
 
-    suspend fun getCategorias() = RoomDb.getInstancia().categoriaDao().getTodas().onEach {
-        InMemoryCache.Singleton.saveCategoria(it.id, it)
-    }
+    suspend fun getCategorias() = RoomDb.getInstancia().categoriaDao().getTodas()
 
+    suspend fun addCategoria(novaCategoria: Categoria1) {
+        RoomDb.getInstancia().categoriaDao().addOuAtualizar(novaCategoria)
+    }
 }

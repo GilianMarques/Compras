@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3b93b972cf371dab099d864f093ee593",
+    "identityHash": "d476ed58f8e3c077eaa854ff9cc445bb",
     "entities": [
       {
-        "tableName": "Item",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`preco` REAL NOT NULL, `qtd` INTEGER NOT NULL, `detalhes` TEXT, `comprado` INTEGER NOT NULL, `categoriaId` TEXT NOT NULL, `listaId` TEXT NOT NULL, `id` TEXT NOT NULL, `ultimaAtualizacao` INTEGER NOT NULL, `removido` INTEGER NOT NULL, `nome` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "tableName": "Produto",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`preco` REAL NOT NULL, `quantidade` INTEGER NOT NULL, `detalhes` TEXT, `comprado` INTEGER NOT NULL, `categoriaId` TEXT NOT NULL, `listaId` TEXT NOT NULL, `id` TEXT NOT NULL, `ultimaAtualizacao` INTEGER NOT NULL, `removido` INTEGER NOT NULL, `nome` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "preco",
@@ -15,8 +15,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "qtd",
-            "columnName": "qtd",
+            "fieldPath": "quantidade",
+            "columnName": "quantidade",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -80,14 +80,8 @@
       },
       {
         "tableName": "Categoria",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cor` INTEGER NOT NULL, `icone` TEXT NOT NULL DEFAULT 'vec_cat_0', `id` TEXT NOT NULL, `ultimaAtualizacao` INTEGER NOT NULL, `removido` INTEGER NOT NULL, `nome` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`icone` TEXT NOT NULL DEFAULT 'vec_cat_0', `id` TEXT NOT NULL, `ultimaAtualizacao` INTEGER NOT NULL, `removido` INTEGER NOT NULL, `nome` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
-          {
-            "fieldPath": "cor",
-            "columnName": "cor",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "icone",
             "columnName": "icone",
@@ -171,7 +165,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3b93b972cf371dab099d864f093ee593')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd476ed58f8e3c077eaa854ff9cc445bb')"
     ]
   }
 }
