@@ -22,6 +22,7 @@ import dev.gmarques.compras.Extensions.Companion.emMoeda
 import dev.gmarques.compras.Extensions.Companion.formatarHtml
 import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
 import dev.gmarques.compras.Extensions.Companion.ocultarTeclado
+import dev.gmarques.compras.Extensions.Companion.smoothScroolToPosition
 import dev.gmarques.compras.R
 import dev.gmarques.compras.Vibrador
 import dev.gmarques.compras.databinding.DialogEditQtdBinding
@@ -81,22 +82,22 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
      * chamado sempre que um novo produto é inserido pelo fragAddItem
      * */
     private fun initFragmentResultAddItem() =
-        setFragmentResultListener("novoProduto") { _, bundle ->
-            val produto = desempacotarProduto(bundle, "produto")
-            viewModel.addItemeAplicarAlteracoes(produto)
+            setFragmentResultListener("novoProduto") { _, bundle ->
+                val produto = desempacotarProduto(bundle, "produto")
+                viewModel.addProduto(produto)
 
 
-        }
+            }
 
     /**
      *  chamado sempre que um novo produto é atualizado pelo fragEditItem
      */
     private fun initFragmentResultAttItem() =
-        setFragmentResultListener("produtoAtualizado") { _, bundle ->
-            val produtoAtualizado = desempacotarProduto(bundle, "produto")
-            val produtoOriginal = desempacotarProduto(bundle, "produtoOriginal")
-            viewModel.itemAtualizadoPeloUsuario(produtoAtualizado, produtoOriginal)
-        }
+            setFragmentResultListener("produtoAtualizado") { _, bundle ->
+                val produtoAtualizado = desempacotarProduto(bundle, "produto")
+                val produtoOriginal = desempacotarProduto(bundle, "produtoOriginal")
+                viewModel.attProduto(produtoAtualizado, produtoOriginal)
+            }
 
     private fun initRvDeItens() {
         val itensAdapter = ProdutoAdapter(this@FragListaDeCompras, this@FragListaDeCompras)
@@ -114,7 +115,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
         val categoriasAdapter =
-            CategoriaAdapter(this@FragListaDeCompras, ArrayList(), ::categoriaSelecionadaCallback)
+                CategoriaAdapter(this@FragListaDeCompras, ArrayList(), ::categoriaSelecionadaCallback)
 
         binding.rvCategorias.setHasFixedSize(true)
         binding.rvCategorias.adapter = categoriasAdapter
@@ -122,7 +123,12 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         viewModel.categoriasLiveData.observe(viewLifecycleOwner) { dados ->
             categoriasAdapter.atualizarColecaoDiff(dados)
             if (binding.rvCategorias.layoutManager == null) binding.rvCategorias.layoutManager =
-                layoutManager
+                    layoutManager
+            lifecycleScope.launch {
+                delay(300)
+                val indice = viewModel.indiceDaCategoriaSelecionada()
+                if (indice > 0) binding.rvCategorias.smoothScroolToPosition(indice)
+            }
         }
 
 
@@ -142,14 +148,13 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         Vibrador.vibInteracao()
 
         val msg =
-            String.format(getString(R.string.Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita),
-                produto.nome).formatarHtml()
+                String.format(getString(R.string.Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita),
+                    produto.nome).formatarHtml()
 
         MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Por_favor_confirme))
             .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    viewModel.removerItem(produto)
-                }
+                viewModel.removerProduto(produto)
+
             }.setNegativeButton(getString(R.string.Cancelar)) { _, _ -> }.setCancelable(false)
             .show()
 
@@ -173,7 +178,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
 
         binding.edtValor.hint = produto.preco.toString()
         binding.tvHistorico.text =
-            String.format(getString(R.string.Historico_de_precos_de_x), produto.nome)
+                String.format(getString(R.string.Historico_de_precos_de_x), produto.nome)
 
         // faz a magica (aplica as alteraçoes no produto e fecha o dialogo)
         fun run(preco: Float) = lifecycleScope.launch {
@@ -224,8 +229,8 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         }
 
         dialog =
-            MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_preco))
-                .setView(binding.root).setCancelable(false).show()
+                MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_preco))
+                    .setView(binding.root).setCancelable(false).show()
 
         lifecycleScope.launch {
             delay(300)
@@ -296,8 +301,8 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
         binding.chip6.setOnClickListener(listener)
 
         dialog =
-            MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_quantidade))
-                .setView(binding.root).setCancelable(false).show()
+                MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_quantidade))
+                    .setView(binding.root).setCancelable(false).show()
 
         lifecycleScope.launch {
             delay(300)
@@ -309,9 +314,9 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ItemAdapterCallback {
      * Extrai o objeto do pacote verificando a plataforma e invocando a função correta
      * */
     private fun desempacotarProduto(bundle: Bundle, key: String): Produto =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            bundle.getSerializable(key, Produto::class.java)!!
-        } else bundle.getSerializable(key) as Produto
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                bundle.getSerializable(key, Produto::class.java)!!
+            } else bundle.getSerializable(key) as Produto
 
 
 }

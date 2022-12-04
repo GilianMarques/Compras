@@ -12,6 +12,7 @@ import dev.gmarques.compras.io.repositorios.ItemRepo
 import dev.gmarques.compras.io.repositorios.ListaRepo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 
 
 class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(appContext) {
@@ -139,11 +140,11 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
             ItemRepo.getItensNaListaPorCategoria(listaLiveData.value!!.id, categoria.id)
                 .all { it.comprado }
 
-    /***
-     * Faz as verificaçoes e aplica as alteraçoes necessarias para refletir  a inserçao de um
+    /**
+     * Faz as verificaçoes e aplica as alteraçoes necessarias para refletir a inserçao de um
      * novo produto na interface
      */
-    fun addItemeAplicarAlteracoes(
+    fun addProduto(
         produto: Produto,
     ) = viewModelScope.launch(IO) {
 
@@ -156,9 +157,13 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
         // produto pertence a uma categoria que ainda nao faz parte da lista
         if (categoriaNaoExisteNalista(categoriaDoProduto)) {
-            categorias.add(CategoriaHolder(categoriaDoProduto))
+            val holder = CategoriaHolder(categoriaDoProduto)
+            categorias.add(holder)
             ordenarCategorias(categorias)
-            _categoriasLiveData.postValue(categorias)
+            withContext(Main) {
+                _categoriasLiveData.value = categorias
+                selecionarCategoria(holder)
+            }
         } else {
 
             // a categoria do produto ja esta sendo exibida pro usuario entao preciso atualizar
@@ -167,19 +172,22 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
             holder.itensComprados = todosOsItensForamComprados(categoriaDoProduto)
             categorias[indice] = holder
 
+            withContext(Main) {
+                _categoriasLiveData.value = categorias
+            }
 
-            //se o produto é da sub-lista sendo exibida, mando a UI add ele nela
-            val catSelecionada = categSelecHolder
-            if (catSelecionada?.categoria?.id == produto.categoriaId || catSelecionada == null) {
-                val itens = _produtosLiveData.value!!
+            //se o novo produto é da sub-lista sendo exibida, atualizo a UI
+            if (categSelecHolder?.categoria?.id == produto.categoriaId || categSelecHolder == null) {
+                val itens = ArrayList(_produtosLiveData.value!!)
                 itens.add(produto)
                 ordenarProdutos(itens)
                 _produtosLiveData.postValue(itens)
-            }
+                //se nao seleciono a categoria dele
+            }else selecionarCategoria(receberHolderDaCategoria(categoriaDoProduto).first)
         }
     }
 
-    fun itemAtualizadoPeloUsuario(
+    fun attProduto(
         produtoAtualizado: Produto,
         produtoOriginal: Produto,
     ) = viewModelScope.launch {
@@ -190,8 +198,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         if (produtoOriginal.categoriaId != produtoAtualizado.categoriaId) {
             carregarCategoriasNaLista()// trabalho pesado feito na IO
             val categoria = receberCategoriaDoDB(produtoAtualizado)
-            categSelecHolder = receberHolderDaCategoria(categoria).first
-            carregarItens()  // trabalho pesado feito na IO
+            selecionarCategoria(receberHolderDaCategoria(categoria).first)
         } else {
             // o produto que o usuario editou saiu dessa lista, logo ela nao é nula
             val produtos = _produtosLiveData.value!!
@@ -238,41 +245,44 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
      * remove o produto da lista de itens, atualiza o objeto no DB e verifica quais dados precisam
      * ser atualizados nos recyclerviews de itens e categorias com base nas condiçoes de exclusao
      * Nota:  Expera-se que o produto removido, tenha sido removido pelo usuario.
+     * TODO: corrigir comportamento de exclusao de ultimo produto
      * */
-    fun removerItem(produto: Produto) = viewModelScope.launch(IO) {
+    fun removerProduto(produto: Produto) = viewModelScope.launch(IO) {
 
         produto.removido = true
+
         attItemNoBancoDeDados(produto)
 
         val categoriaDoProduto = receberCategoriaDoDB(produto)
-        val categorias = _categoriasLiveData.value!!
+        val categorias = ArrayList(_categoriasLiveData.value!!)
 
-        // era o ultimo produto da categoria?
-        val itensDb =
-                ItemRepo.getItensNaListaPorCategoria(listaLiveData.value!!.id, produto.categoriaId)
+        val itensDb = ItemRepo
+            .getItensNaListaPorCategoria(listaLiveData.value!!.id, produto.categoriaId)
         itensDb.retainAll { it.categoriaId == produto.categoriaId } // ficam só os itens da categoria
         itensDb.removeAll { it.id == produto.id } // removo agora o produto removido pelo usuario
 
+        // era o ultimo produto da categoria?
         if (itensDb.size == 0) {
             val (holder: CategoriaHolder, indice: Int) = receberHolderDaCategoria(categoriaDoProduto)
             categorias.remove(holder)
-            _categoriasLiveData.postValue(categorias)
-
-            //categoria removida é a categoria selecionada? 99% das vezes sim
-            if (categoriaDoProduto.id == categSelecHolder?.categoria?.id) {
-                val indiceSeguro = indice.coerceAtMost(categorias.size - 1)
-                // TODO:    _categoriaSelecionadaLiveData.postValue(categorias[indiceSeguro])
-                carregarItens()
-            }
+            withContext(Main) { _categoriasLiveData.value = categorias }
+            // ao remover o ultimo produto de uma categoria, uma outra categoria sera
+            // definida como selecionada mesmo se nao tivesse nenhuma categoria selecionada
+            // antes da exclusao. Esse nao é o comportamento ideal e sera corrigido no futuro.
+            val indiceSeguro = indice.coerceAtMost(categorias.size - 1)
+            selecionarCategoria(categorias[indiceSeguro])
 
         } else {
-            val itensRv = _produtosLiveData.value!!
+            //  removo o item da lista
+            val itensRv = ArrayList(_produtosLiveData.value!!)
             itensRv.remove(produto)
             _produtosLiveData.postValue(itensRv)
-            // recarrega todas as categorias para fazer com que a categoria reveja se  todos os seus itens estao comprados ou nao
-            // é isso ou escrever uma logica para atualizar só a categoria em questao, considerando que a coleção de categorias
-            // é sempre pequena, essa solução é totalmente valida, alem do mais quando nenhuma categoria esta selecionada
-            //  todas as categorias precisam ser verificadas quando um produto é removido
+
+            // verifico se todos os itens foram comprados
+            val (holder: CategoriaHolder, indice: Int) = receberHolderDaCategoria(categoriaDoProduto)
+            holder.itensComprados = todosOsItensForamComprados(categoriaDoProduto)
+            categorias[indice] = holder
+
             _categoriasLiveData.postValue(categorias)
         }
 
@@ -307,6 +317,20 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         carregarItens()
     }
 
+    private suspend fun selecionarCategoria(novaSelecao: CategoriaHolder) = withContext(IO) {
+        if (novaSelecao.categoria.id == categSelecHolder?.categoria?.id) return@withContext
+
+        val categorias = _categoriasLiveData.value!!.map { it.clonar() } // deep copy
+
+        for (holder in categorias) {
+            holder.selecionada = holder.categoria.id == novaSelecao.categoria.id
+            if (holder.selecionada) categSelecHolder = holder
+        }
+
+        _categoriasLiveData.postValue(ArrayList(categorias))
+        carregarItens()
+    }
+
     /**
      * Essa funçao é chamada sempre que um produto tem seu preço ou quantidade atualizados pelos dialogos
      * de ediçao rapida no fragmento de lista de compras, serve apenas para salvar o produto no banco
@@ -327,6 +351,9 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         itens[itens.indexOf(alvo)] = clone
         _produtosLiveData.postValue(itens)
     }
+
+    fun indiceDaCategoriaSelecionada() =
+            if (categSelecHolder != null) receberHolderDaCategoria(categSelecHolder!!.categoria).second else -1
 
 
 }

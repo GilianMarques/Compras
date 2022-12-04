@@ -7,9 +7,9 @@
         android:id="@+id/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="3dp"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="12dp"
         android:layout_marginBottom="3dp"
         android:animateLayoutChanges="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
@@ -24,7 +24,7 @@
             android:elevation="5dp"
             android:padding="8dp"
             android:visibility="gone"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/fab_editar"
@@ -53,7 +53,7 @@
             android:animateLayoutChanges="true"
             android:padding="8dp"
             android:visibility="visible"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
 
             <TextView
