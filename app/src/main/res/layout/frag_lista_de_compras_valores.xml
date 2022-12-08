@@ -8,8 +8,8 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
     android:animateLayoutChanges="true"
-    android:baselineAligned="false"
     android:background="?android:windowBackground"
+    android:baselineAligned="false"
     android:elevation="8dp"
     android:orientation="horizontal"
     android:paddingStart="2dp"
@@ -50,8 +50,8 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
         android:id="@+id/ll_valor_categorias"
+        android:layout_width="wrap_content"
 
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -75,15 +75,15 @@
             android:paddingTop="8dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
-            tools:text="R$999.22"
             android:textAlignment="gravity"
             android:textSize="16sp"
-            app:drawableStartCompat="@drawable/vec_categoria" />
+            app:drawableStartCompat="@drawable/vec_categoria"
+            tools:text="R$999.22" />
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_valor_Lista"
         android:layout_width="wrap_content"
-
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:animateLayoutChanges="true"
@@ -106,10 +106,10 @@
             android:paddingTop="8dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
-            tools:text="R$1.450,22"
             android:textAlignment="gravity"
             android:textSize="16sp"
-            app:drawableStartCompat="@drawable/vec_lista" />
+            app:drawableStartCompat="@drawable/vec_lista"
+            tools:text="R$1.450,22" />
     </LinearLayout>
 
 

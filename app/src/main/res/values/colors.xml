@@ -2,22 +2,22 @@
 <resources>
     <!--tema claro-->
     <!--https://mobilepalette.netlify.app/?color=5423ff-->
-    <color name="colorPrimaryDark">#1C0C55</color>
-    <color name="colorPrimary">#5423ff</color>
-    <color name="colorPrimaryLight">#967AFB</color>
+    <color name="colorPrimaryDark">#180755</color>
+    <color name="colorPrimary">#4713FD</color>
+    <color name="colorPrimaryLight">#7B57FF</color>
 
-    <color name="colorSecondary">#A114FF</color>
+    <color name="colorSecondary">#8704FA</color>
     <color name="background">#EEEAFA</color>
     <color name="itemCardComprado">#99FFFFFF</color>
     <color name="itemCardNormal">#FFFFFF</color>
-    <color name="colorSurface">#5423ff</color>
-    <color name="colorOnSurface">#5423ff</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnSurface">#4A16FF</color>
 
     <!--tema escuro-->
 
-    <color name="colorPrimaryDarkNight">#6034FF</color>
-    <color name="colorPrimaryNight">#734FF4</color>
-    <color name="colorPrimaryLightNight">#A389FF</color>
+    <color name="colorPrimaryDarkNight">#5F4DFF</color>
+    <color name="colorPrimaryNight">#8766FF</color>
+    <color name="colorPrimaryLightNight">#899DFF</color>
 
     <color name="colorSecondaryNight">#C151CD</color>
     <color name="backgroundNight">#0C081B</color>

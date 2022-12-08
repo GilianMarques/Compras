@@ -80,14 +80,15 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
 
     private fun obervarPrecos() {
         viewModel.valoresLiveData.observe(viewLifecycleOwner) {
-            binding.valores.tvValorCarrinho.text = it.first.emMoeda()
-            binding.valores.tvValorCategoria.text = it.second.emMoeda()
-            binding.valores.tvValorLista.text = it.third.emMoeda()
+                binding.valores.tvValorCarrinho.text = it.first.emMoeda()
+                binding.valores.tvValorCategoria.text = it.second.emMoeda()
+                binding.valores.tvValorLista.text = it.third.emMoeda()
 
-            binding.valores.llValorCategorias.visibility =
-                    if (it.second > 0) View.VISIBLE else View.GONE
+                binding.valores.llValorCategorias.visibility =
+                        if (it.second > 0) View.VISIBLE else View.GONE
+                binding.valores.llValorLista.visibility =
+                        if (it.second > 0) View.GONE else View.VISIBLE
         }
-
     }
 
     private fun initFabAddItem() = binding.fab.setOnClickListener {
@@ -334,7 +335,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
             .setMessage(String.format(getString(R.string.O_que_deseja_fazer_com_x), holderCategoria.categoria.nome)
                 .formatarHtml())
             .setPositiveButton(getString(R.string.Editar)) { dialog, which -> /*TODO("Not yet implemented") */ }
-            .setNegativeButton(getString(R.string.Remover)) { dialog, which -> confirmarRemocao(holderCategoria)}
+            .setNegativeButton(getString(R.string.Remover)) { dialog, which -> confirmarRemocao(holderCategoria) }
             .setNeutralButton(getString(R.string.Cancelar)) { dialog, which -> /*TODO("Not yet implemented") */ }
             .setCancelable(false)
             .show()
@@ -363,6 +364,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 bundle.getSerializable(key, Produto::class.java)!!
             } else {
+                @Suppress("DEPRECATION")
                 bundle.getSerializable(key) as Produto
             }
 
