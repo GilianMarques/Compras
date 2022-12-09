@@ -337,7 +337,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         }
 
         _categoriasLiveData.postValue(ArrayList(categorias))
-       
+
         carregarItens()
         calcularValores()
 
@@ -392,6 +392,19 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
         _valoresLiveData.postValue(valores)
     }
+
+    fun categoriaEditada(novaCategoria: Categoria, categoriaOriginal: Categoria) =
+            viewModelScope.launch(IO) {
+
+                CategoriaRepo.addCategoria(novaCategoria)
+
+                val categorias = ArrayList(_categoriasLiveData.value!!)
+                val (holderOriginal: CategoriaHolder, indice: Int) = receberHolderDaCategoria(categoriaOriginal)
+                holderOriginal.categoria = novaCategoria
+                categorias[indice] = holderOriginal
+                ordenarCategorias(categorias)
+                _categoriasLiveData.postValue(categorias)
+            }
 
 
 }

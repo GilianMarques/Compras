@@ -8,10 +8,9 @@ object CategoriaRepo : BaseRepo() {
     /**
      * Retorna a categoria do produto
      * Não retorna null, se a categoria nao existir, essa funçao retorna a categoria padrao.
-     * */
+     */
     suspend fun getCategoriaPorId(id: String): Categoria1 =
-        RoomDb.getInstancia().categoriaDao().get(id)
-            ?: Categoria1.SEM_CATEGORIA
+            RoomDb.getInstancia().categoriaDao().get(id) ?: Categoria1.SEM_CATEGORIA
 
     suspend fun getCategoriaPorNome(nome: String): Categoria1? {
 
@@ -23,6 +22,9 @@ object CategoriaRepo : BaseRepo() {
 
     suspend fun getCategorias() = RoomDb.getInstancia().categoriaDao().getTodas()
 
+    /**
+     * Adidiona ou atualiza o objeto recebido no banco de dados
+     */
     suspend fun addCategoria(novaCategoria: Categoria1) {
         RoomDb.getInstancia().categoriaDao().addOuAtualizar(novaCategoria)
     }

@@ -113,7 +113,7 @@ class ProdutoAdapter(
             }
 
             bindingView.tvQtd.setOnClickListener {
-                callback.qtdEditada(produto)
+                callback.quantidadeEditada(produto)
             }
 
             bindingView.tvPreco.setOnClickListener {

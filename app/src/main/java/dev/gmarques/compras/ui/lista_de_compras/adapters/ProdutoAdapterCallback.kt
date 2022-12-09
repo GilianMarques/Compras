@@ -8,5 +8,5 @@ interface ProdutoAdapterCallback {
     fun produtoRemovido(produto: Produto)
     fun editarProduto(produto: Produto)
     fun precoEditado(produto: Produto)
-    fun qtdEditada(produto: Produto)
+    fun quantidadeEditada(produto: Produto)
 }
