@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.Extensions.Companion.emMoeda
 import dev.gmarques.compras.Extensions.Companion.formatarHtml
 import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
@@ -337,7 +338,15 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
             .setMessage(String.format(getString(R.string.O_que_deseja_fazer_com_x), holderCategoria.categoria.nome)
                 .formatarHtml())
             .setPositiveButton(getString(R.string.Editar)) { _, _ -> mostrarDialogoDeEdicaoDeCategoria(holderCategoria) }
-            .setNegativeButton(getString(R.string.Remover)) { _, _ -> confirmarRemocao(holderCategoria) }
+            .setNegativeButton(getString(R.string.Remover)) { _, _ ->
+                lifecycleScope.launch {
+                    if (viewModel.categoriaEstaEmUso(holderCategoria.categoria)) {
+                        Snackbar
+                            .make(binding.root, String.format(getString(R.string.categoria_esta_em_uso_e_nao_pode_ser_removida), holderCategoria.categoria.nome), Snackbar.LENGTH_LONG)
+                            .show()
+                    } else confirmarRemocao(holderCategoria)
+                }
+            }
             .setNeutralButton(getString(R.string.Cancelar)) { _, _ -> }
             .setCancelable(false)
             .show()
@@ -356,8 +365,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
 
         MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Por_favor_confirme))
             .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { _, _ ->
-                // TODO:   viewModel.removerProduto(produto)
-
+                viewModel.removerCategoria(holderCategoria)
             }.setNegativeButton(getString(R.string.Cancelar)) { _, _ -> }.setCancelable(false)
             .show()
 

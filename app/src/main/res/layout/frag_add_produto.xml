@@ -50,7 +50,6 @@
                 android:lines="1"
                 android:maxLength="24"
                 android:minHeight="56dp"
-                android:text="item 00"
                 tools:ignore="LabelFor"
                 tools:text="Pão de queijo" />
 
@@ -82,8 +81,6 @@
                 android:inputType="numberDecimal"
                 android:maxLength="6"
                 android:minHeight="56dp"
-                android:text="1.50"
-
                 tools:text="9,79" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -111,8 +108,6 @@
                 android:inputType="number"
                 android:maxLength="3"
                 android:minHeight="56dp"
-                android:text="2"
-
                 tools:text="3" />
 
         </com.google.android.material.textfield.TextInputLayout>

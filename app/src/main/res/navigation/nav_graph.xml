@@ -9,7 +9,7 @@
         android:id="@+id/addItem"
         android:name="dev.gmarques.compras.ui.produto_io.add_produto.FragAddProduto"
         android:label="@string/Novo_item"
-        tools:layout="@layout/frag_add_item">
+        tools:layout="@layout/frag_add_produto">
 
         <argument
             android:name="listaId"
@@ -22,7 +22,7 @@
     <fragment
         android:id="@+id/editItem"
         android:name="dev.gmarques.compras.ui.produto_io.edit_produto.FragEditProduto"
-        tools:layout="@layout/frag_add_item">
+        tools:layout="@layout/frag_add_produto">
 
         <argument
             android:name="produto"

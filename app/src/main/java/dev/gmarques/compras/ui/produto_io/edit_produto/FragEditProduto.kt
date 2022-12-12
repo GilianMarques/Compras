@@ -23,7 +23,7 @@ import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
 import dev.gmarques.compras.Extensions.Companion.smoothScroolToPosition
 import dev.gmarques.compras.R
 import dev.gmarques.compras.Vibrador
-import dev.gmarques.compras.databinding.FragAddItemBinding
+import dev.gmarques.compras.databinding.FragAddProdutoBinding
 import dev.gmarques.compras.entidades.Categoria
 import dev.gmarques.compras.ui.categoria_io.AddCategoriaDialog
 import dev.gmarques.compras.ui.produto_io.CategoriaAdapter
@@ -36,13 +36,13 @@ class FragEditProduto : Fragment(), CategoriaAdapterCallback {
 
     private lateinit var categoriaAdapter: CategoriaAdapter
     private lateinit var viewModel: EditProdutoViewModel
-    private lateinit var binding: FragAddItemBinding
+    private lateinit var binding: FragAddProdutoBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragAddItemBinding.inflate(inflater, container, false)
+        binding = FragAddProdutoBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -175,9 +175,9 @@ class FragEditProduto : Fragment(), CategoriaAdapterCallback {
 
     private fun nomeInvalido(nome: String) = nome.isEmpty()
 
-    private fun precoInvalido(preco: String) = preco.isEmpty()
+    private fun precoInvalido(preco: String) = preco.isEmpty()|| preco.toFloat() < .10f
 
-    private fun qtdInvalida(qtd: String) = qtd.isEmpty()
+    private fun qtdInvalida(qtd: String) = qtd.isEmpty()|| qtd.toInt() < 1
 
     private fun categoriaNaoFoiSelecionada() = viewModel.categoriaSelecionada.value == null
 

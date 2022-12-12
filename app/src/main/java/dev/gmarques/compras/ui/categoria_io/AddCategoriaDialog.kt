@@ -10,7 +10,6 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.Extensions.Companion.formatarComoNomeValido
 import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
@@ -261,7 +260,7 @@ class AddCategoriaDialog(
         else runBlocking {
             categoria.setIcone(adapter.receberItemSelecionado()!!)
             categoria.nome = nome
-            CategoriaRepo.addCategoria(categoria)
+            CategoriaRepo.addAttCategoria(categoria)
             dialog.dismiss()
             callback(categoria)
         }
