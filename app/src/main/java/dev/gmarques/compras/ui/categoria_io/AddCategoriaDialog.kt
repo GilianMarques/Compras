@@ -1,14 +1,15 @@
 package dev.gmarques.compras.ui.categoria_io
 
 import android.annotation.SuppressLint
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.Extensions.Companion.formatarComoNomeValido
 import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
@@ -17,6 +18,9 @@ import dev.gmarques.compras.Vibrador
 import dev.gmarques.compras.databinding.DialogAddCategoriaBinding
 import dev.gmarques.compras.entidades.Categoria
 import dev.gmarques.compras.io.repositorios.CategoriaRepo
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class AddCategoriaDialog(
@@ -256,7 +260,7 @@ class AddCategoriaDialog(
         else runBlocking {
             categoria.setIcone(adapter.receberItemSelecionado()!!)
             categoria.nome = nome
-            CategoriaRepo.addCategoria(categoria)
+            CategoriaRepo.addAttCategoria(categoria)
             dialog.dismiss()
             callback(categoria)
         }
@@ -270,13 +274,19 @@ class AddCategoriaDialog(
         return@runBlocking CategoriaRepo.getCategoriaPorNome(nome) != null
     }
 
-    private fun notificarErro(mensagem: Int) {
-        Snackbar.make(binding.root, fragment.getString(mensagem),
-            Snackbar.LENGTH_LONG)
-            .show()
-        Vibrador.vibErro()
-    }
 
+    private var job = Job()
+    private fun notificarErro(mensagem: Int) {
+        job.cancel().also { job = Job() }
+        fragment.lifecycleScope.launch(job) {
+            binding.tvErro.visibility = View.VISIBLE
+            binding.tvErro.text = fragment.getString(mensagem)
+            Vibrador.vibErro()
+            delay(3000)
+            binding.tvErro.visibility = View.GONE
+        }
+
+    }
     interface Callback {
         fun categoriaAdicionada()
         fun usuarioCancelou()

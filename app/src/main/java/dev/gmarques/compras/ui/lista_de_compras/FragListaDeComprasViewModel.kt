@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 
 
+@Suppress("UNUSED_VARIABLE")
 class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(appContext) {
 
     /**liveData pra notificar o ui controller sobre alteraçoes na lista de categorias*/
@@ -337,7 +338,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         }
 
         _categoriasLiveData.postValue(ArrayList(categorias))
-       
+
         carregarItens()
         calcularValores()
 
@@ -391,6 +392,39 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         )
 
         _valoresLiveData.postValue(valores)
+    }
+
+    fun categoriaEditada(novaCategoria: Categoria, categoriaOriginal: Categoria) =
+            viewModelScope.launch(IO) {
+
+                CategoriaRepo.addAttCategoria(novaCategoria)
+
+                val categorias = ArrayList(_categoriasLiveData.value!!)
+                val (holderOriginal: CategoriaHolder, indice: Int) = receberHolderDaCategoria(categoriaOriginal)
+                holderOriginal.categoria = novaCategoria
+                categorias[indice] = holderOriginal
+                ordenarCategorias(categorias)
+                _categoriasLiveData.postValue(categorias)
+            }
+
+    fun removerCategoria(alvo: CategoriaHolder) = viewModelScope.launch(IO)
+    {
+        // marco a categoria como removida e salvo no db
+        val holderCategoria = alvo.clonar()
+        holderCategoria.categoria.removido = true
+        CategoriaRepo.addAttCategoria(holderCategoria.categoria)
+
+        // atualizo a interface
+        val categorias = ArrayList(_categoriasLiveData.value!!)
+        val (holderOriginal, indice) = receberHolderDaCategoria(alvo.categoria)
+        categorias.removeAt(indice)
+        withContext(Main) { _categoriasLiveData.value = categorias }
+
+    }
+
+    suspend fun categoriaEstaEmUso(categoria: Categoria): Boolean {
+        return ItemRepo.getItensDaCategoria(categoria.id,1).isNotEmpty()
+
     }
 
 

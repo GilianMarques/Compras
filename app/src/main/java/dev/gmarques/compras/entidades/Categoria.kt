@@ -20,12 +20,7 @@ class Categoria() : Entidade() {
         icone = App.get.resources.getResourceEntryName(intIcone)
     }
 
-    companion object {
-        val SEM_CATEGORIA = Categoria().also {
-            it.nome = App.get.applicationContext.getString(R.string.Sem_categoria)
-            it.id = "999"
-        }
-    }
+
 
     override fun clonar(): Categoria {
         val g = GsonBuilder().setPrettyPrinting().create()

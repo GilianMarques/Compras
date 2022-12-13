@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.Extensions.Companion.emMoeda
 import dev.gmarques.compras.Extensions.Companion.formatarHtml
 import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
@@ -29,8 +30,10 @@ import dev.gmarques.compras.databinding.DialogEditQtdBinding
 import dev.gmarques.compras.databinding.DialogEditValorBinding
 import dev.gmarques.compras.databinding.DialogEditValorItemBinding
 import dev.gmarques.compras.databinding.FragListaDeComprasBinding
+import dev.gmarques.compras.entidades.Categoria
 import dev.gmarques.compras.entidades.Produto
 import dev.gmarques.compras.entidades.helpers.CategoriaHolder
+import dev.gmarques.compras.ui.categoria_io.EditCategoriaDialog
 import dev.gmarques.compras.ui.lista_de_compras.adapters.CategoriaAdapter
 import dev.gmarques.compras.ui.lista_de_compras.adapters.CategoriaAdapterCallback
 import dev.gmarques.compras.ui.lista_de_compras.adapters.ProdutoAdapter
@@ -80,14 +83,14 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
 
     private fun obervarPrecos() {
         viewModel.valoresLiveData.observe(viewLifecycleOwner) {
-                binding.valores.tvValorCarrinho.text = it.first.emMoeda()
-                binding.valores.tvValorCategoria.text = it.second.emMoeda()
-                binding.valores.tvValorLista.text = it.third.emMoeda()
+            binding.valores.tvValorCarrinho.text = it.first.emMoeda()
+            binding.valores.tvValorCategoria.text = it.second.emMoeda()
+            binding.valores.tvValorLista.text = it.third.emMoeda()
 
-                binding.valores.llValorCategorias.visibility =
-                        if (it.second > 0) View.VISIBLE else View.GONE
-                binding.valores.llValorLista.visibility =
-                        if (it.second > 0) View.GONE else View.VISIBLE
+            binding.valores.llValorCategorias.visibility =
+                    if (it.second > 0) View.VISIBLE else View.GONE
+            binding.valores.llValorLista.visibility =
+                    if (it.second > 0) View.GONE else View.VISIBLE
         }
     }
 
@@ -259,7 +262,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
      * Se o usuario aplicar a alteraçao, produto e interface sao atualizados
      * Nota: funçao de callback do recyclerview de itens
      */
-    override fun qtdEditada(produto: Produto) {
+    override fun quantidadeEditada(produto: Produto) {
         val binding = DialogEditQtdBinding.inflate(layoutInflater)
         var dialog: AlertDialog? = null
 
@@ -334,11 +337,23 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
             .setTitle(getString(R.string.Como_deseja_prosseguir))
             .setMessage(String.format(getString(R.string.O_que_deseja_fazer_com_x), holderCategoria.categoria.nome)
                 .formatarHtml())
-            .setPositiveButton(getString(R.string.Editar)) { dialog, which -> /*TODO("Not yet implemented") */ }
-            .setNegativeButton(getString(R.string.Remover)) { dialog, which -> confirmarRemocao(holderCategoria) }
-            .setNeutralButton(getString(R.string.Cancelar)) { dialog, which -> /*TODO("Not yet implemented") */ }
+            .setPositiveButton(getString(R.string.Editar)) { _, _ -> mostrarDialogoDeEdicaoDeCategoria(holderCategoria) }
+            .setNegativeButton(getString(R.string.Remover)) { _, _ ->
+                lifecycleScope.launch {
+                    if (viewModel.categoriaEstaEmUso(holderCategoria.categoria)) {
+                        Snackbar
+                            .make(binding.root, String.format(getString(R.string.categoria_esta_em_uso_e_nao_pode_ser_removida), holderCategoria.categoria.nome), Snackbar.LENGTH_LONG)
+                            .show()
+                    } else confirmarRemocao(holderCategoria)
+                }
+            }
+            .setNeutralButton(getString(R.string.Cancelar)) { _, _ -> }
             .setCancelable(false)
             .show()
+    }
+
+    private fun mostrarDialogoDeEdicaoDeCategoria(holderCategoria: CategoriaHolder) {
+        EditCategoriaDialog(holderCategoria.categoria, this@FragListaDeCompras, viewModel::categoriaEditada).show()
     }
 
     private fun confirmarRemocao(holderCategoria: CategoriaHolder) {
@@ -350,8 +365,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
 
         MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Por_favor_confirme))
             .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { _, _ ->
-                // TODO:   viewModel.removerProduto(produto)
-
+                viewModel.removerCategoria(holderCategoria)
             }.setNegativeButton(getString(R.string.Cancelar)) { _, _ -> }.setCancelable(false)
             .show()
 

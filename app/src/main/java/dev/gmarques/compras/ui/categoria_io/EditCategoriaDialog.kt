@@ -1,11 +1,109 @@
 package dev.gmarques.compras.ui.categoria_io
 
-import androidx.lifecycle.ViewModel
+import android.annotation.SuppressLint
+import android.util.Log
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import dev.gmarques.compras.App
+import dev.gmarques.compras.Extensions.Companion.formatarComoNomeValido
+import dev.gmarques.compras.Extensions.Companion.mostrarTeclado
 import dev.gmarques.compras.R
+import dev.gmarques.compras.Vibrador
+import dev.gmarques.compras.databinding.DialogAddCategoriaBinding
+import dev.gmarques.compras.entidades.Categoria
+import dev.gmarques.compras.io.repositorios.CategoriaRepo
+import kotlinx.coroutines.*
 
-class AddCategoriaViewModel : ViewModel() {
+class EditCategoriaDialog(
+    private val categoriaOriginal: Categoria,
+    private val fragment: Fragment,
+    private val callback: (novaCategoria: Categoria, categoriaOriginal: Categoria) -> Unit,
+) {
 
-    public fun getIcones() = ArrayList<Int>().also {
+    private val binding: DialogAddCategoriaBinding =
+            DialogAddCategoriaBinding.inflate(fragment.layoutInflater)
+    private val dialog = BottomSheetDialog(fragment.requireContext())
+    private val categoria = categoriaOriginal.clonar()
+    private lateinit var adapter: IconesAdapter
+
+    init {
+
+        dialog.setContentView(binding.root)
+        dialog.setCancelable(false)
+        dialog.behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+
+        initToolbar()
+        initRecyclerView()
+        initEditTextNome()
+        initBotoesSalvarECancelar()
+    }
+
+    private fun initBotoesSalvarECancelar() {
+
+        binding.btnSalvar.setOnClickListener {
+            salvarCategoria()
+        }
+
+        binding.btnCancelar.setOnClickListener {
+            dialog.dismiss()
+        }
+    }
+
+    private fun initEditTextNome() {
+
+        // ouve o clique no botao concluir do teclado
+        binding.edtNome.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+            false
+        }
+
+        binding.edtNome.mostrarTeclado()
+
+        binding.edtNome.setText(categoria.nome)
+        binding.edtNome.setSelection(categoria.nome.length)
+    }
+
+    fun show() = dialog.show()
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun initRecyclerView() {
+
+        val layoutManager = FlexboxLayoutManager(App.get.applicationContext)
+        layoutManager.flexDirection = FlexDirection.ROW
+        layoutManager.justifyContent = JustifyContent.SPACE_EVENLY
+
+        adapter = IconesAdapter(getIcones(), fragment)
+
+        binding.rvIcones.layoutManager = layoutManager
+        binding.rvIcones.adapter = adapter
+        (binding.rvIcones.adapter as IconesAdapter).notifyDataSetChanged()
+
+        adapter.selecionarItem(categoria.intIcone())
+
+        layoutManager.scrollToPosition(adapter.receberItens()
+            .indexOf(adapter.receberItemSelecionado()))
+    }
+
+    private fun initToolbar() {
+        binding.toolbar.title = String.format(fragment.getString(R.string.Editar_x), categoria.nome)
+        binding.toolbar.setNavigationOnClickListener {
+
+            Vibrador.vibInteracao()
+            dialog.dismiss()
+        }
+
+    }
+
+    private fun getIcones() = ArrayList<Int>().also {
         it.add(R.drawable.vec_cat_1)
         it.add(R.drawable.vec_cat_2)
         it.add(R.drawable.vec_cat_3)
@@ -158,4 +256,50 @@ class AddCategoriaViewModel : ViewModel() {
         it.add(R.drawable.vec_cat_150)
 
     }
+
+    private fun salvarCategoria() {
+        val nome = binding.edtNome.text.toString().formatarComoNomeValido()
+
+        if (nome.isEmpty()) notificarErro(R.string.Digite_um_nome_valido)
+        else if (categoriaRepetida(nome)) notificarErro(R.string.Essa_categoria_ja_existe_mude)
+        else if (iconeNaoSelecionado()) notificarErro(R.string.Selecione_um_icone_para)
+        else runBlocking {
+            categoria.setIcone(adapter.receberItemSelecionado()!!)
+            categoria.nome = nome
+            CategoriaRepo.addAttCategoria(categoria)
+            dialog.dismiss()
+            callback(categoria, categoriaOriginal)
+            Vibrador.vibSucesso()
+        }
+
+
+    }
+
+    private fun iconeNaoSelecionado(): Boolean = adapter.receberItemSelecionado() == null
+
+    private fun categoriaRepetida(nome: String): Boolean = runBlocking {
+        Log.d("USUK", "EditCategoriaDialog.".plus("categoriaRepetida() $nome, ${categoria.nome}, ${categoriaOriginal.nome} "))
+
+        if (nome == categoriaOriginal.nome) false
+        else CategoriaRepo.getCategoriaPorNome(nome) != null
+    }
+
+    private var job = Job()
+    private fun notificarErro(mensagem: Int) {
+        job.cancel().also { job = Job() }
+        fragment.lifecycleScope.launch(job) {
+            binding.tvErro.visibility = View.VISIBLE
+            binding.tvErro.text = fragment.getString(mensagem)
+            Vibrador.vibErro()
+            delay(3000)
+            binding.tvErro.visibility = View.GONE
+        }
+
+    }
+
+    interface Callback {
+        fun categoriaAdicionada()
+        fun usuarioCancelou()
+    }
+
 }
