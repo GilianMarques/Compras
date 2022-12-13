@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:background="?android:windowBackground"
-        tools:context=".ui.produto_io.add_produto.FragAddProduto">
+        tools:context=".presenter.frags_activities.produto_io.add_produto.FragAddProduto">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"

@@ -1,7 +1,7 @@
 package dev.gmarques.compras
 
 import android.app.Application
-import dev.gmarques.compras.io.database.RoomDb
+import dev.gmarques.compras.data.database.RoomDb
 
 class App : Application() {
 
