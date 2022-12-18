@@ -3,10 +3,13 @@
 
 -----
 
-ℹ️ Este é um projeto funcional para aperfeiçoar meus conhecimentos em Kotlin, Arquitetura MVVM e SOLID.
+ℹ️ Este é um projeto funcional para aperfeiçoar meus conhecimentos.
 
- Kotlin é usada como linguagem principal do projeto, para tarefas em segundo plano, Coroutines, a persistência de dados local é feita com Room (DAO)  a arquitetura escolhida para o projeto foi a MVVM junto com componentes do Android Jetpack 
-
+Tecnologias:
+Kotlin w/ Coroutines
+MVVM
+Room
+Jetpack components
 
 🔥 Por vir:
 - Login com Google
@@ -19,16 +22,16 @@ Nota: Trabalho nesse projeto no meu tempo livre por tanto, novos updates demoram
 
 -------
 
-<p align="start">
-   <img src="https://github.com/GilianMarques/Compras/blob/master/a291f0b2-2436-43a3-a16c-f1a5de19db7c.jpg" width="300">
-<img src="https://github.com/GilianMarques/Compras/blob/master/3834aa93-8525-4d96-a4dd-611204e1d98f.jpg" width="300">
-<img src="https://github.com/GilianMarques/Compras/blob/master/0cf2d5ad-102c-47b5-8bf5-7711102b036f.jpg" width="300">
-<img src="https://github.com/GilianMarques/Compras/blob/master/fcfe6733-74d5-49fc-8bbe-ee7383271049.jpg" width="300">
+<p align="center">
+   <img src="https://github.com/GilianMarques/Compras/blob/master/_Screenshot_20221218_115627.png" width="220">
+<img src="https://github.com/GilianMarques/Compras/blob/master/_Screenshot_20221218_115654.png" width="220">
+<img src="https://github.com/GilianMarques/Compras/blob/master/_Screenshot_20221218_115714.png" width="220">
+<img src="https://github.com/GilianMarques/Compras/blob/master/_Screenshot_20221218_122617.png" width="220">
 </p>
 
 -------
 
 **Stats**
 
-![GitHub last commit](https://img.shields.io/github/last-commit/gilianmarques/Compras?color=green&style=flat) ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/gilianmarques/compras/master?color=green&style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/gilianmarques/Compras?color=green&style=flat-square) ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/gilianmarques/compras/master?color=green&style=flat-square)
 
