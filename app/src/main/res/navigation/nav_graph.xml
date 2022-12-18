@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/addItem"
-        android:name="dev.gmarques.compras.presenter.frags_activities.produto_io.add_produto.FragAddProduto"
+        android:name="dev.gmarques.compras.presenter.fragmentos.produto_io.add_produto.FragAddProduto"
         android:label="@string/Novo_item"
         tools:layout="@layout/frag_add_produto">
 
@@ -21,19 +21,19 @@
 
     <fragment
         android:id="@+id/editItem"
-        android:name="dev.gmarques.compras.presenter.frags_activities.produto_io.edit_produto.FragEditProduto"
+        android:name="dev.gmarques.compras.presenter.fragmentos.produto_io.edit_produto.FragEditProduto"
         tools:layout="@layout/frag_add_produto">
 
         <argument
             android:name="produto"
-            app:argType="dev.gmarques.compras.data.entidades.ProdutoEntidade" />
+            app:argType="dev.gmarques.compras.domain.entidades.Produto" />
 
 
     </fragment>
 
     <fragment
         android:id="@+id/fragListaDeCompras"
-        android:name="dev.gmarques.compras.presenter.frags_activities.lista_de_compras.FragListaDeCompras"
+        android:name="dev.gmarques.compras.presenter.fragmentos.lista_de_compras.FragListaDeCompras"
         android:label="@string/Compras"
         tools:layout="@layout/frag_lista_de_compras">
 

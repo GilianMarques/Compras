@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     android:background="?android:windowBackground">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -24,7 +24,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.Toolbar
@@ -60,7 +59,8 @@
                         android:hint="@string/Digite_o_nome_do_produto"
                         android:imeOptions="actionSearch"
                         android:inputType="textAutoComplete"
-                        android:padding="8dp" />
+                        android:padding="8dp"
+                        tools:ignore="TouchTargetSizeCheck" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 

@@ -44,6 +44,6 @@
     <string name="Nova_lista_de_compras">Nova lista de compras</string>
     <string name="Como_deseja_prosseguir">Como deseja prosseguir?</string>
     <string name="O_que_deseja_fazer_com_x"><![CDATA[O que deseja fazer com <b>%1$s?</b>]]></string>
-    <string name="categoria_esta_em_uso_e_nao_pode_ser_removida">x está em uso e não pode ser removida</string>
+    <string name="categoria_esta_em_uso_e_nao_pode_ser_removida">%1$s está em uso e não pode ser removida</string>
 
 </resources>

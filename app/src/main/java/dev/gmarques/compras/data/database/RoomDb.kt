@@ -4,20 +4,22 @@ import android.graphics.Color
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import dev.gmarques.compras.App
-import dev.gmarques.compras.data.entidades.CategoriaEntidade
-import dev.gmarques.compras.data.entidades.ListaEntidade
-import dev.gmarques.compras.data.entidades.ProdutoEntidade
+import dev.gmarques.compras.domain.entidades.Categoria
+import dev.gmarques.compras.domain.entidades.Lista
+import dev.gmarques.compras.domain.entidades.Produto
+import dev.gmarques.compras.domain.entidades.ProdutoDispensa
 import java.util.*
 
 // exemplo de auto-migração
 /*   autoMigrations = [AutoMigration(from = 1, to = 2), version = 2, exportSchema = true)*/
 
-@androidx.room.Database(entities = [ProdutoEntidade::class, CategoriaEntidade::class, ListaEntidade::class],
+@androidx.room.Database(entities = [Produto::class, Categoria::class, Lista::class, ProdutoDispensa::class],
     version = 1,
     exportSchema = true)
 abstract class RoomDb : RoomDatabase() {
 
     abstract fun produtoDao(): ProdutoDao
+    abstract fun produtoDispensaDao(): ProdutoDispensaDao
     abstract fun listaDao(): ListaDao
     abstract fun categoriaDao(): CategoriaDao
 
@@ -29,34 +31,34 @@ abstract class RoomDb : RoomDatabase() {
         fun getInstancia() = INSTANCIA ?: criarDb().also { INSTANCIA = it }
 
         private fun criarDb() =
-            Room.databaseBuilder(App.get.applicationContext, RoomDb::class.java, "database.sql")
-                .build()
+                Room.databaseBuilder(App.get.applicationContext, RoomDb::class.java, "database.sql")
+                    .build()
 
 
         // TODO: remover funcoes abaixo quando o app sair dessa fase inicial
         suspend fun criarListasItensEcategorias() {
 
             for (i in 0 until 10) {
-                val listaEntidade = ListaEntidade()
-                listaEntidade.nome = "Lista #$i"
+                val lista = Lista()
+                lista.nome = "Lista #$i"
                 for (j in 0 until 35) {
-                    val produtoEntidade = ProdutoEntidade()
-                    with(produtoEntidade) {
+                    val produto = Produto()
+                    with(produto) {
                         nome = "produto #$j"
                         preco = j * 0.75f
                         quantidade = j
                         detalhes = "$j itens criados"
                         categoriaId = carregarCategorias()[Random().nextInt(4)].id
-                        listaId = listaEntidade.id
-                        getInstancia().produtoDao().addOuAtualizar(produtoEntidade)
+                        listaId = lista.id
+                        getInstancia().produtoDao().addOuAtualizar(produto)
 
                     }
                 }
-                getInstancia().listaDao().addOuAtualizar(listaEntidade)
+                getInstancia().listaDao().addOuAtualizar(lista)
             }
         }
 
-        private val categorias: ArrayList<CategoriaEntidade> = ArrayList()
+        private val categorias: ArrayList<Categoria> = ArrayList()
         private val cores: ArrayList<Int> = arrayListOf(Color.CYAN,
             Color.GREEN,
             Color.MAGENTA,
@@ -64,12 +66,12 @@ abstract class RoomDb : RoomDatabase() {
             Color.YELLOW,
             Color.DKGRAY)
 
-        private suspend fun carregarCategorias(): ArrayList<CategoriaEntidade> {
+        private suspend fun carregarCategorias(): ArrayList<Categoria> {
             if (categorias.size == 0) for (i in 0 until 5) {
-                val c = CategoriaEntidade()
+                val c = Categoria()
                 with(c) {
                     nome = "categ #$i"
-                    icone = "vec_cat_${i+10}"
+                    icone = "vec_cat_${i + 10}"
                 }
                 categorias.add(c)
                 getInstancia().categoriaDao().addOuAtualizar(c)

@@ -1,14 +1,14 @@
 package dev.gmarques.compras.presenter.entidades
 
 import com.google.gson.GsonBuilder
-import dev.gmarques.compras.data.entidades.CategoriaEntidade
+import dev.gmarques.compras.domain.entidades.Categoria
 
 /**
  * Usada para disparar atualizaçoes pelo liveData do viewmodel para o RecyclerView
  * permitindo que o DiffUtils veja que houve alteraçao no objeto e atualize a interface
  */
 data class CategoriaUi(
-    var acxds: CategoriaEntidade,
+    var categoria: Categoria,
     var itensComprados: Boolean = false,
     var selecionada: Boolean = false,
 ) {

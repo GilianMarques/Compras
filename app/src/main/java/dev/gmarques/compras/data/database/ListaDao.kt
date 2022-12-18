@@ -2,16 +2,16 @@ package dev.gmarques.compras.data.database
 
 import androidx.room.Dao
 import androidx.room.Query
-import dev.gmarques.compras.data.entidades.ListaEntidade
+import dev.gmarques.compras.domain.entidades.Lista
 
 @Dao
-abstract class ListaDao : BaseDao<ListaEntidade>() {
+abstract class ListaDao : BaseDao<Lista>() {
 
-    @Query("SELECT * FROM listaentidade WHERE removido = 0")
-    abstract suspend fun getListas(): List<ListaEntidade>
+    @Query("SELECT * FROM lista WHERE removido = 0")
+    abstract suspend fun getListas(): List<Lista>
 
-    @Query("SELECT * FROM listaentidade WHERE id = :id AND removido = 0")
-    abstract suspend fun getListas(id: String): ListaEntidade
+    @Query("SELECT * FROM lista WHERE id = :id AND removido = 0")
+    abstract suspend fun getListas(id: String): Lista
 
 }
 

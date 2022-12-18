@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c89f0eaae0b103a58dcc21ab4432701c",
+    "identityHash": "f84803923f303be558a44cb54c749a41",
     "entities": [
       {
-        "tableName": "ProdutoEntidade",
+        "tableName": "Produto",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`preco` REAL NOT NULL, `quantidade` INTEGER NOT NULL, `detalhes` TEXT, `comprado` INTEGER NOT NULL, `categoriaId` TEXT NOT NULL, `listaId` TEXT NOT NULL, `id` TEXT NOT NULL, `ultimaAtualizacao` INTEGER NOT NULL, `removido` INTEGER NOT NULL, `nome` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -79,7 +79,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "CategoriaEntidade",
+        "tableName": "Categoria",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`icone` TEXT NOT NULL DEFAULT 'vec_cat_0', `id` TEXT NOT NULL, `ultimaAtualizacao` INTEGER NOT NULL, `removido` INTEGER NOT NULL, `nome` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -124,7 +124,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "ListaEntidade",
+        "tableName": "Lista",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `ultimaAtualizacao` INTEGER NOT NULL, `removido` INTEGER NOT NULL, `nome` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -160,12 +160,68 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "ProdutoDispensa",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`nome` TEXT NOT NULL, `preco` REAL NOT NULL, `quantidade` INTEGER NOT NULL, `detalhes` TEXT, `categoriaId` TEXT NOT NULL, `removido` INTEGER NOT NULL, `ultimaAtualizacao` INTEGER NOT NULL, PRIMARY KEY(`nome`))",
+        "fields": [
+          {
+            "fieldPath": "nome",
+            "columnName": "nome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "preco",
+            "columnName": "preco",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantidade",
+            "columnName": "quantidade",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "detalhes",
+            "columnName": "detalhes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "categoriaId",
+            "columnName": "categoriaId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "removido",
+            "columnName": "removido",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ultimaAtualizacao",
+            "columnName": "ultimaAtualizacao",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "nome"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c89f0eaae0b103a58dcc21ab4432701c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f84803923f303be558a44cb54c749a41')"
     ]
   }
 }
