@@ -28,7 +28,6 @@ class AddProdutoViewModel : ViewModel() {
         return produtos to nomes
     }
 
-
     /***
      * A posiçao 0 do array pode ficar com uma categoria qualquer porque sera usada para abrir
      * a tela para adicionar uma nova categoria

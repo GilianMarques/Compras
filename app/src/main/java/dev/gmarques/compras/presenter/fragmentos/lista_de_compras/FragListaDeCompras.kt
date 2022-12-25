@@ -4,10 +4,12 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.LifecycleOwner
@@ -19,11 +21,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
- import dev.gmarques.compras.Extensions.emMoeda
- import dev.gmarques.compras.Extensions.formatarHtml
- import dev.gmarques.compras.Extensions.mostrarTeclado
- import dev.gmarques.compras.Extensions.ocultarTeclado
- import dev.gmarques.compras.Extensions.smoothScroolToPosition
+import dev.gmarques.compras.Extensions.emMoeda
+import dev.gmarques.compras.Extensions.formatarHtml
+import dev.gmarques.compras.Extensions.mostrarTeclado
+import dev.gmarques.compras.Extensions.ocultarTeclado
+import dev.gmarques.compras.Extensions.smoothScroolToPosition
 import dev.gmarques.compras.R
 import dev.gmarques.compras.presenter.Vibrador
 import dev.gmarques.compras.databinding.DialogEditQtdBinding
@@ -31,8 +33,9 @@ import dev.gmarques.compras.databinding.DialogEditValorBinding
 import dev.gmarques.compras.databinding.DialogEditValorItemBinding
 import dev.gmarques.compras.databinding.FragListaDeComprasBinding
 import dev.gmarques.compras.domain.entidades.Produto
+import dev.gmarques.compras.presenter.dialogos.lista_io.AddListaDialog
 import dev.gmarques.compras.presenter.entidades.CategoriaUi
-import dev.gmarques.compras.presenter.fragmentos.categoria_io.EditCategoriaDialog
+import dev.gmarques.compras.presenter.dialogos.categoria_io.EditCategoriaDialog
 import dev.gmarques.compras.presenter.fragmentos.lista_de_compras.adapters.CategoriaAdapter
 import dev.gmarques.compras.presenter.fragmentos.lista_de_compras.adapters.CategoriaAdapterCallback
 import dev.gmarques.compras.presenter.fragmentos.lista_de_compras.adapters.ProdutoAdapter
@@ -45,7 +48,7 @@ import kotlinx.coroutines.withContext
 //adb shell setprop log.tag.FragmentManager DEBUG
 
 class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
-    CategoriaAdapterCallback {
+    CategoriaAdapterCallback, Toolbar.OnMenuItemClickListener {
 
     private lateinit var viewModel: FragListaDeComprasViewModel
     lateinit var binding: FragListaDeComprasBinding
@@ -70,7 +73,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
             binding.toolbar.title = it.nome
             binding.toolbar.setNavigationIcon(R.drawable.vec_lista_30_primary)
             binding.toolbar.inflateMenu(R.menu.menu_principal)
-
+            binding.toolbar.setOnMenuItemClickListener(this)
             obervarPrecos()
             initRvDeCategorias()
             initRvDeItens()
@@ -381,6 +384,24 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
                 @Suppress("DEPRECATION")
                 bundle.getSerializable(key) as Produto
             }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.add_lista -> exibirDialogoAddLista()
+        }
+
+        return true
+
+    }
+
+    private fun exibirDialogoAddLista() {
+        AddListaDialog(this) { novaLista ->
+            //viewModel.addLista(novaLista)
+            //viewmode.mudarListaAtual(lista)
+
+        }.show()
+
+    }
 
 
 }

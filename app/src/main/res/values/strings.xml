@@ -31,6 +31,7 @@
     <string name="Historico_de_precos_de_x">Histórico de preços de %1$s</string>
     <string name="Sugestoes_para_x">Sugestões para %1$s</string>
     <string name="Nova_categoria">Nova categoria</string>
+    <string name="Nova_lista">Nova lista</string>
     <string name="_1_un">1 UN</string>
     <string name="_2_un">2 UN</string>
     <string name="_3_un">3 UN</string>
@@ -38,6 +39,7 @@
     <string name="_5_un">5 UN</string>
     <string name="_6_un">6 UN</string>
     <string name="Essa_categoria_ja_existe_mude">Essa categoria já existe, mude o nome para prosseguir</string>
+    <string name="Essa_lista_ja_existe_mude">Essa lista já existe, mude o nome para prosseguir</string>
     <string name="Digite_um_nome_valido">Digite um nome válido</string>
     <string name="Selecione_um_icone_para">Selecione um ícone para prosseguir</string>
     <string name="Digite_o_nome_do_produto">Digite o nome do produto…</string>

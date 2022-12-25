@@ -46,6 +46,7 @@ object Extensions {
     }
 
     fun View.ocultarTeclado() {
+
         val imm = ContextCompat.getSystemService(context,
             InputMethodManager::class.java) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)

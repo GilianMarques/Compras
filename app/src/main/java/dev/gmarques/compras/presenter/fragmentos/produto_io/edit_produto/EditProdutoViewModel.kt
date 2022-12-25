@@ -13,6 +13,7 @@ import dev.gmarques.compras.domain.entidades.ProdutoDispensa
 
 class EditProdutoViewModel : ViewModel() {
     lateinit var produto: Produto
+
     /**Não deve sofrer qualquer tipo de alteraçao*/
     lateinit var produtoOriginal: Produto
 
@@ -20,7 +21,7 @@ class EditProdutoViewModel : ViewModel() {
     val categoriaSelecionada get() = _categoriaSelecionada
 
     suspend fun produtoJaExisteNaLista(nome: String) =
-        ProdutoRepo.getProdutosNaListaPorNome(nome, this.produto.listaId).isNotEmpty()
+            ProdutoRepo.getProdutosNaListaPorNome(nome, this.produto.listaId).isNotEmpty()
 
     suspend fun carregarSugestoes(nome: String): Pair<List<ProdutoDispensa>, ArrayList<String>> {
         val produtos = ProdutoDispensaRepo.getProdutosPorNome(nome)
@@ -31,7 +32,7 @@ class EditProdutoViewModel : ViewModel() {
 
 
     /***
-     * A posiçao 0 do array pode ficar com uma categoria qualquer porque sera usada para abrir
+     * A posiçao 0 do array sera usada para abrir
      * a tela para adicionar uma nova categoria
      * */
     suspend fun carregarCategorias() = ArrayList<Categoria>().also {

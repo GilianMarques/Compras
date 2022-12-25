@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:icon="@drawable/vec_add"
+        android:id="@+id/add_lista"
         android:title="@string/Nova_lista_de_compras"
         android:enabled="true"
         android:numericShortcut="@string/_2_un"

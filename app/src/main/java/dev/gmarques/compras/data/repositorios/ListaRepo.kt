@@ -11,7 +11,7 @@ object ListaRepo : BaseRepo() {
         val id: String? = Preferencias().getString(Preferencias.ultimaLista)
         var lista: Lista? = null
 
-        val listas = RoomDb.getInstancia().listaDao().getListas()
+        val listas = RoomDb.getInstancia().listaDao().getTodasAsListas()
         for (cLista in listas) if (cLista.id == id) {
             lista = cLista
             break
@@ -19,5 +19,13 @@ object ListaRepo : BaseRepo() {
         return lista ?: if (listas.isNotEmpty()) listas[0]
         else null
     }
+
+    suspend fun getListaPorNome(nome: String) =
+            RoomDb.getInstancia().listaDao().getListaPorNome(nome)
+
+    suspend fun addAttLista(lista: Lista) {
+        RoomDb.getInstancia().listaDao().addOuAtualizar(lista)
+    }
+
 
 }

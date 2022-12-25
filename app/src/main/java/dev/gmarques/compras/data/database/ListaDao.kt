@@ -8,10 +8,13 @@ import dev.gmarques.compras.domain.entidades.Lista
 abstract class ListaDao : BaseDao<Lista>() {
 
     @Query("SELECT * FROM lista WHERE removido = 0")
-    abstract suspend fun getListas(): List<Lista>
+    abstract suspend fun getTodasAsListas(): List<Lista>
 
     @Query("SELECT * FROM lista WHERE id = :id AND removido = 0")
-    abstract suspend fun getListas(id: String): Lista
+    abstract suspend fun getListaPorId(id: String): Lista?
+
+    @Query("SELECT * FROM lista WHERE nome = :nome AND removido = 0")
+    abstract suspend fun getListaPorNome(nome: String): Lista?
 
 }
 

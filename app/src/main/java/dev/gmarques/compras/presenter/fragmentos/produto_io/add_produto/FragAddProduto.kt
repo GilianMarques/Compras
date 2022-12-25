@@ -28,7 +28,7 @@ import dev.gmarques.compras.databinding.FragAddProdutoBinding
 import dev.gmarques.compras.domain.entidades.Categoria
 import dev.gmarques.compras.domain.ConvencaoNome.formatarComoNomeValido
 import dev.gmarques.compras.domain.entidades.ProdutoDispensa
-import dev.gmarques.compras.presenter.fragmentos.categoria_io.AddCategoriaDialog
+import dev.gmarques.compras.presenter.dialogos.categoria_io.AddCategoriaDialog
 import dev.gmarques.compras.presenter.fragmentos.produto_io.CategoriaAdapter
 import dev.gmarques.compras.presenter.fragmentos.produto_io.CategoriaAdapterCallback
 import kotlinx.coroutines.Dispatchers
