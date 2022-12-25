@@ -8,11 +8,14 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -27,15 +30,17 @@ import dev.gmarques.compras.Extensions.mostrarTeclado
 import dev.gmarques.compras.Extensions.ocultarTeclado
 import dev.gmarques.compras.Extensions.smoothScroolToPosition
 import dev.gmarques.compras.R
-import dev.gmarques.compras.presenter.Vibrador
 import dev.gmarques.compras.databinding.DialogEditQtdBinding
 import dev.gmarques.compras.databinding.DialogEditValorBinding
 import dev.gmarques.compras.databinding.DialogEditValorItemBinding
 import dev.gmarques.compras.databinding.FragListaDeComprasBinding
+import dev.gmarques.compras.domain.entidades.Lista
 import dev.gmarques.compras.domain.entidades.Produto
-import dev.gmarques.compras.presenter.dialogos.lista_io.AddListaDialog
-import dev.gmarques.compras.presenter.entidades.CategoriaUi
+import dev.gmarques.compras.presenter.Vibrador
 import dev.gmarques.compras.presenter.dialogos.categoria_io.EditCategoriaDialog
+import dev.gmarques.compras.presenter.dialogos.lista_io.AddListaDialog
+import dev.gmarques.compras.presenter.dialogos.lista_io.EditListaDialog
+import dev.gmarques.compras.presenter.entidades.CategoriaUi
 import dev.gmarques.compras.presenter.fragmentos.lista_de_compras.adapters.CategoriaAdapter
 import dev.gmarques.compras.presenter.fragmentos.lista_de_compras.adapters.CategoriaAdapterCallback
 import dev.gmarques.compras.presenter.fragmentos.lista_de_compras.adapters.ProdutoAdapter
@@ -44,6 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 //adb shell setprop log.tag.FragmentManager DEBUG
 
@@ -68,7 +74,25 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
 
         viewModel = ViewModelProvider(this)[FragListaDeComprasViewModel::class.java]
 
+
+        /*   val observer = object : Observer<Lista?> {
+               override fun onChanged(value: Lista?) {
+                   removeObserver(this)
+                   observer(value)
+               }*/
+
         viewModel.listaLiveData.observe(viewLifecycleOwner) {
+            override fun onChanged(value: Lista?) {
+                viewModel.listaLiveData.removeObserver(this)
+                observer(value)
+            }
+        }
+
+
+        viewModel.listaLiveData.observe(viewLifecycleOwner)
+        {
+
+            viewModel.listaLiveData.removeObserver(this)
             Log.d("USUK", "FragListaDeCompras.onViewCreated: ")
             binding.toolbar.title = it.nome
             binding.toolbar.setNavigationIcon(R.drawable.vec_lista_30_primary)
@@ -81,6 +105,11 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
             initFragmentResultAttItem()
             initFabAddItem()
         }
+
+        viewModel.listaLiveData.observe(viewLifecycleOwner)
+        {
+            binding.toolbar.title = it.nome
+        }
     }
 
     private fun obervarPrecos() {
@@ -90,9 +119,9 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
             binding.valores.tvValorLista.text = it.third.emMoeda()
 
             binding.valores.llValorCategorias.visibility =
-                    if (it.second > 0) View.VISIBLE else View.GONE
+                if (it.second > 0) View.VISIBLE else View.GONE
             binding.valores.llValorLista.visibility =
-                    if (it.second > 0) View.GONE else View.VISIBLE
+                if (it.second > 0) View.GONE else View.VISIBLE
         }
     }
 
@@ -106,22 +135,22 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
      * chamado sempre que um novo produto é inserido pelo fragAddItem
      * */
     private fun initFragmentResultAddItem() =
-            setFragmentResultListener("novoProduto") { _, bundle ->
-                val produto = desempacotarProduto(bundle, "produto")
-                viewModel.addProduto(produto)
+        setFragmentResultListener("novoProduto") { _, bundle ->
+            val produto = desempacotarProduto(bundle, "produto")
+            viewModel.addProduto(produto)
 
 
-            }
+        }
 
     /**
      *  chamado sempre que um novo produto é atualizado pelo fragEditItem
      */
     private fun initFragmentResultAttItem() =
-            setFragmentResultListener("produtoAtualizado") { _, bundle ->
-                val produtoAtualizado = desempacotarProduto(bundle, "produto")
-                val produtoOriginal = desempacotarProduto(bundle, "produtoOriginal")
-                viewModel.attProduto(produtoAtualizado, produtoOriginal)
-            }
+        setFragmentResultListener("produtoAtualizado") { _, bundle ->
+            val produtoAtualizado = desempacotarProduto(bundle, "produto")
+            val produtoOriginal = desempacotarProduto(bundle, "produtoOriginal")
+            viewModel.attProduto(produtoAtualizado, produtoOriginal)
+        }
 
     private fun initRvDeItens() {
         val itensAdapter = ProdutoAdapter(this@FragListaDeCompras, this@FragListaDeCompras)
@@ -136,10 +165,11 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
 
     private fun initRvDeCategorias() {
 
-        val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        val layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
         val categoriasAdapter =
-                CategoriaAdapter(this@FragListaDeCompras, ArrayList(), this@FragListaDeCompras)
+            CategoriaAdapter(this@FragListaDeCompras, ArrayList(), this@FragListaDeCompras)
 
         binding.rvCategorias.setHasFixedSize(true)
         binding.rvCategorias.adapter = categoriasAdapter
@@ -147,7 +177,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
         viewModel.categoriasLiveData.observe(viewLifecycleOwner) { dados ->
             categoriasAdapter.atualizarColecaoDiff(dados)
             if (binding.rvCategorias.layoutManager == null) binding.rvCategorias.layoutManager =
-                    layoutManager
+                layoutManager
             lifecycleScope.launch {
                 delay(300)
                 val indice = viewModel.indiceDaCategoriaSelecionada()
@@ -167,8 +197,8 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
         Vibrador.vibInteracao()
 
         val msg =
-                String.format(getString(R.string.Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita),
-                    produto.nome).formatarHtml()
+            String.format(getString(R.string.Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita),
+                produto.nome).formatarHtml()
 
         MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Por_favor_confirme))
             .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { _, _ ->
@@ -197,7 +227,7 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
 
         binding.edtValor.hint = produto.preco.toString()
         binding.tvHistorico.text =
-                String.format(getString(R.string.Historico_de_precos_de_x), produto.nome)
+            String.format(getString(R.string.Historico_de_precos_de_x), produto.nome)
 
         // faz a magica (aplica as alteraçoes no produto e fecha o dialogo)
         fun run(preco: Float) = lifecycleScope.launch {
@@ -248,8 +278,8 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
         }
 
         dialog =
-                MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_preco))
-                    .setView(binding.root).setCancelable(false).show()
+            MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_preco))
+                .setView(binding.root).setCancelable(false).show()
 
         lifecycleScope.launch {
             delay(300)
@@ -269,7 +299,8 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
         var dialog: AlertDialog? = null
 
         binding.edtQtd.hint = produto.quantidade.toString()
-        binding.tvSugestoes.text = String.format(getString(R.string.Sugestoes_para_x), produto.nome)
+        binding.tvSugestoes.text =
+            String.format(getString(R.string.Sugestoes_para_x), produto.nome)
 
 
         // faz a magica (aplica as alteraçoes no ite e fecha o dialogo)
@@ -320,8 +351,8 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
         binding.chip6.setOnClickListener(listener)
 
         dialog =
-                MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_quantidade))
-                    .setView(binding.root).setCancelable(false).show()
+            MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Atualizar_quantidade))
+                .setView(binding.root).setCancelable(false).show()
 
         lifecycleScope.launch {
             delay(300)
@@ -337,15 +368,21 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
     override fun categoriaPressionada(holderCategoria: CategoriaUi) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.Como_deseja_prosseguir))
-            .setMessage(String.format(getString(R.string.O_que_deseja_fazer_com_x), holderCategoria.categoria.nome)
+            .setMessage(String.format(getString(R.string.O_que_deseja_fazer_com_x),
+                holderCategoria.categoria.nome)
                 .formatarHtml())
-            .setPositiveButton(getString(R.string.Editar)) { _, _ -> mostrarDialogoDeEdicaoDeCategoria(holderCategoria) }
+            .setPositiveButton(getString(R.string.Editar)) { _, _ ->
+                mostrarDialogoDeEdicaoDeCategoria(holderCategoria)
+            }
             .setNegativeButton(getString(R.string.Remover)) { _, _ ->
                 lifecycleScope.launch {
                     if (viewModel.categoriaEstaEmUso(holderCategoria.categoria)) {
 
                         Snackbar
-                            .make(binding.root, String.format(getString(R.string.categoria_esta_em_uso_e_nao_pode_ser_removida), holderCategoria.categoria.nome), Snackbar.LENGTH_LONG)
+                            .make(binding.root,
+                                String.format(getString(R.string.categoria_esta_em_uso_e_nao_pode_ser_removida),
+                                    holderCategoria.categoria.nome),
+                                Snackbar.LENGTH_LONG)
                             .show()
                     } else confirmarRemocao(holderCategoria)
                 }
@@ -356,15 +393,17 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
     }
 
     private fun mostrarDialogoDeEdicaoDeCategoria(holderCategoria: CategoriaUi) {
-        EditCategoriaDialog(holderCategoria.categoria, this@FragListaDeCompras, viewModel::categoriaEditada).show()
+        EditCategoriaDialog(holderCategoria.categoria,
+            this@FragListaDeCompras,
+            viewModel::categoriaEditada).show()
     }
 
     private fun confirmarRemocao(holderCategoria: CategoriaUi) {
         Vibrador.vibInteracao()
 
         val msg =
-                String.format(getString(R.string.Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita),
-                    holderCategoria.categoria.nome).formatarHtml()
+            String.format(getString(R.string.Deseja_mesmo_remover_x_essa_acao_nao_podera_ser_desfeita),
+                holderCategoria.categoria.nome).formatarHtml()
 
         MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.Por_favor_confirme))
             .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { _, _ ->
@@ -378,16 +417,17 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
      * Extrai o objeto do pacote verificando a plataforma e invocando a função correta
      * */
     private fun desempacotarProduto(bundle: Bundle, key: String): Produto =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                bundle.getSerializable(key, Produto::class.java)!!
-            } else {
-                @Suppress("DEPRECATION")
-                bundle.getSerializable(key) as Produto
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getSerializable(key, Produto::class.java)!!
+        } else {
+            @Suppress("DEPRECATION")
+            bundle.getSerializable(key) as Produto
+        }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.add_lista -> exibirDialogoAddLista()
+            R.id.editar_lista -> exibirDialogoEditLista()
         }
 
         return true
@@ -396,12 +436,22 @@ class FragListaDeCompras : Fragment(), LifecycleOwner, ProdutoAdapterCallback,
 
     private fun exibirDialogoAddLista() {
         AddListaDialog(this) { novaLista ->
-            //viewModel.addLista(novaLista)
-            //viewmode.mudarListaAtual(lista)
-
+            lifecycleScope.launch {
+                viewModel.addListaOuAtualizarListaNoBancoDeDados(novaLista)
+                viewModel.definirListaAtual(novaLista)
+                viewModel.carregarDadosDaLista()
+            }
         }.show()
 
     }
 
+    private fun exibirDialogoEditLista() {
+        EditListaDialog(this, viewModel.listaLiveData.value!!) { lista ->
+            lifecycleScope.launch {
+                viewModel.addListaOuAtualizarListaNoBancoDeDados(lista)
+                viewModel.definirListaAtual(lista)
+            }
+        }.show()
+    }
 
 }

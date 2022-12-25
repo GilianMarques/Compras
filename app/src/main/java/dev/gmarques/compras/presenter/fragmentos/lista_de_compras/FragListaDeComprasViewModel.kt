@@ -3,6 +3,8 @@ package dev.gmarques.compras.presenter.fragmentos.lista_de_compras
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import dev.gmarques.compras.data.database.RoomDb
+import dev.gmarques.compras.data.preferencias.Preferencias
 import dev.gmarques.compras.domain.entidades.Categoria
 import dev.gmarques.compras.domain.entidades.Lista
 import dev.gmarques.compras.domain.entidades.Produto
@@ -44,15 +46,17 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
     init {
         runBlocking {
-            _listaLiveData.value = ListaRepo.getUtimaOuQualquerLista() ?: Lista.PADRAO
-            @Suppress("ControlFlowWithEmptyBody") if (Lista.PADRAO == _listaLiveData.value) {
-            } // TODO: criar uma lista a partir daqui
-
-            carregarCategoriasNaLista()
-            carregarItens()
-            calcularValores()
+            _listaLiveData.value = ListaRepo.getUtimaOuQualquerLista()
+            if (_listaLiveData.value != null) carregarDadosDaLista()
         }
 
+
+    }
+
+    suspend fun carregarDadosDaLista() {
+        carregarCategoriasNaLista()
+        carregarItens()
+        calcularValores()
 
     }
 
@@ -81,8 +85,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
         for (produto in itens) {
             val categoria = CategoriaRepo.getCategoriaPorId(produto.categoriaId)
-            map[produto.categoriaId] =
-                    CategoriaUi(categoria, todosOsItensForamComprados(categoria))
+            map[produto.categoriaId] = CategoriaUi(categoria, todosOsItensForamComprados(categoria))
         }
 
         val resultado = ArrayList(map.values.toList())
@@ -97,11 +100,10 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
     /**
      * Adicioona ou atualiza o produto e sua versao de dispensa no banco de dados
      * */
-    private suspend fun addOuAttProdutoNoBancoDeDados(produto: Produto) =
-            withContext(IO) {
-                ProdutoRepo.addOuAtualizar(produto)
-                ProdutoDispensaRepo.addOuAtualizar(produto.produtoDispensa())// TODO: nem sempre é necessario atualizar um item de dispensa, ex.: item comprado 
-            }
+    private suspend fun addOuAttProdutoNoBancoDeDados(produto: Produto) = withContext(IO) {
+        ProdutoRepo.addOuAtualizar(produto)
+        ProdutoDispensaRepo.addOuAtualizar(produto.produtoDispensa())// TODO: nem sempre é necessario atualizar um item de dispensa, ex.: item comprado
+    }
 
     /**
      * @return Um par com uma copia editavel de CategoriaHolder e seu indice
@@ -114,10 +116,9 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
             if (holder.categoria.id == alvo.id) return holder.clonar() to i
         }
 
-        throw java.lang.Exception("${alvo.nome} nao foi encontrada na lista" +
-                "\nalvo = $alvo" +
-                "\nTamanho da lista: ${_categoriasLiveData.value?.size}, Conteudo:" +
-                "\n${_categoriasLiveData.value?.joinToString(separator = "\n")}")
+        throw java.lang.Exception("${alvo.nome} nao foi encontrada na lista" + "\nalvo = $alvo" + "\nTamanho da lista: ${_categoriasLiveData.value?.size}, Conteudo:" + "\n${
+            _categoriasLiveData.value?.joinToString(separator = "\n")
+        }")
     }
 
     /**
@@ -149,8 +150,8 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
      * Os itens verificados sao carregados diretamente do Banco de dados.
      * */
     private suspend fun todosOsItensForamComprados(categoria: Categoria) =
-            ProdutoRepo.getProdutosNaListaPorCategoria(listaLiveData.value!!.id, categoria.id)
-                .all { it.comprado }
+        ProdutoRepo.getProdutosNaListaPorCategoria(listaLiveData.value!!.id, categoria.id)
+            .all { it.comprado }
 
     /**
      * Faz as verificaçoes e aplica as alteraçoes necessarias para refletir a inserçao de um
@@ -246,7 +247,8 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
         // atualizo a categoria
         val categorias = ArrayList(_categoriasLiveData.value!!)
-        val (holder: CategoriaUi, indice: Int) = receberHolderDaCategoria(receberCategoriaDoDB(novoProduto))
+        val (holder: CategoriaUi, indice: Int) = receberHolderDaCategoria(receberCategoriaDoDB(
+            novoProduto))
         holder.itensComprados = todosOsItensForamComprados(holder.categoria)
 
         categorias[indice] = holder
@@ -271,8 +273,8 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         val categoriaDoProduto = receberCategoriaDoDB(produto)
         val categorias = ArrayList(_categoriasLiveData.value!!)
 
-        val itensDb = ProdutoRepo
-            .getProdutosNaListaPorCategoria(listaLiveData.value!!.id, produto.categoriaId)
+        val itensDb = ProdutoRepo.getProdutosNaListaPorCategoria(listaLiveData.value!!.id,
+            produto.categoriaId)
         itensDb.retainAll { it.categoriaId == produto.categoriaId } // ficam só os itens da categoria
         itensDb.removeAll { it.id == produto.id } // removo agora o produto removido pelo usuario
 
@@ -305,7 +307,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
     }
 
     suspend fun buscarItemEmOutrasListas(produto: Produto): ArrayList<Produto> =
-            ArrayList(ProdutoRepo.getProdutosPorNomeExato(produto, 6))
+        ArrayList(ProdutoRepo.getProdutosPorNomeExato(produto, 6))
 
     /**
      * Verifica a categoria selecionada para saber se o usuario esta selecionando
@@ -318,8 +320,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
 
         if (novaSelecao.categoria.id == categSelecHolder?.categoria?.id) {
             // desseleciono todas as categorias
-            categorias.forEach { it.selecionada = false }
-                .also { categSelecHolder = null }
+            categorias.forEach { it.selecionada = false }.also { categSelecHolder = null }
 
         } else {
             for (holder in categorias) {
@@ -374,7 +375,7 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
     }
 
     fun indiceDaCategoriaSelecionada() =
-            if (categSelecHolder != null) receberHolderDaCategoria(categSelecHolder!!.categoria).second else -1
+        if (categSelecHolder != null) receberHolderDaCategoria(categSelecHolder!!.categoria).second else -1
 
     /**
      * Calcula os valores dos itens na lista de compras atual
@@ -387,7 +388,8 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
         val produtosDaLista = ProdutoRepo.getProdutosNaLista(_listaLiveData.value?.id!!)
 
         for (produto in produtosDaLista) {
-            if (produto.categoriaId == categSelecHolder?.categoria?.id) produtosDaCategoria.add(produto)
+            if (produto.categoriaId == categSelecHolder?.categoria?.id) produtosDaCategoria.add(
+                produto)
             if (produto.comprado) produtosComprados.add(produto)
         }
 
@@ -402,20 +404,20 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
     }
 
     fun categoriaEditada(novaCategoria: Categoria, categoriaOriginal: Categoria) =
-            viewModelScope.launch(IO) {
+        viewModelScope.launch(IO) {
 
-                CategoriaRepo.addAttCategoria(novaCategoria)
+            CategoriaRepo.addAttCategoria(novaCategoria)
 
-                val categorias = ArrayList(_categoriasLiveData.value!!)
-                val (holderOriginal: CategoriaUi, indice: Int) = receberHolderDaCategoria(categoriaOriginal)
-                holderOriginal.categoria = novaCategoria
-                categorias[indice] = holderOriginal
-                ordenarCategorias(categorias)
-                _categoriasLiveData.postValue(categorias)
-            }
+            val categorias = ArrayList(_categoriasLiveData.value!!)
+            val (holderOriginal: CategoriaUi, indice: Int) = receberHolderDaCategoria(
+                categoriaOriginal)
+            holderOriginal.categoria = novaCategoria
+            categorias[indice] = holderOriginal
+            ordenarCategorias(categorias)
+            _categoriasLiveData.postValue(categorias)
+        }
 
-    fun removerCategoria(alvo: CategoriaUi) = viewModelScope.launch(IO)
-    {
+    fun removerCategoria(alvo: CategoriaUi) = viewModelScope.launch(IO) {
         // marco a categoria como removida e salvo no db
         val holderCategoria = alvo.clonar()
         holderCategoria.categoria.removido = true
@@ -430,11 +432,20 @@ class FragListaDeComprasViewModel(appContext: Application) : AndroidViewModel(ap
     }
 
     suspend fun categoriaEstaEmUso(categoria: Categoria): Boolean {
-        return ProdutoRepo
-            .getProdutosDaCategoria(categoria.id, 1).isNotEmpty()
-                || ProdutoDispensaRepo.getProdutosDaCategoria(categoria.id, 1).isNotEmpty()
+        return ProdutoRepo.getProdutosDaCategoria(categoria.id, 1)
+            .isNotEmpty() || ProdutoDispensaRepo.getProdutosDaCategoria(categoria.id, 1)
+            .isNotEmpty()
 
     }
 
+    suspend fun addListaOuAtualizarListaNoBancoDeDados(novaLista: Lista) {
+        ListaRepo.addAttLista(novaLista)
+    }
+
+    fun definirListaAtual(novaLista: Lista) {
+        _listaLiveData.value = novaLista
+        Preferencias().saveString(Preferencias.ultimaLista, novaLista.id)
+
+    }
 
 }

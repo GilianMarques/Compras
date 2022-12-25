@@ -8,12 +8,7 @@ import java.util.*
 
 @Entity
 class Lista : DomainModel() {
-    companion object {
-        val PADRAO = Lista().also {
-            it.nome = String.format(App.get.applicationContext.getString(R.string.Lista),
-                Random().nextInt(999))
-        }
-    }
+
 
     override fun clonar(): Lista {
         val g = GsonBuilder().setPrettyPrinting().create()
