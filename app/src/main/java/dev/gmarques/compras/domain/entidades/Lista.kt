@@ -9,6 +9,7 @@ import java.util.*
 @Entity
 class Lista : DomainModel() {
 
+    // TODO: Esse objeto pode manter referencia da ultima categoria selecionada pelo usuario
 
     override fun clonar(): Lista {
         val g = GsonBuilder().setPrettyPrinting().create()

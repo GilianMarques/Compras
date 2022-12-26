@@ -14,6 +14,7 @@ object ConvencaoNome {
      * do que ele digitou.
      * */
     fun String.formatarComoNomeValido() = this
+        // TODO: nao esta aceitando caracteres acentuados ó ã ô etc...
         .replace(Regex("""[^a-zA-Z0-9. ]"""), "")
         .replace(Regex("[ ]+"), " ")
         .trim().capitalizar()

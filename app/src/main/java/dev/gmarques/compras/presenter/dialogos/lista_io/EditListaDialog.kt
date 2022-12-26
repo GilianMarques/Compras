@@ -8,7 +8,7 @@ import dev.gmarques.compras.Extensions.mostrarTeclado
 import dev.gmarques.compras.Extensions.ocultarTeclado
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.repositorios.ListaRepo
-import dev.gmarques.compras.databinding.DialogEditListaBinding
+import dev.gmarques.compras.databinding.DialogAddListaBinding
 import dev.gmarques.compras.domain.ConvencaoNome.formatarComoNomeValido
 import dev.gmarques.compras.domain.entidades.Lista
 import dev.gmarques.compras.presenter.Vibrador
@@ -21,12 +21,12 @@ class EditListaDialog(
 ) {
 
     @Suppress("JoinDeclarationAndAssignment")
-    private val binding: DialogEditListaBinding
+    private val binding: DialogAddListaBinding
     private val dialog: BottomSheetDialog
     private val lista = listaOriginal.clonar()
 
     init {
-        binding = DialogEditListaBinding.inflate(fragment.layoutInflater)
+        binding = DialogAddListaBinding.inflate(fragment.layoutInflater)
 
         dialog = BottomSheetDialog(fragment.requireContext())
         dialog.setContentView(binding.root)
@@ -54,10 +54,6 @@ class EditListaDialog(
         }
 
 
-        binding.btnRemover.setOnClickListener {
-            confirmarRemocaoDaLista()
-        }
-
     }
 
 
@@ -74,10 +70,6 @@ class EditListaDialog(
 
     }
 
-    private fun confirmarRemocaoDaLista() {
-
-
-    }
 
 
     private fun salvarLista() {

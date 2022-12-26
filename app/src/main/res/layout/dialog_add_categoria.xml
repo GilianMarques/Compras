@@ -115,29 +115,7 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
 
-        <TextView
-            android:id="@+id/tv_erro"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="32dp"
-            android:background="@drawable/background_valores_lista"
-            android:drawablePadding="8dp"
-            android:elevation="5dp"
-            android:paddingStart="8dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="8dp"
-            android:textColor="@android:color/holo_red_dark"
-            android:visibility="gone"
-            app:drawableStartCompat="@drawable/vec_info_12"
-            app:drawableTint="@android:color/holo_red_dark"
-            app:layout_constraintBottom_toTopOf="@id/btn_salvar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Categoria repetida, use outro nome para prosseguir"
-            tools:visibility="visible" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

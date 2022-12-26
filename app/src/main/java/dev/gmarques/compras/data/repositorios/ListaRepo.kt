@@ -27,5 +27,7 @@ object ListaRepo : BaseRepo() {
         RoomDb.getInstancia().listaDao().addOuAtualizar(lista)
     }
 
+    suspend fun getTodasAsListas() = RoomDb.getInstancia().listaDao().getTodasAsListas()
+
 
 }

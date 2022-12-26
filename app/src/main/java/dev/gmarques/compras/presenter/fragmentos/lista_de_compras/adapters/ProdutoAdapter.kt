@@ -13,7 +13,7 @@ import dev.gmarques.compras.App
  import dev.gmarques.compras.Extensions.formatarHtml
  import dev.gmarques.compras.Extensions.riscarTexto
 import dev.gmarques.compras.R
-import dev.gmarques.compras.databinding.ItemRvViewBinding
+import dev.gmarques.compras.databinding.ItemRvProdutoBinding
 import dev.gmarques.compras.domain.entidades.Produto
 import dev.gmarques.compras.presenter.fragmentos.lista_de_compras.FragListaDeCompras
 
@@ -38,7 +38,7 @@ class ProdutoAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemRvViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemRvProdutoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding, callback)
     }
 
@@ -75,7 +75,7 @@ class ProdutoAdapter(
 
 
     inner class ViewHolder(
-        private val bindingView: ItemRvViewBinding,
+        private val bindingView: ItemRvProdutoBinding,
         private val callback: ProdutoAdapterCallback,
     ) : RecyclerView.ViewHolder(bindingView.root) {
 
