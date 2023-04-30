@@ -2,13 +2,11 @@ package dev.gmarques.compras.domain.entidades
 
 import androidx.room.Entity
 import com.google.gson.GsonBuilder
-import dev.gmarques.compras.data.database.ProdutoDispensaDao
 import java.math.BigDecimal
 import java.math.MathContext
-import java.util.*
 
 @Entity
-class Produto : DomainModel() {
+class Produto : EntidadeDominio() {
 
     var preco: Float = 0.1f
     var quantidade: Int = 1

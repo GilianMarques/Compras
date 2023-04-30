@@ -7,7 +7,7 @@ import com.google.gson.GsonBuilder
 import dev.gmarques.compras.App
 
 @Entity
-class Categoria() : DomainModel() {
+class Categoria() : EntidadeDominio() {
 
     @ColumnInfo(defaultValue = "vec_cat_0")
     var icone: String = "vec_cat_0"

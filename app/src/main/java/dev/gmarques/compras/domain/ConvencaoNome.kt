@@ -4,6 +4,9 @@ import dev.gmarques.compras.Extensions.capitalizar
 
 
 object ConvencaoNome {
+   
+    private val espacosMultiplos = Regex("[ ][ ]+")
+    private val caracteresEspeciais = Regex("""[\\!@$%¨&*()_+="'°|¬¢£§;:/<>()\[\]{}]""")
 
     /**
      * Formata a string como um nome de objeto valido.
@@ -13,10 +16,15 @@ object ConvencaoNome {
      * caracteres fazendo que com o nome inserido pelo ususario fique (possivelmente) bem diferente
      * do que ele digitou.
      * */
-    fun String.formatarComoNomeValido() = this
-        // TODO: nao esta aceitando caracteres acentuados ó ã ô etc...
-        .replace(Regex("""[^a-zA-Z0-9. ]"""), "")
-        .replace(Regex("[ ]+"), " ")
-        .trim().capitalizar()
-
+    fun String.formatarComoNomeValido(): String {
+        var nome: String = this
+        
+        nome = nome.replace(caracteresEspeciais, "")
+        nome = nome.replace(espacosMultiplos, " ")
+        
+        if (nome.startsWith(" ")) nome = nome.drop(1)
+        if (nome.endsWith(" ")) nome = nome.dropLast(1)
+        
+        return nome.capitalizar()
+    }
 }

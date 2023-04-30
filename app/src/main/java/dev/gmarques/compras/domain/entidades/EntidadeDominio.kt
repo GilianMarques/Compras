@@ -6,7 +6,7 @@ import dev.gmarques.compras.domain.ConvencaoNome.formatarComoNomeValido
 import java.io.Serializable
 import java.util.*
 
-abstract class DomainModel : Sincronizavel, Serializable {
+abstract class EntidadeDominio : Sincronizavel, Serializable {
     @PrimaryKey
     override var id: String = UUID.randomUUID().toString()
     override var ultimaAtualizacao: Long = System.currentTimeMillis()
@@ -20,7 +20,7 @@ abstract class DomainModel : Sincronizavel, Serializable {
             }
         }
 
-    abstract fun clonar(): DomainModel
+    abstract fun clonar(): EntidadeDominio
 
 
 }

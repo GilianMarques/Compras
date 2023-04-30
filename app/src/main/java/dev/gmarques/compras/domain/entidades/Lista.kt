@@ -2,12 +2,9 @@ package dev.gmarques.compras.domain.entidades
 
 import androidx.room.Entity
 import com.google.gson.GsonBuilder
-import dev.gmarques.compras.App
-import dev.gmarques.compras.R
-import java.util.*
 
 @Entity
-class Lista : DomainModel() {
+class Lista : EntidadeDominio() {
 
     // TODO: Esse objeto pode manter referencia da ultima categoria selecionada pelo usuario
 
