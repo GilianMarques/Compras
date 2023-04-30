@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "332911346878",
+    "project_id": "comprasv3-db992",
+    "storage_bucket": "comprasv3-db992.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:332911346878:android:2170c3c3985727edb3caef",
+        "android_client_info": {
+          "package_name": "gmarques.compras2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "332911346878-j9ttpvqocqitudmgsnmj6mlvk31321g8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRN4FlMWZpHQHuIaA64vv9CfcQQb7qva8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "332911346878-j9ttpvqocqitudmgsnmj6mlvk31321g8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

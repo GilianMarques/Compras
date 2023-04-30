@@ -1,0 +1,29 @@
+
+9
+	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+P
+ app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
+’
+bapp/src/main/java/dev/gmarques/compras/presenter/fragmentos/lista_de_compras/FragListaDeCompras.kt,9\2\923d5d3bceed4a70ed80f3e108fd797a03ad52b9
+™
+iapp/src/main/java/dev/gmarques/compras/presenter/fragmentos/produto_io/add_produto/AddProdutoViewModel.kt,8\2\82daff74a4e38ced110b5410e75e20c9e54c3fb2
+d
+4app/src/main/java/dev/gmarques/compras/Extensions.kt,6\c\6ca016340429bb8e60325e066d02efe53a0bc4bf
+n
+>app/src/main/java/dev/gmarques/compras/domain/ConvencaoNome.kt,4\0\40f26af159ba49d497cf01a8e4b45b4832777cca
+›
+kapp/src/main/java/dev/gmarques/compras/presenter/fragmentos/lista_de_compras/FragListaDeComprasViewModel.kt,5\5\550d87dc4c7f26d7a0403909eaddd4d9662e2802
+p
+@app/src/main/java/dev/gmarques/compras/domain/entidades/Lista.kt,9\1\91519a51b10eae3b11f90386d739ae5f6ac49cf7
+y
+Iapp/src/main/java/dev/gmarques/compras/presenter/entidades/CategoriaUi.kt,1\e\1e05d9d99c305b39da5e050467e7e49d5432b7cf
+x
+Happ/src/main/java/dev/gmarques/compras/domain/entidades/Sincronizavel.kt,8\e\8edb323de894e2606bf48c8a20042862a371ea37
+z
+Japp/src/main/java/dev/gmarques/compras/domain/entidades/EntidadeDominio.kt,5\b\5b01b468a1d811fe0d2fbafa32edb106a52a5d5e
+n
+>app/src/main/java/dev/gmarques/compras/data/database/RoomDb.kt,3\0\3019424c6feb13400d10f5b66a72002890303900
+]
+-app/src/main/java/dev/gmarques/compras/App.kt,f\0\f07e2a9a637b1de858f183f5e30d2b82c104e111
+X
+(gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
