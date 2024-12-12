@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Compras</string>
+    <string name="Botao_adicionar_nova_lista">Botão adicionar nova lista</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="Google_auth_web_client_id">506787812008-lt189hk74uat00onsrcuivdcoduum8o0.apps.googleusercontent.com</string>
+    <string name="Tentar_novamente">Tentar novamente</string>
+    <string name="Vocenaoestaconectadoainternetouadata">Você não está conectado à internet ou a data do dispositivo está incorreta</string>
+    <string name="Voce_cancelou_o_login">Você cancelou o login</string>
+    <string name="Hamaisdeumprocessodeloginemandamentoquantas">Há mais de um processo de login em andamento. Quantas vezes você apertou esse botão?</string>
+    <string name="Houveumerroaoautenticarsuacontatente">Houve um erro ao autenticar sua conta, tente novamente. Causa: {0}</string>
+    <string name="BemvindoX">Bem-vindo(a) {0}</string>
+    <string name="Ologinfalhou">O login falhou. Código: {0}</string>
+    <string name="Vocecancelouologin">Você cancelou o login</string>
+    <string name="Houveumerroaocontactaraapidogoole">Houve um erro ao contactar a API do Google, verfique sua conexão e tente reiniciar o app.  Código: {0}</string>
+    <string name="Foto_de_perfil_do_usuario">Foto de perfil do usuário</string>
+    <string name="Bom_dia">Bom dia</string>
+    <string name="Boa_tarde">Boa tarde</string>
+    <string name="Boa_noite">Boa noite</string>
+    <string name="Suas_listas">Suas listas</string>
+    <string name="Nova_lista">Nova lista</string>
+    <string name="Adicionar_lista">Adicionar lista</string>
+    <string name="Digite_o_nome_aqui">Digite o nome aqui</string>
+    <string name="O_nome_da_lista_precisa_ser_preenchido">O nome da lista precisa ser preenchido.</string>
+    <string name="O_nome_inserido_muito_curto">O nome inserido é muito curto.</string>
+</resources>

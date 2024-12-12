@@ -1,0 +1,21 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Compras" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:fontFamily">@font/madera_bold</item>
+    </style>
+
+    <style name="Theme.EditText" parent="Base.Theme.Compras">
+        <item name="android:editTextBackground">@drawable/back_edit_text</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingStart">8dp</item>
+
+
+    </style>
+
+    <style name="Theme.Compras" parent="Base.Theme.Compras" />
+</resources>
