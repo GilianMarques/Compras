@@ -16,18 +16,28 @@ class MainActivityViewModel : ViewModel() {
 
     private fun observeUpdates() {
 
-        ShopListRepository.observeListUpdates { lists, error ->
+        listenerRegister = ShopListRepository.observeListUpdates { lists, error ->
             if (error == null) lists.let { _listsLiveData.postValue(lists) }
             else Log.d("USUK", "ShopListRepository.getAllLists: erro obtendo snapshot e $error")
         }
 
     }
 
-    fun addShopList(shopList: ShopList) {
-        ShopListRepository.addList(shopList)
+    fun addOrEditShopList(shopList: ShopList) {
+        ShopListRepository.addOrAttShopList(shopList)
+    }
+
+    override fun onCleared() {
+        listenerRegister.remove()
+        super.onCleared()
+    }
+
+    fun removeShopList(shopList: ShopList) {
+        ShopListRepository.removeShopList(shopList)
     }
 
 
+    private lateinit var listenerRegister: ShopListRepository.ListenerRegister
     private val _listsLiveData = MutableLiveData<List<ShopList>>()
     val listsLiveData: LiveData<List<ShopList>> get() = _listsLiveData
 

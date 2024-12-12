@@ -38,7 +38,7 @@ object Vibrator {
      * Realiza uma vibração curta.
      */
     fun interaction() {
-        vibrate(30) // Duração curta
+        vibrate(50) // Duração curta
     }
 
     /**

@@ -1,5 +1,7 @@
 package dev.gmarques.compras.data.data.repository
 
+import android.util.Log
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.data.firestore.Firestore
@@ -11,21 +13,19 @@ import java.util.UUID
 
 object ShopListRepository {
 
-    private val fakeShopLists = mutableListOf<ShopList>()
 
-    init {
-        repeat(30) {
-            //  addList(ShopList(generateUniqueId(), "Lista de compras # $it"))
-        }
+    fun addOrAttShopList(shopList: ShopList) {
+        Firestore.shopListCollection.document(shopList.id.toString())
+            .set(shopList)
     }
 
-    fun addList(shopList: ShopList) {
-        Firestore.shopListCollection.document(shopList.createdDate.toString()).set(shopList)
-    }
 
-    // TODO: se for chamado de mais de um lugar vai gerar listeners duplicados do fb, otimize quando puder.
-    fun observeListUpdates(onSnapshot: (List<ShopList>?, Exception?) -> Any) {
-        Firestore.shopListCollection.addSnapshotListener { querySnapshot, fbException ->
+    /**
+     * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
+     * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
+     * */
+    fun observeListUpdates(onSnapshot: (List<ShopList>?, Exception?) -> Any): ListenerRegister {
+        return ListenerRegister(Firestore.shopListCollection.addSnapshotListener { querySnapshot, fbException ->
 
             if (fbException != null) onSnapshot(null, fbException)
             else querySnapshot?.let {
@@ -33,29 +33,16 @@ object ShopListRepository {
                 shopLists.addAll(querySnapshot.map { it.toObject<ShopList>() })
                 onSnapshot(shopLists, null)
             }
-        }
+        })
 
     }
 
-    fun removeList(id: String): Boolean {
-        return fakeShopLists.removeIf { it.id == id }
-    }
-
-    fun updateList(updatedShopList: ShopList): Boolean {
-        val index = fakeShopLists.indexOfFirst { it.id == updatedShopList.id }
-        return if (index != -1) {
-            fakeShopLists[index] = updatedShopList
-            true
-        } else {
-            false
-        }
-    }
 
     fun generateUniqueId(): String {
         return UUID.randomUUID().toString()
     }
 
-    fun validateNameAndGenerateList(name: String): Result<ShopList> {
+    fun validateName(name: String): Result<Boolean> {
 
         return if (name.isEmpty()) {
             Result.Error(
@@ -65,6 +52,20 @@ object ShopListRepository {
             Result.Error(
                 Exception(App.getContext().getString(R.string.O_nome_inserido_muito_curto))
             )
-        } else Result.Success(ShopList(name))
+        } else Result.Success(true)
+    }
+
+    fun removeShopList(shopList: ShopList) {
+        Firestore.shopListCollection.document(shopList.id.toString()).delete()
+    }
+
+    /**
+     * Embrulha uma instancia de Listener do firestore, para evitar vazamentos
+     *
+     *  Preciso passar uma instancia dessa classe pra quem define um listener no firebase para que, o listener
+     * possa ser dispensado quando nao for mais necessario
+     * */
+    class ListenerRegister(private val listener: ListenerRegistration) {
+        fun remove() = listener.remove()
     }
 }

@@ -1,32 +1,33 @@
 package dev.gmarques.compras.ui.main_activity
 
-import Dropdown
-import MenuItem
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Spanned
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.androidpoet.dropdown.ExitAnimation
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.collection.LLRBNode
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.data.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityMainBinding
+import dev.gmarques.compras.databinding.RvItemListBinding
+import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.login.LoginActivity
-import dropDownMenu
-import dropDownMenuColors
+import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
 import java.util.Calendar
+
 
 class MainActivity : AppCompatActivity() {
 
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
-    private val rvAdapter = ShopListAdapter()
+    private val rvAdapter = ShopListAdapter(::rvItemMenuclick)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,39 +93,56 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showDialogAddShopList() {
-        AddShopListBottomSheetDialog(this, rvAdapter.itemCount)
+        BsdAddOrEditShopList(this, rvAdapter.itemCount)
             .setOnConfirmListener { shopList ->
-                viewModel.addShopList(shopList)
+                viewModel.addOrEditShopList(shopList)
             }.show()
     }
 
     private fun observeRecyclerViewAtts() {
 
         viewModel.listsLiveData.observe(this@MainActivity) { newData ->
-            if (!newData.isNullOrEmpty()) {
-                rvAdapter.submitList(newData)
-            }
+            if (!newData.isNullOrEmpty()) rvAdapter.submitList(newData)
         }
     }
 
+    private fun rvItemMenuclick(shopList: ShopList) {
 
+        Vibrator.interaction()
 
-    fun getMenu(): MenuItem<String> {
-        val menu = dropDownMenu<String> {
-            item("remove", "Remover") {
-                item("remove_confirm", "Remover") {
-
-                }
-
-                item("remove_cancel", "Cancelar") {
-
-                }
-            }
-            item("rename", "Renomear") {
-            }
-        }
-        return menu
+        BsdShopListMenu(this, shopList,
+            { renameList ->
+                showRenameDialog(renameList)
+            }, { removeList ->
+                confirmRemove(removeList)
+            })
+            .show()
     }
 
+    private fun showRenameDialog(renameList: ShopList) {
+        BsdAddOrEditShopList(this, renameList)
+            .setOnConfirmListener { shopList ->
+                viewModel.addOrEditShopList(shopList)
+            }.show()
+    }
 
+    private fun confirmRemove(shopList: ShopList) {
+        val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x), shopList.name).formatHtml()
+
+        val dialogBuilder =
+            AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
+                .setMessage(msg)
+                .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
+                    viewModel.removeShopList(shopList)
+                    dialog.dismiss()
+                }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
+    }
 }
+
+
+

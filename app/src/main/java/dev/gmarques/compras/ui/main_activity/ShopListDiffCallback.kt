@@ -1,5 +1,6 @@
 package dev.gmarques.compras.ui.main_activity
 
+import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import dev.gmarques.compras.data.data.model.ShopList
 

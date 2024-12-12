@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.databinding.RvItemListBinding
-import dev.gmarques.compras.utils.App
 
-class ShopListAdapter : ListAdapter<ShopList, ShopListAdapter.ListViewHolder>(ShopListDiffCallback()) {
+class ShopListAdapter(private val onMenuClick: (ShopList) -> Any) :
+    ListAdapter<ShopList, ShopListAdapter.ListViewHolder>(ShopListDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
 
@@ -28,19 +28,20 @@ class ShopListAdapter : ListAdapter<ShopList, ShopListAdapter.ListViewHolder>(Sh
         holder.bind(getItem(position))
     }
 
-    class ListViewHolder(private val binding: RvItemListBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(list: ShopList) {
+    inner class ListViewHolder(private val binding: RvItemListBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(shopList: ShopList) = binding.apply {
 
             itemView.alpha = 0f // Inicia a view invisível
 
-            binding.tvListName.text = list.name
-
-            val saturatedColor = adjustSaturation(list.color, 2.99f)
-            binding.ivListIcon.background?.mutate()?.apply {
+            tvListName.text = shopList.name
+            ivMenu.setOnClickListener { onMenuClick(shopList) }
+            val saturatedColor = adjustSaturation(shopList.color, 2.99f)
+            ivListIcon.background?.mutate()?.apply {
                 if (this is GradientDrawable) setColor(saturatedColor)
             }
 
-            binding.cvChild.setBackgroundColor(list.color)
+            cvChild.setBackgroundColor(shopList.color)
 
             // Anima a entrada da view
             itemView.animate()

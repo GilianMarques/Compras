@@ -24,6 +24,9 @@
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/edt_input"
             android:layout_width="0dp"
+            android:drawableStart="@drawable/vec_rename"
+            android:drawablePadding="16dp"
+            android:drawableTint="?colorPrimary"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="16dp"

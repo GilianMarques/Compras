@@ -3,6 +3,7 @@
     <style name="Base.Theme.Compras" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@android:color/white</item>
+        <item name="backgroundColor">@android:color/white</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:fontFamily">@font/madera_bold</item>
     </style>

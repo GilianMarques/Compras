@@ -30,4 +30,10 @@
     <string name="Digite_o_nome_aqui">Digite o nome aqui</string>
     <string name="O_nome_da_lista_precisa_ser_preenchido">O nome da lista precisa ser preenchido.</string>
     <string name="O_nome_inserido_muito_curto">O nome inserido é muito curto.</string>
+    <string name="Remover">Remover</string>
+    <string name="Renomear">Renomear</string>
+    <string name="Renomear_lista">Renomear lista</string>
+    <string name="Por_favor_confirme">Por favor, confirme:</string>
+    <string name="Deseja_mesmo_remover_x">Deseja mesmo remover <b>%1$s</b>?</string>
+    <string name="Cancelar">Cancelar</string>
 </resources>
