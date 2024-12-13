@@ -1,23 +1,23 @@
-package dev.gmarques.compras.ui.view_list
+package dev.gmarques.compras.ui.products
 
-import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class DragDropHelperCallback(private val adapter: ListAdapter) : ItemTouchHelper.Callback() {
+class DragDropHelperCallback(private val adapter: ProductAdapter) : ItemTouchHelper.Callback() {
+    override fun isLongPressDragEnabled(): Boolean = false
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
+        viewHolder: RecyclerView.ViewHolder
     ): Int {
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-        return makeMovementFlags(dragFlags, 0) // Apenas movimento vertical
+        return makeMovementFlags(dragFlags, 0)
     }
 
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
     ): Boolean {
         val fromPosition = viewHolder.adapterPosition
         val toPosition = target.adapterPosition
@@ -26,6 +26,6 @@ class DragDropHelperCallback(private val adapter: ListAdapter) : ItemTouchHelper
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        // Não implementado porque o swipe não está sendo usado
+        // Não implementado porque swipe não está sendo usado
     }
 }

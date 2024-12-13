@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dev.gmarques.compras.R
 import dev.gmarques.compras.databinding.ActivityLoginBinding
-import dev.gmarques.compras.ui.main_activity.MainActivity
+import dev.gmarques.compras.ui.main.MainActivity
 import dev.gmarques.compras.utils.InternetConnectionChecker
 import java.text.MessageFormat
 

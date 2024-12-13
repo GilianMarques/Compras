@@ -1,11 +1,9 @@
-package dev.gmarques.compras.ui.main_activity
+package dev.gmarques.compras.ui.main
 
 import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Spanned
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -16,9 +14,9 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.data.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityMainBinding
-import dev.gmarques.compras.databinding.RvItemListBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.login.LoginActivity
+import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
 import java.util.Calendar
 
@@ -27,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
-    private val rvAdapter = ShopListAdapter(::rvItemMenuclick)
+    private val rvAdapter = ShopListAdapter(::rvItemMenuclick, ::rvItemClick)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         checkUserAuthenticated()
         initRecyclerView()
         initFabAddList()
-        observeRecyclerViewAtts()
+        observeListsUpdates()
 
     }
 
@@ -99,7 +97,7 @@ class MainActivity : AppCompatActivity() {
             }.show()
     }
 
-    private fun observeRecyclerViewAtts() {
+    private fun observeListsUpdates() {
 
         viewModel.listsLiveData.observe(this@MainActivity) { newData ->
             if (!newData.isNullOrEmpty()) rvAdapter.submitList(newData)
@@ -141,6 +139,12 @@ class MainActivity : AppCompatActivity() {
 
         val dialog = dialogBuilder.create()
         dialog.show()
+    }
+
+    private fun rvItemClick(shopList: ShopList) {
+        Vibrator.interaction()
+        val intent = ProductsActivity.newIntent(this, shopList.id)
+        startActivity(intent)
     }
 }
 

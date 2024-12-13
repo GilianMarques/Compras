@@ -1,9 +1,10 @@
-package dev.gmarques.compras.ui.main_activity
+package dev.gmarques.compras.ui.main
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dev.gmarques.compras.data.data.ListenerRegister
 import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.data.data.repository.ShopListRepository
 
@@ -36,8 +37,7 @@ class MainActivityViewModel : ViewModel() {
         ShopListRepository.removeShopList(shopList)
     }
 
-
-    private lateinit var listenerRegister: ShopListRepository.ListenerRegister
+    private lateinit var listenerRegister: ListenerRegister
     private val _listsLiveData = MutableLiveData<List<ShopList>>()
     val listsLiveData: LiveData<List<ShopList>> get() = _listsLiveData
 

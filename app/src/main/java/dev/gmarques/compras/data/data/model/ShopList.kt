@@ -7,32 +7,32 @@ data class ShopList(
     val id: Long = System.currentTimeMillis(),
 ) {
 
-    constructor() : this("not_initializes", 0)
-
-
-    //  Atualize o equals e hashcode a cada nova variavel inserida aqui
-
+    constructor() : this("not_initialized", 0)
 
     override fun equals(other: Any?): Boolean {
-        if (other == null) return false
-        if (other !is ShopList) return false
-        if (this.id != other.id) return false
-        if (this.name != other.name) return false
-        if (this.color != other.color) return false
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ShopList
+
+        if (name != other.name) return false
+        if (color != other.color) return false
+        if (id != other.id) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + name.hashCode()
+        var result = name.hashCode()
         result = 31 * result + color
+        result = 31 * result + id.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "ShopList(id=$id, name='$name', color=$color)"
+        return "ShopList(name='$name', color=$color, id=$id)"
     }
+
 
 }
 

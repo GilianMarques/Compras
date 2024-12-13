@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.data.ListenerRegister
 import dev.gmarques.compras.data.data.firestore.Firestore
 import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.utils.App
@@ -13,12 +14,10 @@ import java.util.UUID
 
 object ShopListRepository {
 
-
     fun addOrAttShopList(shopList: ShopList) {
         Firestore.shopListCollection.document(shopList.id.toString())
             .set(shopList)
     }
-
 
     /**
      * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
@@ -35,11 +34,6 @@ object ShopListRepository {
             }
         })
 
-    }
-
-
-    fun generateUniqueId(): String {
-        return UUID.randomUUID().toString()
     }
 
     fun validateName(name: String): Result<Boolean> {
@@ -59,13 +53,4 @@ object ShopListRepository {
         Firestore.shopListCollection.document(shopList.id.toString()).delete()
     }
 
-    /**
-     * Embrulha uma instancia de Listener do firestore, para evitar vazamentos
-     *
-     *  Preciso passar uma instancia dessa classe pra quem define um listener no firebase para que, o listener
-     * possa ser dispensado quando nao for mais necessario
-     * */
-    class ListenerRegister(private val listener: ListenerRegistration) {
-        fun remove() = listener.remove()
-    }
 }

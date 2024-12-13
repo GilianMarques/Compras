@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.main_activity
+package dev.gmarques.compras.ui.main
 
 import android.app.Activity
 import android.graphics.Color
