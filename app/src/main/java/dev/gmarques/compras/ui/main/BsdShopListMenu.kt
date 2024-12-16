@@ -3,7 +3,7 @@ package dev.gmarques.compras.ui.main
 import android.app.Activity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.data.data.model.ShopList
-import dev.gmarques.compras.databinding.BsShoplistMenuDialogBinding
+import dev.gmarques.compras.databinding.BsdShoplistMenuDialogBinding
 
 class BsdShopListMenu(
     targetActivity: Activity,
@@ -12,7 +12,7 @@ class BsdShopListMenu(
     private var removeListener: ((ShopList) -> Unit),
 ) {
 
-    private var binding = BsShoplistMenuDialogBinding.inflate(targetActivity.layoutInflater)
+    private var binding = BsdShoplistMenuDialogBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
 
 
@@ -31,7 +31,7 @@ class BsdShopListMenu(
                 dialog.dismiss()
             }
 
-            tvShoplistName.text = shopList.name
+            tvTitle.text = shopList.name
         }
 
     }

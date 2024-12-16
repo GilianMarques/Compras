@@ -7,7 +7,7 @@ import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.data.data.repository.ShopListRepository
-import dev.gmarques.compras.databinding.BsAddShoplistDialogBinding
+import dev.gmarques.compras.databinding.BsdAddShoplistDialogBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.utils.Result
 
@@ -19,7 +19,7 @@ class BsdAddOrEditShopList(
     constructor(targetActivity: Activity, editShopList: ShopList) : this(targetActivity, 0, editShopList)
 
     private var pastelColors: List<Int>? = null
-    private var binding = BsAddShoplistDialogBinding.inflate(targetActivity.layoutInflater)
+    private var binding = BsdAddShoplistDialogBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
     private var onConfirmListener: ((ShopList) -> Unit)? = null
 

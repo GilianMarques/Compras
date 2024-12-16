@@ -36,4 +36,13 @@
     <string name="Por_favor_confirme">Por favor, confirme:</string>
     <string name="Deseja_mesmo_remover_x">Deseja mesmo remover <b>%1$s</b>?</string>
     <string name="Cancelar">Cancelar</string>
+    <string name="un">%1$d UN</string>
+    <string name="Editar_produto">Editar produto</string>
+    <string name="Digite_o_novo_preco">Digite o novo preço</string>
+    <string name="Digite_a_nova_quantidade">Digite a nova quantidade</string>
+    <string name="Salvar_alteracoes">Salvar alterações</string>
+    <string name="Insira_uma_quantidade_valida">Insira uma quantidade válida</string>
+    <string name="Insira_um_preco_valido">Insira um preço válido</string>
+    <string name="Editar_preco">Editar preço</string>
+    <string name="Editar_quantidade">Editar quantidade</string>
 </resources>

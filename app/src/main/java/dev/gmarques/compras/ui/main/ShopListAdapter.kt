@@ -41,7 +41,7 @@ class ShopListAdapter(private val onMenuItemClick: (ShopList) -> Any, private va
 
             tvListName.text = shopList.name
 
-            ivMenu.setOnClickListener { onMenuItemClick(shopList) }
+            tvEditItem.setOnClickListener { onMenuItemClick(shopList) }
             cardView.setOnClickListener { onItemClick(shopList) }
 
             val saturatedColor = shopList.color.adjustSaturation(2.99f)

@@ -8,9 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import dev.gmarques.compras.data.data.model.Product
 import dev.gmarques.compras.databinding.ActivityShopListBinding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlin.random.Random
 
-class ProductsActivity : AppCompatActivity() {
+class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     private lateinit var viewModel: ProductsActivityViewModel
     private lateinit var binding: ActivityShopListBinding
@@ -42,29 +46,34 @@ class ProductsActivity : AppCompatActivity() {
         initRecyclerView()
         observeProductsUpdates()
 
-        /*  repeat(20) {
-              val x = Product(shopListId, name = "produto #$it",0,Random.nextDouble(49.967),"no info", "no obs")
-              ProductRepository.addOrAttProduct(x)
-          }*/
+        runBlocking {
+            repeat(10) {
+                delay(2)
+                val x = Product(
+                    shopListId,
+                    "produto #$it",
+                    -1,
+                    Random.nextDouble(499.967),
+                    Random.nextInt(5),
+                    "info referente ao produto #$it",
+                    false
+                )
+                //   ProductRepository.addOrUpdateProduct(x)
+            }
+        }
     }
 
     private fun observeProductsUpdates() {
         viewModel.productsLiveData.observe(this) { newData ->
-            if (!newData.isNullOrEmpty()) rvAdapter.submitList(newData)
+            if (!newData.isNullOrEmpty()) {
+                rvAdapter.submitList(newData.sortedBy { it.position })
+            }
         }
     }
 
-
     private fun initRecyclerView() {
 
-        rvAdapter = ProductAdapter(
-            { fromPosition: Int, toPosition: Int ->
-                Log.d(
-                    "USUK",
-                    "ProductsActivity.".plus("initRecyclerView() fromPosition = $fromPosition, toPosition = $toPosition")
-                )
-            },
-        )
+        rvAdapter = ProductAdapter(this@ProductsActivity)
 
 
         val dragDropHelper = DragDropHelperCallback(rvAdapter)
@@ -76,5 +85,32 @@ class ProductsActivity : AppCompatActivity() {
 
         binding.rvProducts.layoutManager = LinearLayoutManager(this)
         binding.rvProducts.adapter = rvAdapter
+    }
+
+    override fun rvProductsOnDragAndDrop(toPosition: Int, product: Product) {
+        Log.d("USUK", "ProductsActivity.".plus("rvProductsOnDragAndDrop() product = ${product.name}, toPosition = $toPosition, "))
+        viewModel.updateProductPosition(product, toPosition)
+    }
+
+    override fun rvProductsOnEditPriceClick(product: Product) {
+        BsdEditProductPriceOrQuantity(this, product, true)
+            .setOnConfirmListener {
+                viewModel.updateProductAsIs(it)
+            }.show()
+    }
+
+    override fun rvProductsOnEditQuantityClick(product: Product) {
+        BsdEditProductPriceOrQuantity(this, product, false)
+            .setOnConfirmListener {
+                viewModel.updateProductAsIs(it)
+            }.show()
+    }
+
+    override fun rvProductsOnEditItemClick(product: Product) {
+        Log.d("USUK", "ProductsActivity.".plus("rvProductsOnEditItemClick() product = $product"))
+    }
+
+    override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {
+        viewModel.updateProductBoughtState(product, isBought)
     }
 }

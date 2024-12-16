@@ -24,7 +24,7 @@ class MainActivityViewModel : ViewModel() {
 
     }
 
-    fun addOrEditShopList(shopList: ShopList) {
+    fun addOrUpdateShopList(shopList: ShopList) {
         ShopListRepository.addOrAttShopList(shopList)
     }
 

@@ -11,7 +11,7 @@ import dev.gmarques.compras.utils.Result
 
 object ProductRepository {
 
-    fun addOrAttProduct(product: Product) {
+    fun addOrUpdateProduct(product: Product) {
         Firestore.productCollection.document(product.id.toString())
             .set(product)
     }
@@ -50,6 +50,22 @@ object ProductRepository {
 
     fun removeProduct(product: Product) {
         Firestore.productCollection.document(product.id.toString()).delete()
+    }
+
+    fun validateQuantity(quantity: Int): Result<Boolean> {
+        return if (quantity in 1..999) {
+            Result.Success(true)
+        } else Result.Error(
+            Exception(App.getContext().getString(R.string.Insira_uma_quantidade_valida))
+        )
+    }
+
+    fun validatePrice(price: Double): Result<Boolean> {
+        return if (price in 0.1..10_000.00) {
+            Result.Success(true)
+        } else Result.Error(
+            Exception(App.getContext().getString(R.string.Insira_um_preco_valido))
+        )
     }
 
 

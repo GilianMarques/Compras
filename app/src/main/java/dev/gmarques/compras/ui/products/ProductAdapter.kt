@@ -3,6 +3,9 @@ package dev.gmarques.compras.ui.products
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -12,11 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.data.model.Product
 import dev.gmarques.compras.databinding.RvItemProductBinding
+import dev.gmarques.compras.utils.App
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 
-class ProductAdapter(
-    private val onDragAndDrop: (fromPosition: Int, toPosition: Int) -> Unit,
-) : ListAdapter<Product, ProductAdapter.ListViewHolder>(ProductDiffCallback()) {
+class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapter.ListViewHolder>(ProductDiffCallback()) {
 
     private lateinit var itemTouchHelper: ItemTouchHelper
     private val utilList = mutableListOf<Product>()
@@ -31,73 +33,140 @@ class ProductAdapter(
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bindData(getItem(position))
     }
 
-    fun moveItem(fromPosition: Int, toPosition: Int) {
-        //Quando ha uma  açao de dragndrop, aplico a alteraçao na lista mutavel
-        // entao faço uma copia imutavel dela e mando pro diffuteils atraves da funçao *submitList*
-        // para que as diferenças sejam calculadas e o recyclerview atulizado automaticamente
-        val item = utilList.removeAt(fromPosition)
-        utilList.add(toPosition, item)
-        onDragAndDrop(fromPosition, toPosition)
+    /**
+     * Quando ha um evento de dragndrop, aplico a alteraçao na lista mutavel
+     *  entao faço uma copia imutavel dela e mando pro diffuteils atraves da funçao *submitList*
+     *  para que as diferenças sejam calculadas e o recyclerview atulizado automaticamente
+     * */
+    fun dragProducts(fromPosition: Int, toPosition: Int) {
+
+        val product = utilList.removeAt(fromPosition)
+        utilList.add(toPosition, product)
         submitList(utilList.toList())
     }
+
+
+    /**
+     * Atualiza no banco de dados os produtos que tiveram suas posições alteradas  após o usuário
+     * soltar a view  que estava sendo arrastada.
+     *
+     * Esta função percorre um intervalo de índices definidos pelos valores `biggerValue` e `smallerValue`,
+     * chamando um callback para atualizar os produtos correspondentes no banco de dados.
+     *
+     * @param biggerValue O maior índice dentro do intervalo afetado.
+     * @param smallerValue O menor índice dentro do intervalo afetado.
+     * @throws IllegalArgumentException Se `biggerValue` for menor que `smallerValue`.
+     */
+    fun updateDraggedProducts(biggerValue: Int, smallerValue: Int) {
+        require(biggerValue >= smallerValue) { "biggerValue deve ser maior ou igual a smallerValue" }
+
+        for (i in smallerValue..biggerValue) {
+            callback.rvProductsOnDragAndDrop(i, getItem(i))
+        }
+    }
+
 
     fun setItemTouchHelper(itemTouchHelper: ItemTouchHelper) {
         this.itemTouchHelper = itemTouchHelper
     }
 
+    /**
+     * Submete uma nova lista ao Adapter e mantém uma cópia mutável da lista para suportar
+     * funcionalidades adicionais, como arrastar e soltar (drag and drop).
+     *
+     * A cópia mutável, armazenada em `utilList`, é usada para manipulações diretas de itens,
+     * garantindo que a funcionalidade de arrastar e soltar funcione corretamente em conjunto com o DiffUtil.
+     *
+     * @param list A nova lista de produtos a ser exibida. Pode ser nula, caso em que uma lista vazia será usada.
+     */
     override fun submitList(list: List<Product>?) {
         super.submitList(list)
-        // faço uma copia mutavel da lista que me permitira adicionar e remover itens
-        // uso isso para implementar a funcionalidade de drag and drop junto com o diff utils
-        // veja  a funçao *moveItem*
         utilList.clear()
         utilList.addAll(list ?: emptyList())
-
-
     }
+
 
     inner class ListViewHolder(private val binding: RvItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        @SuppressLint("ClickableViewAccessibility")
-        fun bind(product: Product) {
-            itemView.alpha = 0f
-            itemView.animate()
-                .alpha(1f)
-                .setDuration(150)
-                .setStartDelay(10L * adapterPosition)
-                .start()
+        private var hideableViews = emptyList<View>()
 
+        fun bindData(product: Product) {
+            animarView()
 
             binding.apply {
 
+                hideableViews = listOf(tvEditPriceUnity, tvEditQuantity, tvEditItem, divider)
+
                 tvProductName.text = product.name
-                tvProductPrice.text = product.price.toCurrency()
+                tvProductInfo.text = product.info
+                tvProductPrice.text = (product.price * product.quantity).toCurrency()
+                tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
+                tvEditQuantity.text = tvProductQuantity.text
+                tvEditPriceUnity.text = product.price.toCurrency()
+                cbBought.isChecked = product.isBought
+            }
 
-                ivHandle.setOnTouchListener { it, motionEvent ->
+            setListeners(binding, product)
+        }
 
-                    when (motionEvent.action) {
-                        MotionEvent.ACTION_DOWN -> {
-                            // Inicia o drag and drop
-                            itemTouchHelper.startDrag(this@ListViewHolder)
-                            return@setOnTouchListener true
-                        }
-                        MotionEvent.ACTION_UP -> {
-                            // Garante que performClick seja chamado para acessibilidade
-                            it.performClick()
-                            return@setOnTouchListener true
-                        }
-                        else -> {
-                            // Permite que outros manipuladores tratem o evento
-                            return@setOnTouchListener false
-                        }
+        @SuppressLint("ClickableViewAccessibility")
+        private fun setListeners(binding: RvItemProductBinding, product: Product) = binding.apply {
+            cvChild.setOnLongClickListener {
+                toggleHideableViews()
+                true
+            }
+
+            tvEditItem.setOnClickListener {
+                toggleHideableViews()
+                callback.rvProductsOnEditItemClick(product)
+            }
+
+            tvEditQuantity.setOnClickListener {
+                toggleHideableViews()
+                callback.rvProductsOnEditQuantityClick(product)
+            }
+
+            tvEditPriceUnity.setOnClickListener {
+                toggleHideableViews()
+                callback.rvProductsOnEditPriceClick(product)
+            }
+
+            cbBought.setOnCheckedChangeListener { _, isChecked ->
+                callback.rvProductsOnBoughtItemClick(product, isChecked)
+            }
+            ivHandle.setOnTouchListener { it, motionEvent ->
+
+                when (motionEvent.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        // Inicia o drag and drop
+                        itemTouchHelper.startDrag(this@ListViewHolder)
+                        return@setOnTouchListener true
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        // Garante que performClick seja chamado para acessibilidade
+                        it.performClick()
+                        return@setOnTouchListener true
+                    }
+
+                    else -> {
+                        // Permite que outros manipuladores tratem o evento
+                        return@setOnTouchListener false
                     }
                 }
-
-
             }
+        }
+
+        private fun toggleHideableViews() {
+            hideableViews.forEach { it.visibility = if (it.visibility == GONE) VISIBLE else GONE }
+        }
+
+        private fun animarView() {
+            itemView.alpha = 0f
+            itemView.animate().alpha(1f).setDuration(150).setStartDelay(10L * adapterPosition).start()
         }
     }
 
@@ -115,5 +184,12 @@ class ProductAdapter(
         }
     }
 
+    interface Callback {
+        fun rvProductsOnDragAndDrop(toPosition: Int, product: Product)
+        fun rvProductsOnEditPriceClick(product: Product)
+        fun rvProductsOnEditQuantityClick(product: Product)
+        fun rvProductsOnEditItemClick(product: Product)
+        fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean)
+    }
 
 }

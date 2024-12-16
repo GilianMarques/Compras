@@ -59,13 +59,13 @@
                     android:paddingBottom="8dp"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/iv_menu"
+                    app:layout_constraintEnd_toStartOf="@id/tv_edit_item"
                     app:layout_constraintStart_toEndOf="@id/iv_list_icon"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Macarrão" />
 
                 <ImageView
-                    android:id="@+id/iv_menu"
+                    android:id="@+id/tv_edit_item"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center_vertical"

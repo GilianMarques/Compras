@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
     private fun showDialogAddShopList() {
         BsdAddOrEditShopList(this, rvAdapter.itemCount)
             .setOnConfirmListener { shopList ->
-                viewModel.addOrEditShopList(shopList)
+                viewModel.addOrUpdateShopList(shopList)
             }.show()
     }
 
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     private fun showRenameDialog(renameList: ShopList) {
         BsdAddOrEditShopList(this, renameList)
             .setOnConfirmListener { shopList ->
-                viewModel.addOrEditShopList(shopList)
+                viewModel.addOrUpdateShopList(shopList)
             }.show()
     }
 
