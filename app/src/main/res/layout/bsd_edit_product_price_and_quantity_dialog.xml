@@ -44,17 +44,16 @@
             android:layout_height="1dp"
             android:layout_marginBottom="32dp"
             android:background="?android:attr/listDivider"
-            app:layout_constraintBottom_toTopOf="@id/edt_input_quantity" />
+            app:layout_constraintBottom_toTopOf="@id/edt_input_price" />
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/edt_input_price"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="128dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginBottom="16dp"
             android:drawableStart="@drawable/vec_price"
             android:drawablePadding="16dp"
             android:drawableTint="?colorPrimary"
@@ -65,20 +64,20 @@
             android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
             android:theme="@style/Theme.EditText"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/edt_input_quantity"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/edt_input_quantity"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="36dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="128dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginBottom="32dp"
             android:drawableStart="@drawable/vec_quantity"
             android:drawablePadding="16dp"
             android:drawableTint="?colorPrimary"
@@ -89,8 +88,7 @@
             android:inputType="number"
             android:selectAllOnFocus="true"
             android:theme="@style/Theme.EditText"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/fab_more_options"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -98,11 +96,27 @@
             android:id="@+id/fab_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="@string/Salvar_alteracoes"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:text="@string/Salvar"
+            android:textColor="?colorOnPrimary"
             app:icon="@drawable/vec_check"
+            app:iconTint="?attr/colorOnPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/fab_more_options" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/fab_more_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/Mais_opcoes"
+            app:icon="@drawable/vec_rename"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/fab_confirm"
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

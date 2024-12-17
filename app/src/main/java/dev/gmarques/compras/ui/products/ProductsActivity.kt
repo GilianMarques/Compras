@@ -40,7 +40,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         viewModel = ViewModelProvider(this)[ProductsActivityViewModel::class.java]
 
         val shopListId = intent.getLongExtra(LIST_ID, -1)
-
         viewModel.observeProducts(shopListId)
 
         initRecyclerView()
@@ -56,9 +55,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                     Random.nextDouble(499.967),
                     Random.nextInt(5),
                     "info referente ao produto #$it",
-                    false
+                    true
                 )
-                //   ProductRepository.addOrUpdateProduct(x)
+               //    ProductRepository.addOrUpdateProduct(x)
             }
         }
     }
@@ -92,22 +91,10 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         viewModel.updateProductPosition(product, toPosition)
     }
 
-    override fun rvProductsOnEditPriceClick(product: Product) {
-        BsdEditProductPriceOrQuantity(this, product, true)
-            .setOnConfirmListener {
-                viewModel.updateProductAsIs(it)
-            }.show()
-    }
-
-    override fun rvProductsOnEditQuantityClick(product: Product) {
-        BsdEditProductPriceOrQuantity(this, product, false)
-            .setOnConfirmListener {
-                viewModel.updateProductAsIs(it)
-            }.show()
-    }
-
     override fun rvProductsOnEditItemClick(product: Product) {
-        Log.d("USUK", "ProductsActivity.".plus("rvProductsOnEditItemClick() product = $product"))
+        BsdEditProductPriceOrQuantity(this, product).setOnConfirmListener {
+            viewModel.updateProductAsIs(it)
+        }.show()
     }
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {

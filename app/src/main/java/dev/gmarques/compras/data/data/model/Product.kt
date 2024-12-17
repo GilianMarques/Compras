@@ -7,7 +7,7 @@ data class Product(
     val price: Double,
     val quantity: Int,
     val info: String,
-    val isBought: Boolean,
+    val hasBeenBought: Boolean, // isBought estava dando problema com o firebase
     val id: Long = System.currentTimeMillis(),
 ) {
     constructor() : this(0, "not_initialized", -1, 0.0, 0, "not_initialized", false)
@@ -24,7 +24,7 @@ data class Product(
         if (price != other.price) return false
         if (quantity != other.quantity) return false
         if (info != other.info) return false
-        if (isBought != other.isBought) return false
+        if (hasBeenBought != other.hasBeenBought) return false
         if (id != other.id) return false
 
         return true
@@ -37,13 +37,13 @@ data class Product(
         result = 31 * result + price.hashCode()
         result = 31 * result + quantity
         result = 31 * result + info.hashCode()
-        result = 31 * result + isBought.hashCode()
+        result = 31 * result + hasBeenBought.hashCode()
         result = 31 * result + id.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "Product(shopListId=$shopListId, name='$name', position=$position, price=$price, quantity=$quantity, info='$info', bought=$isBought, id=$id)"
+        return "Product(shopListId=$shopListId, name='$name', position=$position, price=$price, quantity=$quantity, info='$info', isBought=$hasBeenBought, id=$id)"
     }
 
 

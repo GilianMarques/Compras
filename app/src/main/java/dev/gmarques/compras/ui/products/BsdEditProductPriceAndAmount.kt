@@ -2,14 +2,14 @@ package dev.gmarques.compras.ui.products
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
+import android.view.View
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.data.model.Product
 import dev.gmarques.compras.data.data.repository.ProductRepository
-import dev.gmarques.compras.databinding.BsdEditProductPriceOrQuantityDialogBinding
+import dev.gmarques.compras.databinding.BsdEditProductPriceAndQuantityDialogBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.utils.Result
@@ -18,10 +18,9 @@ import dev.gmarques.compras.utils.Result
 class BsdEditProductPriceOrQuantity(
     targetActivity: Activity,
     private val editProduct: Product,
-    private val isPriceEditing: Boolean,
 ) {
 
-    private var binding = BsdEditProductPriceOrQuantityDialogBinding.inflate(targetActivity.layoutInflater)
+    private var binding = BsdEditProductPriceAndQuantityDialogBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
     private lateinit var onConfirmListener: ((Product) -> Unit)
 
@@ -30,12 +29,6 @@ class BsdEditProductPriceOrQuantity(
 
         with(binding) {
 
-            edtInputQuantity.visibility = if (isPriceEditing) INVISIBLE else VISIBLE
-            edtInputPrice.visibility = if (isPriceEditing) VISIBLE else INVISIBLE
-
-            tvTitle.text = targetActivity.getString(
-                if (isPriceEditing) R.string.Editar_preco else R.string.Editar_quantidade
-            )
             edtInputQuantity.setText(String.format(targetActivity.getString(R.string.un), editProduct.quantity))
             edtInputPrice.setText(editProduct.price.toCurrency())
 
@@ -100,13 +93,11 @@ class BsdEditProductPriceOrQuantity(
     fun show() {
 
         dialog.show()
-
-        if (isPriceEditing) binding.edtInputPrice.requestFocus()
-        else binding.edtInputQuantity.requestFocus()
+        binding.edtInputPrice.requestFocus()
 
         // Acesse o comportamento do BottomSheet e defina o estado para expandido
-        // val behavior = BottomSheetBehavior.from(binding.root.parent as View)
-        // behavior.state = BottomSheetBehavior.STATE_EXPANDED
+         val behavior = BottomSheetBehavior.from(binding.root.parent as View)
+         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
 

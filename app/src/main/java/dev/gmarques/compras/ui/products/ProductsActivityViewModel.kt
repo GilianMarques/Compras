@@ -19,10 +19,13 @@ class ProductsActivityViewModel : ViewModel() {
 
 
     private lateinit var dataToPost: List<Product>
+    private var awaiting = false
+    private var firstLoad = true
     private var listenerRegister: ListenerRegister? = null
+
     private val _productsLiveData = MutableLiveData<List<Product>>()
     val productsLiveData: LiveData<List<Product>> get() = _productsLiveData
-    var awaiting = false
+
 
     override fun onCleared() {
         listenerRegister?.remove()
@@ -60,7 +63,6 @@ class ProductsActivityViewModel : ViewModel() {
 
     /**
      *Aplica o  throttling mais simples que consegui pensar pra evitar atualizaçoes repetidas na UI
-     *
      */
     private fun postDataWithThrottling(newData: MutableList<Product>) {
 
@@ -69,10 +71,11 @@ class ProductsActivityViewModel : ViewModel() {
             awaiting = true
 
             CoroutineScope(IO).launch {
-                delay(500)
+                delay(if (firstLoad) 0 else 500)
                 withContext(Main) {
                     _productsLiveData.postValue(dataToPost)
                     awaiting = false
+                    firstLoad = false
                     dataToPost = emptyList()
                 }
             }
@@ -90,7 +93,7 @@ class ProductsActivityViewModel : ViewModel() {
     }
 
     fun updateProductBoughtState(product: Product, isBought: Boolean) {
-        val newProduct = product.copy(isBought = isBought)
+        val newProduct = product.copy(hasBeenBought = isBought)
         ProductRepository.addOrUpdateProduct(newProduct)
     }
 

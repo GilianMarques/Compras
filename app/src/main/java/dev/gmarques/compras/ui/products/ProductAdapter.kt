@@ -1,11 +1,9 @@
 package dev.gmarques.compras.ui.products
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
-import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -91,22 +89,18 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
 
     inner class ListViewHolder(private val binding: RvItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        private var hideableViews = emptyList<View>()
-
         fun bindData(product: Product) {
             animarView()
 
             binding.apply {
 
-                hideableViews = listOf(tvEditPriceUnity, tvEditQuantity, tvEditItem, divider)
 
                 tvProductName.text = product.name
                 tvProductInfo.text = product.info
                 tvProductPrice.text = (product.price * product.quantity).toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
-                tvEditQuantity.text = tvProductQuantity.text
-                tvEditPriceUnity.text = product.price.toCurrency()
-                cbBought.isChecked = product.isBought
+                cbBought.isChecked = product.hasBeenBought
+                Log.d("USUK", "ListViewHolder.bindData: $product")
             }
 
             setListeners(binding, product)
@@ -115,25 +109,9 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
         @SuppressLint("ClickableViewAccessibility")
         private fun setListeners(binding: RvItemProductBinding, product: Product) = binding.apply {
             cvChild.setOnLongClickListener {
-                toggleHideableViews()
+                callback.rvProductsOnEditItemClick(product)
                 true
             }
-
-            tvEditItem.setOnClickListener {
-                toggleHideableViews()
-                callback.rvProductsOnEditItemClick(product)
-            }
-
-            tvEditQuantity.setOnClickListener {
-                toggleHideableViews()
-                callback.rvProductsOnEditQuantityClick(product)
-            }
-
-            tvEditPriceUnity.setOnClickListener {
-                toggleHideableViews()
-                callback.rvProductsOnEditPriceClick(product)
-            }
-
             cbBought.setOnCheckedChangeListener { _, isChecked ->
                 callback.rvProductsOnBoughtItemClick(product, isChecked)
             }
@@ -160,9 +138,6 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
             }
         }
 
-        private fun toggleHideableViews() {
-            hideableViews.forEach { it.visibility = if (it.visibility == GONE) VISIBLE else GONE }
-        }
 
         private fun animarView() {
             itemView.alpha = 0f
@@ -186,8 +161,6 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
 
     interface Callback {
         fun rvProductsOnDragAndDrop(toPosition: Int, product: Product)
-        fun rvProductsOnEditPriceClick(product: Product)
-        fun rvProductsOnEditQuantityClick(product: Product)
         fun rvProductsOnEditItemClick(product: Product)
         fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean)
     }

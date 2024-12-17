@@ -21,12 +21,12 @@ class BsdShopListMenu(
 
         binding.apply {
 
-            llRemove.setOnClickListener {
+            fabRemove.setOnClickListener {
                 removeListener(shopList)
                 dialog.dismiss()
             }
 
-            llRename.setOnClickListener {
+            fabRename.setOnClickListener {
                 renameListener(shopList)
                 dialog.dismiss()
             }

@@ -35,6 +35,7 @@ class BsdAddOrEditShopList(
 
             if (editShopList != null) {
                 tvTitle.text = targetActivity.getString(R.string.Renomear_lista)
+                fabConfirm.text = targetActivity.getString(R.string.Salvar)
                 edtInput.setText(editShopList.name)
 
             } else {
