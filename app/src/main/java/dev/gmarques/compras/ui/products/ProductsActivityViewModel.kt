@@ -65,13 +65,13 @@ class ProductsActivityViewModel : ViewModel() {
      *Aplica o  throttling mais simples que consegui pensar pra evitar atualizaçoes repetidas na UI
      */
     private fun postDataWithThrottling(newData: MutableList<Product>) {
-
+        Log.d("USUK", "ProductsActivityViewModel.postDataWithThrottling: ")
         dataToPost = newData.toList()
         if (!awaiting) {
             awaiting = true
 
             CoroutineScope(IO).launch {
-                delay(if (firstLoad) 0 else 500)
+                delay(if (firstLoad) 0 else 250)
                 withContext(Main) {
                     _productsLiveData.postValue(dataToPost)
                     awaiting = false

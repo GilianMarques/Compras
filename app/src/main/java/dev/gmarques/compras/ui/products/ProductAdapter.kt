@@ -1,7 +1,6 @@
 package dev.gmarques.compras.ui.products
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import dev.gmarques.compras.data.data.model.Product
 import dev.gmarques.compras.databinding.RvItemProductBinding
 import dev.gmarques.compras.utils.App
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
+import java.util.Collections
 
 class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapter.ListViewHolder>(ProductDiffCallback()) {
 
@@ -39,40 +39,40 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
      *  entao faço uma copia imutavel dela e mando pro diffuteils atraves da funçao *submitList*
      *  para que as diferenças sejam calculadas e o recyclerview atulizado automaticamente
      * */
-    fun dragProducts(fromPosition: Int, toPosition: Int) {
-
-        val product = utilList.removeAt(fromPosition)
-        utilList.add(toPosition, product)
+    fun moveProduct(fromPosition: Int, toPosition: Int) {
+        Collections.swap(utilList, fromPosition, toPosition)
         submitList(utilList.toList())
     }
 
-
     /**
+     * Chamado pelo DragDropHelperCallback quando o ususario termina a açao de dragNdrop noo RV
      * Atualiza no banco de dados os produtos que tiveram suas posições alteradas  após o usuário
      * soltar a view  que estava sendo arrastada.
-     *
-     * Esta função percorre um intervalo de índices definidos pelos valores `biggerValue` e `smallerValue`,
-     * chamando um callback para atualizar os produtos correspondentes no banco de dados.
-     *
-     * @param biggerValue O maior índice dentro do intervalo afetado.
-     * @param smallerValue O menor índice dentro do intervalo afetado.
-     * @throws IllegalArgumentException Se `biggerValue` for menor que `smallerValue`.
      */
-    fun updateDraggedProducts(biggerValue: Int, smallerValue: Int) {
-        require(biggerValue >= smallerValue) { "biggerValue deve ser maior ou igual a smallerValue" }
-
-        for (i in smallerValue..biggerValue) {
-            callback.rvProductsOnDragAndDrop(i, getItem(i))
+    fun updateDraggedProducts() {
+        for (i in utilList.indices) {
+            val product = utilList[i]
+            if (product.position != i) callback.rvProductsOnDragAndDrop(i, product)
         }
     }
 
-
-    fun setItemTouchHelper(itemTouchHelper: ItemTouchHelper) {
+    /**
+     * Configura a instância de [ItemTouchHelper] que será usada para iniciar eventos de arrastar
+     * (drag and drop) na lista do RecyclerView.
+     *
+     * Essa instância é necessária para vincular o manipulador de toque (handle) de uma View ao evento
+     * de arrastar. O méto_do é chamado externamente para fornecer o [ItemTouchHelper] ao adapter.
+     *
+     * @param itemTouchHelper A instância de [ItemTouchHelper] responsável por gerenciar os eventos de
+     * arrastar e soltar no RecyclerView.
+     */
+    fun attachItemTouchHelper(itemTouchHelper: ItemTouchHelper) {
         this.itemTouchHelper = itemTouchHelper
+         
     }
 
     /**
-     * Submete uma nova lista ao Adapter e mantém uma cópia mutável da lista para suportar
+     * Envia a nova lista ao Adapter e mantém uma cópia mutável da lista para suportar
      * funcionalidades adicionais, como arrastar e soltar (drag and drop).
      *
      * A cópia mutável, armazenada em `utilList`, é usada para manipulações diretas de itens,
@@ -85,7 +85,6 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
         utilList.clear()
         utilList.addAll(list ?: emptyList())
     }
-
 
     inner class ListViewHolder(private val binding: RvItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -100,7 +99,6 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
                 tvProductPrice.text = (product.price * product.quantity).toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
                 cbBought.isChecked = product.hasBeenBought
-                Log.d("USUK", "ListViewHolder.bindData: $product")
             }
 
             setListeners(binding, product)
@@ -155,7 +153,12 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
         }
 
         override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
-            return oldItem == newItem
+            // deve comparar toda a informação que é exibida na view pro usuario
+            return oldItem.name == newItem.name &&
+                    oldItem.info == newItem.info &&
+                    oldItem.price == newItem.price &&
+                    oldItem.quantity == newItem.quantity &&
+                    oldItem.hasBeenBought == newItem.hasBeenBought
         }
     }
 

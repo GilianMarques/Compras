@@ -43,7 +43,7 @@ data class Product(
     }
 
     override fun toString(): String {
-        return "Product(shopListId=$shopListId, name='$name', position=$position, price=$price, quantity=$quantity, info='$info', isBought=$hasBeenBought, id=$id)"
+        return "Product(name='$name', position=$position, price=$price, quantity=$quantity, info='$info', isBought=$hasBeenBought, id=$id, shopListId=$shopListId)"
     }
 
 

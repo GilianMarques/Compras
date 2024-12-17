@@ -3,7 +3,6 @@ package dev.gmarques.compras.ui.products
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -46,8 +45,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         observeProductsUpdates()
 
         runBlocking {
-            repeat(10) {
-                delay(2)
+            repeat(100) {
+                delay(1)
                 val x = Product(
                     shopListId,
                     "produto #$it",
@@ -57,7 +56,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                     "info referente ao produto #$it",
                     true
                 )
-               //    ProductRepository.addOrUpdateProduct(x)
+                //    ProductRepository.addOrUpdateProduct(x)
             }
         }
     }
@@ -65,7 +64,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     private fun observeProductsUpdates() {
         viewModel.productsLiveData.observe(this) { newData ->
             if (!newData.isNullOrEmpty()) {
-                rvAdapter.submitList(newData.sortedBy { it.position })
+                val sorted = newData.sortedBy { it.position }
+                rvAdapter.submitList(sorted)
             }
         }
     }
@@ -78,7 +78,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         val dragDropHelper = DragDropHelperCallback(rvAdapter)
         val touchHelper = ItemTouchHelper(dragDropHelper)
 
-        rvAdapter.setItemTouchHelper(touchHelper)
+        rvAdapter.attachItemTouchHelper(touchHelper)
 
         touchHelper.attachToRecyclerView(binding.rvProducts)
 
@@ -87,7 +87,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     }
 
     override fun rvProductsOnDragAndDrop(toPosition: Int, product: Product) {
-        Log.d("USUK", "ProductsActivity.".plus("rvProductsOnDragAndDrop() product = ${product.name}, toPosition = $toPosition, "))
         viewModel.updateProductPosition(product, toPosition)
     }
 
