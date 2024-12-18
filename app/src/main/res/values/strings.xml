@@ -46,4 +46,6 @@
     <string name="Editar_preco">Editar preço</string>
     <string name="Editar_quantidade">Editar quantidade</string>
     <string name="Mais_opcoes">Mais opções</string>
+    <string name="Pesquise_aqui">Pesquise aqui</string>
+    <string name="Botao_para_adicionar_produtos_lista">Botão para adicionar produtos à lista</string>
 </resources>

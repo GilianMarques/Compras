@@ -68,7 +68,6 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
      */
     fun attachItemTouchHelper(itemTouchHelper: ItemTouchHelper) {
         this.itemTouchHelper = itemTouchHelper
-         
     }
 
     /**

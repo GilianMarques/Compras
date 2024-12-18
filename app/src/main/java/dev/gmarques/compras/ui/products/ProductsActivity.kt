@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import dev.gmarques.compras.data.data.model.Product
-import dev.gmarques.compras.databinding.ActivityShopListBinding
+import dev.gmarques.compras.databinding.ActivityProductsBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
@@ -16,16 +16,18 @@ import kotlin.random.Random
 class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     private lateinit var viewModel: ProductsActivityViewModel
-    private lateinit var binding: ActivityShopListBinding
+    private lateinit var binding: ActivityProductsBinding
     private lateinit var rvAdapter: ProductAdapter
 
 
     companion object {
         private const val LIST_ID = "list_id"
+        private const val LIST_NAME = "list_name"
 
-        fun newIntent(context: Context, id: Long): Intent {
+        fun newIntent(context: Context, name: String, id: Long): Intent {
             return Intent(context, ProductsActivity::class.java).apply {
                 putExtra(LIST_ID, id)
+                putExtra(LIST_NAME, name)
             }
         }
     }
@@ -33,12 +35,15 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityShopListBinding.inflate(layoutInflater)
+        binding = ActivityProductsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this)[ProductsActivityViewModel::class.java]
 
         val shopListId = intent.getLongExtra(LIST_ID, -1)
+        val shopListName = intent.getStringExtra(LIST_NAME)
+
+        initToolbar(shopListName)
         viewModel.observeProducts(shopListId)
 
         initRecyclerView()
@@ -59,6 +64,14 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                 //    ProductRepository.addOrUpdateProduct(x)
             }
         }
+    }
+
+    private fun initToolbar(shopListName: String?) {
+        binding.tvTitle.text = shopListName
+        binding.ivGoBack.setOnClickListener {
+            finish()
+        }
+
     }
 
     private fun observeProductsUpdates() {

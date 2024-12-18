@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun rvItemClick(shopList: ShopList) {
         Vibrator.interaction()
-        val intent = ProductsActivity.newIntent(this, shopList.id)
+        val intent = ProductsActivity.newIntent(this, shopList.name, shopList.id)
         startActivity(intent)
     }
 }

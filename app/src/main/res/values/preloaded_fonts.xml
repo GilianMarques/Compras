@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/lexend_deca</item>
+        <item>@font/lexend_deca_bold</item>
+        <item>@font/lexend_deca_extrabold</item>
+        <item>@font/lexend_deca_extralight</item>
+        <item>@font/lexend_deca_light</item>
+        <item>@font/lexend_deca_medium</item>
+    </array>
+</resources>
