@@ -48,4 +48,7 @@
     <string name="Mais_opcoes">Mais opções</string>
     <string name="Pesquise_aqui">Pesquise aqui</string>
     <string name="Botao_para_adicionar_produtos_lista">Botão para adicionar produtos à lista</string>
+    <string name="Valor_da_lista">Valor da lista</string>
+    <string name="Valor_do_carrinho">Valor do carrinho</string>
+    <string name="Alca_para_mudar_a_posicao_do_produto_na_lista">Alça para mudar a posição do produto na lista</string>
 </resources>

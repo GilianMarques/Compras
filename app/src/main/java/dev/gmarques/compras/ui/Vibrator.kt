@@ -27,7 +27,7 @@ object Vibrator {
      * Realiza cinco vibrações rápidas.
      */
     fun success() {
-        for (i in 1..4) {
+        for (i in 1..3) {
             vibrate(50)
             Thread.sleep(110)
         }

@@ -1,8 +1,11 @@
 package dev.gmarques.compras.ui.products
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -18,6 +21,7 @@ import java.util.Collections
 
 class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapter.ListViewHolder>(ProductDiffCallback()) {
 
+    private var dragnDropEnabled: Boolean = true
     private lateinit var itemTouchHelper: ItemTouchHelper
     private val utilList = mutableListOf<Product>()
 
@@ -27,7 +31,7 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
             LayoutInflater.from(parent.context), R.layout.rv_item_product, parent, false
         )
 
-        return ListViewHolder(binding)
+        return ListViewHolder(binding, callback, dragnDropEnabled, itemTouchHelper)
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
@@ -80,24 +84,34 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
      * @param list A nova lista de produtos a ser exibida. Pode ser nula, caso em que uma lista vazia será usada.
      */
     override fun submitList(list: List<Product>?) {
-        super.submitList(list)
         utilList.clear()
         utilList.addAll(list ?: emptyList())
+        super.submitList(list)
     }
 
-    inner class ListViewHolder(private val binding: RvItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
+    fun toggleDragnDropState(dragnDropEnabled: Boolean) {
+        this.dragnDropEnabled = dragnDropEnabled
+    }
+
+    class ListViewHolder(
+        private val binding: RvItemProductBinding,
+        val callback: Callback,
+        private val dragnDropEnabled: Boolean,
+        private val itemTouchHelper: ItemTouchHelper,
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bindData(product: Product) {
             animarView()
 
             binding.apply {
 
-
                 tvProductName.text = product.name
                 tvProductInfo.text = product.info
                 tvProductPrice.text = (product.price * product.quantity).toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
                 cbBought.isChecked = product.hasBeenBought
+
+                ivHandle.visibility = if (dragnDropEnabled) VISIBLE else GONE
             }
 
             setListeners(binding, product)
@@ -109,8 +123,15 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
                 callback.rvProductsOnEditItemClick(product)
                 true
             }
-            cbBought.setOnCheckedChangeListener { _, isChecked ->
-                callback.rvProductsOnBoughtItemClick(product, isChecked)
+
+            cbBought.setOnCheckedChangeListener { compoundButton, b ->
+                Log.d("USUK", "ListViewHolder.setListeners: ${product.name}  ${compoundButton.isChecked}")
+            }
+
+            cbBought.setOnClickListener {
+                // algo estava disparando o checkedChangeListener do checkbox e causando instabilidade no app, por isso
+                // mudei para o evento de clique
+                callback.rvProductsOnBoughtItemClick(product, !product.hasBeenBought)
             }
             ivHandle.setOnTouchListener { it, motionEvent ->
 
@@ -138,7 +159,7 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
 
         private fun animarView() {
             itemView.alpha = 0f
-            itemView.animate().alpha(1f).setDuration(150).setStartDelay(10L * adapterPosition).start()
+            itemView.animate().alpha(1f).setDuration(150).setStartDelay(3L * adapterPosition).start()
         }
     }
 

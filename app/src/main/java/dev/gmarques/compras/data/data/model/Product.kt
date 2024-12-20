@@ -12,6 +12,7 @@ data class Product(
 ) {
     constructor() : this(0, "not_initialized", -1, 0.0, 0, "not_initialized", false)
 
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -43,7 +44,7 @@ data class Product(
     }
 
     override fun toString(): String {
-        return "Product(name='$name', position=$position, price=$price, quantity=$quantity, info='$info', isBought=$hasBeenBought, id=$id, shopListId=$shopListId)"
+        return "Product(shopListId=$shopListId, name='$name', position=$position, price=$price, quantity=$quantity, info='$info', hasBeenBought=$hasBeenBought, id=$id)"
     }
 
 

@@ -11,8 +11,11 @@ import dev.gmarques.compras.data.data.model.Product
 import dev.gmarques.compras.data.data.repository.ProductRepository
 import dev.gmarques.compras.databinding.BsdEditProductPriceAndQuantityDialogBinding
 import dev.gmarques.compras.ui.Vibrator
+import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
+import dev.gmarques.compras.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.utils.Result
+
 
 @SuppressLint("SetTextI18n") // nao é necessario levar a localizaçao em conta quando editando valor e quantidade nessa tela
 class BsdEditProductPriceOrQuantity(
@@ -35,15 +38,10 @@ class BsdEditProductPriceOrQuantity(
             // Configura o botão de confirmação
             fabConfirm.setOnClickListener {
 
-                val newQuantity = edtInputQuantity.text.toString().trim()
-                    .replace(Regex("[^0-9]"), "")
-                    .ifBlank { "0" }
-                    .toInt()
+                val newQuantity = edtInputQuantity.text.toString().onlyIntegerNumbers()
 
-                val newPrice = edtInputPrice.text.toString().trim()
-                    .replace(Regex("[^0-9.,]"), "")
-                    .ifBlank { "0.0" }.replace(",", ".")
-                    .toDouble()
+                // FIXME: as vezes o valor digitado sera moeda ou nao, tem que ajustar o codigo pra lidar com isso   
+                val newPrice = edtInputPrice.text.toString().currencyToDouble()
 
                 validateUserInput(newQuantity, newPrice)
             }
@@ -96,9 +94,11 @@ class BsdEditProductPriceOrQuantity(
         binding.edtInputPrice.requestFocus()
 
         // Acesse o comportamento do BottomSheet e defina o estado para expandido
-         val behavior = BottomSheetBehavior.from(binding.root.parent as View)
-         behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        val behavior = BottomSheetBehavior.from(binding.root.parent as View)
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
 
 }
+
+
