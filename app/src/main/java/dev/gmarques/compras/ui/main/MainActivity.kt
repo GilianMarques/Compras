@@ -1,9 +1,7 @@
 package dev.gmarques.compras.ui.main
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.text.Spanned
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +15,6 @@ import dev.gmarques.compras.databinding.ActivityMainBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
-import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
 import java.util.Calendar
 
 
@@ -25,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
-    private val rvAdapter = ShopListAdapter(::rvItemMenuclick, ::rvItemClick)
+    private val rvAdapter = ShopListAdapter( ::rvItemClick)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,46 +101,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun rvItemMenuclick(shopList: ShopList) {
-
-        Vibrator.interaction()
-
-        BsdShopListMenu(this, shopList,
-            { renameList ->
-                showRenameDialog(renameList)
-            }, { removeList ->
-                confirmRemove(removeList)
-            })
-            .show()
-    }
-
-    private fun showRenameDialog(renameList: ShopList) {
-        BsdAddOrEditShopList(this, renameList)
-            .setOnConfirmListener { shopList ->
-                viewModel.addOrUpdateShopList(shopList)
-            }.show()
-    }
-
-    private fun confirmRemove(shopList: ShopList) {
-        val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x), shopList.name).formatHtml()
-
-        val dialogBuilder =
-            AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
-                .setMessage(msg)
-                .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
-                    viewModel.removeShopList(shopList)
-                    dialog.dismiss()
-                }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-
-        val dialog = dialogBuilder.create()
-        dialog.show()
-    }
-
     private fun rvItemClick(shopList: ShopList) {
         Vibrator.interaction()
-        val intent = ProductsActivity.newIntent(this, shopList.name, shopList.color, shopList.id)
+        val intent = ProductsActivity.newIntent(this, shopList.id)
         startActivity(intent)
     }
 }

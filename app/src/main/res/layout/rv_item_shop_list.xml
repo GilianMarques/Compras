@@ -75,11 +75,11 @@
                     android:layout_marginBottom="16dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:importantForAccessibility="no"
-                    android:padding="8dp"
+                    android:padding="10dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/vec_menu"
+                    app:srcCompat="@drawable/vec_arrow_forward"
                     app:tint="?colorPrimary" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 

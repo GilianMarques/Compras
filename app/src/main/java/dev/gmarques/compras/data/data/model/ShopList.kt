@@ -1,12 +1,15 @@
 package dev.gmarques.compras.data.data.model
 
+import java.io.Serializable
+
 
 data class ShopList(
     val name: String,
     val color: Int,
     val id: Long = System.currentTimeMillis(),
-) {
+) : Serializable {
 
+    @Suppress("unused") // necessario pra uso com firebase
     constructor() : this("not_initialized", 0)
 
     override fun equals(other: Any?): Boolean {

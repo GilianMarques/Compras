@@ -12,7 +12,7 @@ import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.databinding.RvItemShopListBinding
 import dev.gmarques.compras.utils.ExtFun.Companion.adjustSaturation
 
-class ShopListAdapter(private val onMenuItemClick: (ShopList) -> Any, private val onItemClick: (ShopList) -> Any) :
+class ShopListAdapter(private val onItemClick: (ShopList) -> Any) :
     ListAdapter<ShopList, ShopListAdapter.ListViewHolder>(ShopListDiffCallback()) {
     var x = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -41,7 +41,6 @@ class ShopListAdapter(private val onMenuItemClick: (ShopList) -> Any, private va
 
             tvListName.text = shopList.name
 
-            tvEditItem.setOnClickListener { onMenuItemClick(shopList) }
             cardView.setOnClickListener { onItemClick(shopList) }
 
             val saturatedColor = shopList.color.adjustSaturation(2.99f)
@@ -63,6 +62,7 @@ class ShopListAdapter(private val onMenuItemClick: (ShopList) -> Any, private va
 
     }
 
+
     class ShopListDiffCallback : DiffUtil.ItemCallback<ShopList>() {
 
 
@@ -71,7 +71,8 @@ class ShopListAdapter(private val onMenuItemClick: (ShopList) -> Any, private va
         }
 
         override fun areContentsTheSame(oldItem: ShopList, newItem: ShopList): Boolean {
-            return oldItem == newItem
+            return oldItem.name == newItem.name
+                    && oldItem.color == newItem.color
         }
     }
 

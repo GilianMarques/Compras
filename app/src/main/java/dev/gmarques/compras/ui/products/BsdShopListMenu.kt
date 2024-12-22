@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.main
+package dev.gmarques.compras.ui.products
 
 import android.app.Activity
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -21,12 +21,12 @@ class BsdShopListMenu(
 
         binding.apply {
 
-            fabRemove.setOnClickListener {
+            tvRemove.setOnClickListener {
                 removeListener(shopList)
                 dialog.dismiss()
             }
 
-            fabRename.setOnClickListener {
+            tvRename.setOnClickListener {
                 renameListener(shopList)
                 dialog.dismiss()
             }

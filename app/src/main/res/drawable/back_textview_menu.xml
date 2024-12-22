@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners android:radius="6dp" />
-    <stroke android:color="@color/rv_product_item_background"  android:width="1.5dp"/>
-    <solid android:color="?attr/backgroundColor"/>
+    <corners android:radius="8dp" />
+    <solid android:color="?colorSecondaryContainer" />
     <size
         android:width="150dp"
         android:height="54dp" />

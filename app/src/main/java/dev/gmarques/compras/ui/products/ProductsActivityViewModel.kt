@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dev.gmarques.compras.data.data.ListenerRegister
 import dev.gmarques.compras.data.data.model.Product
+import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.data.data.repository.ProductRepository
+import dev.gmarques.compras.data.data.repository.ShopListRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
@@ -17,69 +19,64 @@ import kotlinx.coroutines.launch
 class ProductsActivityViewModel : ViewModel() {
 
 
-    var shopListId: Long = -1
     private var searchTerm: String = ""
+
     private lateinit var productsToBePosted: List<Product>
     private lateinit var pricesToBePosted: Pair<Double, Double>
-    private var firstLoad = true
-    private var listenerRegister: ListenerRegister? = null
 
-    private var scope = CoroutineScope(IO)
+    private var productsDatabaseListener: ListenerRegister? = null
+    private var shopListDatabaseListener: ListenerRegister? = null
 
-    private val _productsLiveData = MutableLiveData<List<Product>>()
-    val productsLiveData: LiveData<List<Product>> get() = _productsLiveData
+    private var scope: CoroutineScope? = null
 
+    private val _productsLD = MutableLiveData<List<Product>>()
+    val productsLD: LiveData<List<Product>> get() = _productsLD
 
-    private val _pricesLiveData = MutableLiveData<Pair<Double, Double>>()
-    val pricesLiveData: LiveData<Pair<Double, Double>> get() = _pricesLiveData
+    private val _shopListLD = MutableLiveData<ShopList>()
+    val shopListLD: LiveData<ShopList> get() = _shopListLD
+
+    private val _pricesLD = MutableLiveData<Pair<Double, Double>>()
+    val pricesLD: LiveData<Pair<Double, Double>> get() = _pricesLD
 
 
     override fun onCleared() {
-        listenerRegister?.remove()
-        scope.cancel()
+        productsDatabaseListener?.remove()
+        shopListDatabaseListener?.remove()
+        scope?.cancel()
 
         super.onCleared()
     }
 
     fun observeProducts() {
-        if (listenerRegister != null) return
+        if (_shopListLD.value == null) throw NullPointerException("Carrege a lista primeiro, só entao chame a função para carregar os produtos")
+        if (productsDatabaseListener != null) return
         observeUpdates()
     }
 
     private fun observeUpdates() {
-
-        if (shopListId == -1L) throw IllegalStateException("shopListId não foi inicializado")
-
-        listenerRegister = ProductRepository.observeProductUpdates(shopListId) { lists, error ->
+        productsDatabaseListener = ProductRepository.observeProductUpdates(_shopListLD.value!!.id) { lists, error ->
             if (error == null) lists.let {
-
-                /* Uma vez que o usuário mova um produto da posição 0 para a posição 1/2/3... caso os produtos não tenham índice
-                  definido, o  item movido irá parar no final da lista uma vez que todos os outros índices são zero ou -1,
-                   para evitar esse  comportamento é necessário definir um índice de acordo com a posição do produto na lista*/
 
                 val filteredProducts = mutableListOf<Product>()
                 var fullPrice = 0.0
-                var bougthPrice = 0.0
+                var boughtPrice = 0.0
 
                 for (i in lists!!.indices) {
 
-                    var product = lists[i]
-                    if (product.position == -1) product = product.copy(position = i)
+                    val product = lists[i]
 
                     if (searchTerm.isEmpty() || product.name.contains(searchTerm, true)) {
                         fullPrice += product.price * product.quantity
-                        if (product.hasBeenBought) bougthPrice += product.price * product.quantity
+                        if (product.hasBeenBought) boughtPrice += product.price * product.quantity
 
                         filteredProducts.add(product)
                     }
                 }
 
-                postDataWithThrottling(filteredProducts, fullPrice to bougthPrice)
+                postDataWithThrottling(filteredProducts, fullPrice to boughtPrice)
             }
         }
-
     }
-
 
     /**
      *Aplica o  throttling mais simples que consegui pensar pra evitar atualizaçoes repetidas na UI
@@ -91,21 +88,19 @@ class ProductsActivityViewModel : ViewModel() {
         productsToBePosted = products
         pricesToBePosted = prices
 
-        scope.cancel().also { scope = CoroutineScope(IO) }
-        scope.launch {
-            delay(if (firstLoad) 0 else 250)
+
+        var delayMillis = 0L
+        scope?.apply { delayMillis = 250; cancel() }
+        scope = CoroutineScope(IO)
+        scope!!.launch {
+            delay(delayMillis)
             Log.d("USUK", "ProductsActivityViewModel.postDataWithThrottling: posting data ")
-            _productsLiveData.postValue(productsToBePosted)
-            _pricesLiveData.postValue(pricesToBePosted)
-            firstLoad = false
+            _productsLD.postValue(productsToBePosted)
+            _pricesLD.postValue(pricesToBePosted)
             productsToBePosted = emptyList()
             pricesToBePosted = Pair(0.0, 0.0)
         }
-    }
 
-    fun updateProductPosition(product: Product, newIndex: Int) {
-        val newProduct = product.copy(position = newIndex)
-        ProductRepository.addOrUpdateProduct(newProduct)
     }
 
     fun updateProductAsIs(updatedProduct: Product) {
@@ -119,10 +114,30 @@ class ProductsActivityViewModel : ViewModel() {
 
     fun searchProduct(searchTerm: String) {
         this.searchTerm = searchTerm
-        listenerRegister?.remove()
-        listenerRegister = null
+        productsDatabaseListener?.remove()
+        productsDatabaseListener = null
         observeProducts()
 
+    }
+
+    fun addOrUpdateShopList(shopList: ShopList) {
+        ShopListRepository.addOrAttShopList(shopList)
+    }
+
+    fun removeShopList(shopList: ShopList) {
+        ShopListRepository.removeShopList(shopList)
+    }
+
+    fun loadList(shoplistId: Long) {
+        shopListDatabaseListener = ShopListRepository.observeList(shoplistId) { shopList, error ->
+            if (error == null) shopList.let {
+                _shopListLD.postValue(shopList!!)
+            }
+        }
+    }
+
+    fun removeProduct(product: Product) {
+        ProductRepository.removeProduct(product)
     }
 
 

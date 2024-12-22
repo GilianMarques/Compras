@@ -21,6 +21,7 @@ glide = "5.0.0-rc01"
 playServicesFido = "20.0.1"
 firebaseFirestore = "25.1.1"
 dropdown = "1.1.2"
+legacySupportV4 = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +43,7 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 play-services-fido = { group = "com.google.android.gms", name = "play-services-fido", version.ref = "playServicesFido" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 dropdown = { group = "io.github.androidpoet", name = "dropdown", version.ref = "dropdown" }
+androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
 
 
 [plugins]

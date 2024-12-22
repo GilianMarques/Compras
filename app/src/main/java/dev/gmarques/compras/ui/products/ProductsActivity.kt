@@ -1,10 +1,11 @@
 package dev.gmarques.compras.ui.products
 
 import android.animation.ValueAnimator
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.text.Spanned
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AnticipateInterpolator
@@ -13,21 +14,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import dev.gmarques.compras.R
 import dev.gmarques.compras.data.data.model.Product
+import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.databinding.ActivityProductsBinding
 import dev.gmarques.compras.ui.Vibrator
+import dev.gmarques.compras.ui.add_product.AddEditProductActivity
+import dev.gmarques.compras.ui.main.BsdAddOrEditShopList
 import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
+import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
+import dev.gmarques.compras.utils.ExtFun.Companion.observeOnce
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
 
 class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
@@ -38,14 +41,11 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     companion object {
         private const val LIST_ID = "list_id"
-        private const val LIST_NAME = "list_name"
-        private const val LIST_COLOR = "list_color"
 
-        fun newIntent(context: Context, name: String, color: Int, id: Long): Intent {
+
+        fun newIntent(context: Context, list: Long): Intent {
             return Intent(context, ProductsActivity::class.java).apply {
-                putExtra(LIST_ID, id)
-                putExtra(LIST_NAME, name)
-                putExtra(LIST_COLOR, color)
+                putExtra(LIST_ID, list)
             }
         }
     }
@@ -53,78 +53,79 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val shopListId = intent.getLongExtra(LIST_ID, -1)
-        val shopListName = intent.getStringExtra(LIST_NAME)
-        val shopListColor = intent.getIntExtra(LIST_COLOR, 0)
+        val shoplistId = intent.getLongExtra(LIST_ID, -1)
 
         binding = ActivityProductsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this)[ProductsActivityViewModel::class.java]
+        viewModel.loadList(shoplistId)
 
-        initToolbar(shopListName, shopListColor)
+        initToolbar()
         initRecyclerView()
         initSearch()
-        initFabAnimation()
+        initFabAddProduct()
         observeProductsUpdates()
         observePrices()
+        observeShopList()
 
-        runBlocking {
-            repeat(15) {
-                delay(1)
-                val x = Product(
-                    shopListId,
-                    "produto #$it",
-                    -1,
-                    Random.nextDouble(499.967),
-                    Random.nextInt(5),
-                    "info referente ao produto #$it",
-                    true
-                )
-                //    ProductRepository.addOrUpdateProduct(x)
-            }
+        /*   runBlocking {
+               repeat(15) {
+                   delay(100)
+                   val x = Product(
+                       shopListId,
+                       "produto #$it",
+                       -1,
+                       Random.nextDouble(499.967),
+                       Random.nextInt(5),
+                       "info referente ao produto #$it",
+                       true
+                   )
+                       ProductRepository.addOrUpdateProduct(x)
+               }
+           }*/
+
+
+    }
+
+    private fun observePrices() = viewModel.pricesLD.observe(this) {
+        binding.apply {
+
+
+            ValueAnimator.ofFloat(tvPriceList.text.toString().currencyToDouble().toFloat(), it.first.toFloat()).apply {
+                interpolator = AnticipateInterpolator()
+                duration = 500
+                addUpdateListener {
+                    lifecycleScope.launch {
+                        withContext(Main) {
+                            tvPriceList.text = it.animatedValue.toString().toDouble().toCurrency()
+                        }
+                    }
+                }
+            }.start()
+
+
+            ValueAnimator.ofFloat(tvPriceCart.text.toString().currencyToDouble().toFloat(), it.second.toFloat()).apply {
+                interpolator = AnticipateInterpolator()
+                duration = 500
+                addUpdateListener {
+                    lifecycleScope.launch {
+                        withContext(Main) {
+                            tvPriceCart.text = it.animatedValue.toString().toDouble().toCurrency()
+                        }
+                    }
+                }
+            }.start()
+
         }
+    }
 
-        viewModel.shopListId = shopListId
+    private fun observeShopList() = viewModel.shopListLD.observe(this) {
+        binding.toolbar.tvActivityTitle.text = it.name
         viewModel.observeProducts()
-
     }
 
-    private fun observePrices() {
-
-        viewModel.pricesLiveData.observe(this) {
-            binding.apply {
-
-
-                ValueAnimator.ofFloat(tvPriceList.text.toString().currencyToDouble().toFloat(), it.first.toFloat()).apply {
-                    interpolator = AnticipateInterpolator()
-                    duration = 500
-                    addUpdateListener {
-                        lifecycleScope.launch {
-                            withContext(Main) {
-                                tvPriceList.text = it.animatedValue.toString().toDouble().toCurrency()
-                            }
-                        }
-                    }
-                }.start()
-
-
-                ValueAnimator.ofFloat(tvPriceCart.text.toString().currencyToDouble().toFloat(), it.second.toFloat()).apply {
-                    interpolator = AnticipateInterpolator()
-                    duration = 500
-                    addUpdateListener {
-                        lifecycleScope.launch {
-                            withContext(Main) {
-                                tvPriceCart.text = it.animatedValue.toString().toDouble().toCurrency()
-                            }
-                        }
-                    }
-                }.start()
-
-            }
-        }
-    }
-
+    @Suppress("UNUSED_ANONYMOUS_PARAMETER")
     private fun initSearch() {
 
         binding.edtSearch.doOnTextChanged { text, start, before, count ->
@@ -135,8 +136,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
             rvAdapter.submitList(emptyList())
             viewModel.searchProduct(term)
 
-
-            rvAdapter.toggleDragnDropState(term.isEmpty())
             binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
         }
 
@@ -148,18 +147,19 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     }
 
-    private fun initToolbar(shopListName: String?, shopListColor: Int) {
-        binding.tvTitle.text = shopListName
-        // TODO: remover codigo relacionado a cor de fundo se nao for usar
-        //binding.appbar.setBackgroundColor(shopListColor)
-        binding.ivGoBack.setOnClickListener {
+    private fun initToolbar() {
+        binding.toolbar.ivGoBack.setOnClickListener {
             finish()
+        }
+
+        binding.toolbar.ivMenu.setOnClickListener {
+            showMenuDialog()
         }
 
     }
 
     private fun observeProductsUpdates() {
-        viewModel.productsLiveData.observe(this) { newData ->
+        viewModel.productsLD.observe(this) { newData ->
             val sorted = newData.sortedBy { it.position }
             rvAdapter.submitList(sorted)
 
@@ -175,20 +175,18 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     private fun initRecyclerView() {
 
         rvAdapter = ProductAdapter(this@ProductsActivity)
-
-
-        val dragDropHelper = DragDropHelperCallback(rvAdapter)
-        val touchHelper = ItemTouchHelper(dragDropHelper)
-
-        rvAdapter.attachItemTouchHelper(touchHelper)
-
-        touchHelper.attachToRecyclerView(binding.rvProducts)
-
         binding.rvProducts.layoutManager = LinearLayoutManager(this)
         binding.rvProducts.adapter = rvAdapter
     }
 
-    private fun initFabAnimation() = binding.apply {
+    private fun initFabAddProduct() = binding.apply {
+
+
+        fabAddProduct.setOnClickListener {
+            startActivityAddProduct()
+        }
+
+
         rvProducts.addOnScrollListener(object : OnScrollListener() {
 
 
@@ -196,41 +194,100 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                 if (dy > 0) {  // Rolando para cima - Esconde o FAB
                     if (fabHidden) return
 
-                    fabAddProduct.animate()
-                        .translationY(fabAddProduct.height.toFloat() * 2)
-                        .alpha(0f)
-                        .setStartDelay(100)
-                        .setDuration(200L)
-                        .start()
+                    fabAddProduct.animate().translationY(fabAddProduct.height.toFloat() * 2).alpha(0f).setStartDelay(100)
+                        .setDuration(200L).start()
                     fabHidden = true
 
                 } else if (dy < 0) { // Rolando para baixo - Mostra o FAB
                     if (!fabHidden) return
 
-                    fabAddProduct.animate()
-                        .translationY(0f)
-                        .alpha(1f)
-                        .setStartDelay(100)
-                        .setDuration(200L)
-                        .start()
+                    fabAddProduct.animate().translationY(0f).alpha(1f).setStartDelay(100).setDuration(200L).start()
                     fabHidden = false
                 }
             }
         })
     }
 
-    override fun rvProductsOnDragAndDrop(toPosition: Int, product: Product) {
-        Log.d("USUK", "ProductsActivity.".plus("rvProductsOnDragAndDrop() 1 = toPosition = $toPosition, product = $product"))
+    private fun startActivityAddProduct() {
+        viewModel.shopListLD.observeOnce(this@ProductsActivity) { shopList ->
 
-        viewModel.updateProductPosition(product, toPosition)
+            Vibrator.interaction()
+            val intent = AddEditProductActivity.newIntentAddProduct(this@ProductsActivity, shopList.id)
+            startActivity(intent)
+        }
+    }
 
+    private fun startActivityEditProduct(product: Product) {
+        viewModel.shopListLD.observeOnce(this@ProductsActivity) { shopList ->
+
+            Vibrator.interaction()
+            val intent = AddEditProductActivity.newIntentEditProduct(this@ProductsActivity, shopList.id, product.id)
+            startActivity(intent)
+        }
+    }
+
+    private fun showMenuDialog() {
+        viewModel.shopListLD.observeOnce(this) {
+            Vibrator.interaction()
+
+            BsdShopListMenu(this, it, { renameList ->
+                showRenameDialog(renameList)
+            }, { removeList ->
+                confirmRemove(removeList)
+            }).show()
+        }
+    }
+
+    private fun showRenameDialog(renameList: ShopList) {
+        BsdAddOrEditShopList(this, renameList).setOnConfirmListener { shopList ->
+            viewModel.addOrUpdateShopList(shopList)
+        }.show()
+    }
+
+    private fun confirmRemove(shopList: ShopList) {
+        val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x), shopList.name).formatHtml()
+
+        val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
+            .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
+                viewModel.removeShopList(shopList)
+                dialog.dismiss()
+            }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
+    }
+
+    private fun confirmRemove(product: Product) {
+        val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x), product.name).formatHtml()
+
+        val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
+            .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
+                viewModel.removeProduct(product)
+                dialog.dismiss()
+            }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
     }
 
     override fun rvProductsOnEditItemClick(product: Product) {
 
-        BsdEditProductPriceOrQuantity(this@ProductsActivity, product).setOnConfirmListener {
-            viewModel.updateProductAsIs(it)
-        }.show()
+        BsdEditProductPriceOrQuantity.Builder().setActivity(this@ProductsActivity).setActivity(this@ProductsActivity)
+            .setProduct(product)
+            .setEditListener {
+                startActivityEditProduct(it)
+
+            }.setRemoveListener {
+                confirmRemove(it)
+
+            }.setConfirmListener {
+                viewModel.updateProductAsIs(it)
+
+            }.build().show()
     }
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {

@@ -8,6 +8,7 @@
         android:layout_height="match_parent"
         android:paddingTop="8dp">
 
+
         <ImageView
             android:id="@+id/iv_list_icon"
             android:layout_width="42dp"
@@ -42,79 +43,136 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="32dp"
             android:background="?android:attr/listDivider"
-            app:layout_constraintBottom_toTopOf="@id/edt_input_price" />
+            app:layout_constraintBottom_toTopOf="@id/ll_options" />
 
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/edt_input_price"
+        <LinearLayout
+            android:id="@+id/ll_options"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="36dp"
-            android:layout_marginEnd="36dp"
-            android:layout_marginBottom="16dp"
-            android:drawableStart="@drawable/vec_price"
-            android:drawablePadding="16dp"
-            android:drawableTint="?colorPrimary"
-            android:gravity="center_vertical"
-            android:hint="@string/Digite_o_novo_preco"
-            android:importantForAutofill="no"
-            android:inputType="numberDecimal"
-            android:selectAllOnFocus="true"
-            android:theme="@style/Theme.EditText"
-            app:layout_constraintBottom_toTopOf="@+id/edt_input_quantity"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_marginBottom="24dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/fab_confirm">
 
 
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/edt_input_quantity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="36dp"
-            android:layout_marginBottom="32dp"
-            android:drawableStart="@drawable/vec_quantity"
-            android:drawablePadding="16dp"
-            android:drawableTint="?colorPrimary"
-            android:gravity="center_vertical"
-            android:hint="@string/Digite_a_nova_quantidade"
-            android:importantForAutofill="no"
-            android:inputType="number"
-            android:selectAllOnFocus="true"
-            android:theme="@style/Theme.EditText"
-            app:layout_constraintBottom_toTopOf="@id/fab_more_options"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/tv_title2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/lexend_deca_bold"
+                android:padding="16dp"
+                android:text="@string/Edicao_rapida"
+                android:textAlignment="viewStart"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/edt_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/vec_price"
+                android:hint="@string/Digite_o_novo_preco"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal"
+                android:maxLength="12"
+                android:selectAllOnFocus="true"
+                style="@style/Margins_edittext"
+                android:theme="@style/Theme.EditText.Dialog" />
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/edt_quantity"
+                style="@style/Margins_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:drawableStart="@drawable/vec_quantity"
+                android:hint="@string/Digite_a_nova_quantidade"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="6"
+                android:selectAllOnFocus="true"
+                android:theme="@style/Theme.EditText.Dialog"
+
+                />
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+
+            <TextView
+                android:id="@+id/tv_title3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/lexend_deca_bold"
+                android:padding="16dp"
+                android:text="@string/Outras_opcoes"
+                android:textAlignment="viewStart"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_edit_product"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/back_textview_menu"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/Editar_outros_atributos"
+                android:textColor="?attr/colorPrimaryVariant"
+                app:drawableStartCompat="@drawable/vec_rename"
+                app:drawableTint="?attr/colorPrimaryVariant"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/tv_remove"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_remove_product"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/back_textview_menu"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/Remover_produto"
+                android:textColor="?attr/colorPrimaryVariant"
+                app:drawableStartCompat="@drawable/vec_remove"
+                app:drawableTint="?attr/colorPrimaryVariant"
+                app:layout_constraintBottom_toTopOf="@id/tv_order_items"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fab_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="?attr/colorPrimary"
-            android:text="@string/Salvar"
+            android:text="@string/Fechar"
             android:textColor="?colorOnPrimary"
             app:icon="@drawable/vec_check"
             app:iconTint="?attr/colorOnPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/fab_more_options" />
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/fab_more_options"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/Mais_opcoes"
-            app:icon="@drawable/vec_rename"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fab_confirm"
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.play.services.fido)
     implementation(libs.firebase.firestore)
     implementation(libs.dropdown)
+    implementation(libs.androidx.legacy.support.v4)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,6 +1,5 @@
 package dev.gmarques.compras.ui.products
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -8,64 +7,89 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.data.model.Product
-import dev.gmarques.compras.data.data.repository.ProductRepository
 import dev.gmarques.compras.databinding.BsdEditProductPriceAndQuantityDialogBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
-import dev.gmarques.compras.utils.Result
 
+class BsdEditProductPriceOrQuantity private constructor() {
 
-@SuppressLint("SetTextI18n") // nao é necessario levar a localizaçao em conta quando editando valor e quantidade nessa tela
-class BsdEditProductPriceOrQuantity(
-    targetActivity: Activity,
-    private val editProduct: Product,
-) {
-
-    private var binding = BsdEditProductPriceAndQuantityDialogBinding.inflate(targetActivity.layoutInflater)
-    private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
+    private lateinit var targetActivity: Activity
+    private lateinit var editProduct: Product
+    private lateinit var binding: BsdEditProductPriceAndQuantityDialogBinding
+    private lateinit var dialog: BottomSheetDialog
     private lateinit var onConfirmListener: ((Product) -> Unit)
+    private lateinit var onEditListener: ((Product) -> Unit)
+    private lateinit var onRemoveListener: ((Product) -> Unit)
 
-    init {
+    private fun init() {
+        dialog = BottomSheetDialog(targetActivity)
+        binding = BsdEditProductPriceAndQuantityDialogBinding.inflate(targetActivity.layoutInflater)
         dialog.setContentView(binding.root)
 
         with(binding) {
 
-            edtInputQuantity.setText(String.format(targetActivity.getString(R.string.un), editProduct.quantity))
-            edtInputPrice.setText(editProduct.price.toCurrency())
+            edtQuantity.setText(String.format(targetActivity.getString(R.string.un), editProduct.quantity))
+            edtPrice.setText(editProduct.price.toCurrency())
 
-            // Configura o botão de confirmação
             fabConfirm.setOnClickListener {
-
-                val newQuantity = edtInputQuantity.text.toString().onlyIntegerNumbers()
-
-                // FIXME: as vezes o valor digitado sera moeda ou nao, tem que ajustar o codigo pra lidar com isso   
-                val newPrice = edtInputPrice.text.toString().currencyToDouble()
-
+                val newQuantity = edtQuantity.text.toString().onlyIntegerNumbers()
+                val newPrice = edtPrice.text.toString().currencyToDouble()
                 validateUserInput(newQuantity, newPrice)
+            }
+        }
+        setupInputPriceFocusListener()
+        setupInputQuantityFocusListener()
+        setupAditionalOptions()
+    }
+
+    private fun setupAditionalOptions() = binding.apply {
+
+        tvEditProduct.setOnClickListener { onEditListener(editProduct); dialog.dismiss() }
+
+        tvRemoveProduct.setOnClickListener { onRemoveListener(editProduct); dialog.dismiss() }
+
+    }
+
+    private fun setupInputPriceFocusListener() {
+        val edtTarget = binding.edtPrice
+        edtTarget.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val term = edtTarget.text.toString().ifBlank { "-1" }.currencyToDouble()
+                val result = Product.Validator.validatePrice(term)
+                if (result.isSuccess) edtTarget.setText(result.getOrThrow().toCurrency())
             }
         }
     }
 
+    private fun setupInputQuantityFocusListener() {
+        val edtTarget = binding.edtQuantity
+        edtTarget.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val term = edtTarget.text.toString().ifBlank { "0" }.onlyIntegerNumbers()
+                val result = Product.Validator.validateQuantity(term)
+                if (result.isSuccess) edtTarget.setText(String.format(targetActivity.getString(R.string.un), result.getOrThrow()))
+            }
+        }
+    }
 
     private fun validateUserInput(newQuantity: Int, newPrice: Double) {
-
-        val resultQuantity = ProductRepository.validateQuantity(newQuantity)
-        val resultPrice = ProductRepository.validatePrice(newPrice)
+        val resultQuantity = Product.Validator.validateQuantity(newQuantity)
+        val resultPrice = Product.Validator.validatePrice(newPrice)
 
         when {
-            resultQuantity is Result.Success && resultPrice is Result.Success -> {
+            resultQuantity.isSuccess && resultPrice.isSuccess -> {
                 updateProductAndClose(newQuantity, newPrice)
                 Vibrator.success()
             }
 
-            resultQuantity is Result.Error -> {
-                showErrorSnackbar(resultQuantity.exception.message)
+            resultQuantity.isFailure -> {
+                showErrorSnackbar(resultQuantity.exceptionOrNull()!!.message)
             }
 
-            resultPrice is Result.Error -> {
-                showErrorSnackbar(resultPrice.exception.message)
+            resultPrice.isFailure -> {
+                showErrorSnackbar(resultPrice.exceptionOrNull()!!.message)
             }
         }
     }
@@ -75,30 +99,49 @@ class BsdEditProductPriceOrQuantity(
         Snackbar.make(binding.root, message.orEmpty(), Snackbar.LENGTH_LONG).show()
     }
 
-
     private fun updateProductAndClose(newQuantity: Int, newPrice: Double) {
         val edited = editProduct.copy(quantity = newQuantity, price = newPrice)
-        onConfirmListener.invoke(edited)
+        onConfirmListener(edited)
         dialog.dismiss()
     }
 
-
-    fun setOnConfirmListener(listener: (Product) -> Unit): BsdEditProductPriceOrQuantity {
-        onConfirmListener = listener
-        return this
-    }
-
     fun show() {
-
         dialog.show()
-        binding.edtInputPrice.requestFocus()
-
-        // Acesse o comportamento do BottomSheet e defina o estado para expandido
         val behavior = BottomSheetBehavior.from(binding.root.parent as View)
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
+    class Builder {
+        private val instance = BsdEditProductPriceOrQuantity()
 
+        fun setActivity(activity: Activity): Builder {
+            instance.targetActivity = activity
+            return this
+        }
+
+        fun setProduct(product: Product): Builder {
+            instance.editProduct = product
+            return this
+        }
+
+        fun setConfirmListener(listener: (Product) -> Unit): Builder {
+            instance.onConfirmListener = listener
+            return this
+        }
+
+        fun setEditListener(listener: (Product) -> Unit): Builder {
+            instance.onEditListener = listener
+            return this
+        }
+
+        fun setRemoveListener(listener: (Product) -> Unit): Builder {
+            instance.onRemoveListener = listener
+            return this
+        }
+
+        fun build(): BsdEditProductPriceOrQuantity {
+            instance.init()
+            return instance
+        }
+    }
 }
-
-

@@ -9,7 +9,7 @@ import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.data.data.repository.ShopListRepository
 import dev.gmarques.compras.databinding.BsdAddShoplistDialogBinding
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.utils.Result
+import dev.gmarques.compras.utils.RequestResult
 
 class BsdAddOrEditShopList(
     targetActivity: Activity,
@@ -49,13 +49,13 @@ class BsdAddOrEditShopList(
 
         val result = ShopListRepository.validateName(name)
 
-        if (result is Result.Success) {
+        if (result is RequestResult.Success) {
 
             if (editShopList != null) updateListAndClose(name)
             else createListAndClose(name)
             Vibrator.success()
 
-        } else if (result is Result.Error) {
+        } else if (result is RequestResult.Error) {
             Snackbar.make(binding.root, result.exception.message!!, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
         }

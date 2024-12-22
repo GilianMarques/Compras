@@ -37,7 +37,7 @@
     <string name="Deseja_mesmo_remover_x">Deseja mesmo remover <b>%1$s</b>?</string>
     <string name="Cancelar">Cancelar</string>
     <string name="un">%1$d UN</string>
-    <string name="Editar_produto">Editar produto</string>
+    <string name="Editar_outros_atributos">Editar outros atributos</string>
     <string name="Digite_o_novo_preco">Digite o novo preço</string>
     <string name="Digite_a_nova_quantidade">Digite a nova quantidade</string>
     <string name="Salvar">Salvar</string>
@@ -51,4 +51,26 @@
     <string name="Valor_da_lista">Valor da lista</string>
     <string name="Valor_do_carrinho">Valor do carrinho</string>
     <string name="Alca_para_mudar_a_posicao_do_produto_na_lista">Alça para mudar a posição do produto na lista</string>
+    <string name="Remover_lista">Remover lista</string>
+    <string name="Ordenar_produtos">Ordenar produtos</string>
+    <string name="Detalhes_Ex_marca_x_ou_y_500gr_1kg">Detalhes (Ex.: Marca X, 500gr)</string>
+    <string name="Nome_do_produto_ex_macarrao_parafuso">Nome (Ex.: Macarrão Parafuso)</string>
+    <string name="Valor_da_unidade">Valor da unidade</string>
+    <string name="Quantidade_necessaria">Quantidade necessária</string>
+    <string name="Sugerir_produto_ao_criar_nova_lista">Sugerir produto ao criar nova lista</string>
+    <string name="Categoria">Categoria</string>
+    <string name="Adicionar_produto">Adicionar produto</string>
+    <string name="O_nome_nao_pode_ficar_vazio">O nome não pode ficar vazio</string>
+    <string name="O_nome_deve_ter_no_m_nimo_x_caracteres">O nome deve ter no mínimo %1$d caracteres</string>
+    <string name="O_nome_deve_ter_no_m_ximo_x_caracteres">O nome deve ter no máximo %1$d caracteres</string>
+    <string name="Os_detalhes_devem_ter_ate_x_caracteres">Os detalhes devem ter no máximo %1$d caracteres</string>
+    <string name="Edicao_rapida">Edição rápida</string>
+    <string name="Outras_opcoes">Outras opções</string>
+    <string name="Remover_produto">Remover produto</string>
+    <string name="Editar_produto">Editar produto</string>
+    <string name="Editar_x">Editar %1$s</string>
+    <string name="Fechar">Fechar</string>
+    <string name="X_ja_existe_na_lista">%1$s já existe na lista</string>
+    <string name="Nao_foi_possivel_verificar_se_x_ja_existe_na_lista">Não foi possivel verificar se %1$s já existe na lista</string>
+    <string name="Salvar_produto">Salvar produto</string>
 </resources>

@@ -1,6 +1,6 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme.Compras" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Compras" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@android:color/white</item>
         <item name="backgroundColor">@android:color/white</item>
@@ -10,12 +10,14 @@
 
     <style name="Theme.EditText" parent="Base.Theme.Compras">
         <item name="android:editTextBackground">@drawable/back_edit_text</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingEnd">8dp</item>
-        <item name="android:paddingStart">8dp</item>
+        <item name="android:backgroundTint">@color/edittext_background</item>
+    </style>
 
 
+    <style name="Theme.EditText.Dialog" parent="Base.Theme.Compras">
+        <item name="android:editTextBackground">@drawable/back_edit_text</item>
+        <item name="android:backgroundTint">?attr/colorSecondaryContainer</item>
+        <item name="android:drawableTint">?attr/colorPrimary</item>
     </style>
 
     <style name="Theme.Compras" parent="Base.Theme.Compras" />
