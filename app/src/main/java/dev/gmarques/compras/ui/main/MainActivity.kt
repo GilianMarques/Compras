@@ -1,6 +1,7 @@
 package dev.gmarques.compras.ui.main
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import dev.gmarques.compras.databinding.ActivityMainBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
+import dev.gmarques.compras.utils.App
 import java.util.Calendar
 
 
@@ -22,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
-    private val rvAdapter = ShopListAdapter( ::rvItemClick)
+    private val rvAdapter = ShopListAdapter(isDarkThemeEnabled(), ::rvItemClick)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +39,11 @@ class MainActivity : AppCompatActivity() {
         initFabAddList()
         observeListsUpdates()
 
+    }
+
+    private fun isDarkThemeEnabled(): Boolean {
+        val nightModeFlags = App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun checkUserAuthenticated() {

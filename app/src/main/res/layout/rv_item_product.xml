@@ -15,7 +15,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="5dp"
-            android:background="@drawable/back_rv_item_background"
+            android:background="@drawable/back_rv_product_background"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             app:cardCornerRadius="8dp"

@@ -1,5 +1,6 @@
 package dev.gmarques.compras.ui.main
 
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,7 +13,7 @@ import dev.gmarques.compras.data.data.model.ShopList
 import dev.gmarques.compras.databinding.RvItemShopListBinding
 import dev.gmarques.compras.utils.ExtFun.Companion.adjustSaturation
 
-class ShopListAdapter(private val onItemClick: (ShopList) -> Any) :
+class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (ShopList) -> Any) :
     ListAdapter<ShopList, ShopListAdapter.ListViewHolder>(ShopListDiffCallback()) {
     var x = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -34,21 +35,25 @@ class ShopListAdapter(private val onItemClick: (ShopList) -> Any) :
         fun bind(shopList: ShopList) = binding.apply {
             // TODO: remover quando terminar tela de produtos
             if (!x) {
-                onItemClick(shopList)
+                //   onItemClick(shopList)
                 x = true
             }
             itemView.alpha = 0f // Inicia a view invisível
 
             tvListName.text = shopList.name
 
-            cardView.setOnClickListener { onItemClick(shopList) }
+            cvChild.setOnClickListener { onItemClick(shopList) }
 
             val saturatedColor = shopList.color.adjustSaturation(2.99f)
             ivListIcon.background?.mutate()?.apply {
                 if (this is GradientDrawable) setColor(saturatedColor)
             }
 
-            cvChild.setBackgroundColor(shopList.color)
+            if (!darkModeEnable) {
+                val drawable = cvChild.background as? GradientDrawable
+                drawable?.setColor(shopList.color)
+                drawable?.setStroke(0, Color.TRANSPARENT)
+            }
 
             // Anima a entrada da view
             itemView.animate()
