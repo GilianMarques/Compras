@@ -2,7 +2,7 @@ package dev.gmarques.compras.ui.products
 
 import android.app.Activity
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import dev.gmarques.compras.data.data.model.ShopList
+import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.BsdShoplistMenuDialogBinding
 
 class BsdShopListMenu(
@@ -10,6 +10,7 @@ class BsdShopListMenu(
     private val shopList: ShopList,
     private var renameListener: ((ShopList) -> Unit),
     private var removeListener: ((ShopList) -> Unit),
+    private var orderListener: (() -> Unit),
 ) {
 
     private var binding = BsdShoplistMenuDialogBinding.inflate(targetActivity.layoutInflater)
@@ -31,6 +32,11 @@ class BsdShopListMenu(
                 dialog.dismiss()
             }
 
+            tvOrderItems.setOnClickListener {
+                orderListener()
+                dialog.dismiss()
+            }
+
             tvTitle.text = shopList.name
         }
 
@@ -41,7 +47,7 @@ class BsdShopListMenu(
 
         dialog.show()
 
-        // Acesse o comportamento do BottomSheet e defina o estado para expandido
+        
         // val behavior = BottomSheetBehavior.from(binding.root.parent as View)
         // behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }

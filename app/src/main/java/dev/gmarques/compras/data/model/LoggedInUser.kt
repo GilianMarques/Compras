@@ -1,4 +1,4 @@
-package dev.gmarques.compras.data.data.model
+package dev.gmarques.compras.data.model
 
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository

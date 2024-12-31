@@ -6,7 +6,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.data.model.Product
+import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.BsdEditProductPriceAndQuantityDialogBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble

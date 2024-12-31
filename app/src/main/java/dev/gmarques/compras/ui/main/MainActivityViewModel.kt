@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import dev.gmarques.compras.data.data.ListenerRegister
-import dev.gmarques.compras.data.data.model.ShopList
-import dev.gmarques.compras.data.data.repository.ShopListRepository
+import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.data.repository.ShopListRepository
+import dev.gmarques.compras.utils.ListenerRegister
 
 
 class MainActivityViewModel : ViewModel() {

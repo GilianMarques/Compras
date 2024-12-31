@@ -27,18 +27,17 @@
 
             <ImageView
                 android:id="@+id/iv_handle"
-                android:layout_width="4dp"
+                android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_gravity="end"
                 android:layout_marginStart="4dp"
-                android:visibility="invisible"
                 android:layout_marginEnd="4dp"
                 android:contentDescription="@string/Alca_para_mudar_a_posicao_do_produto_na_lista"
                 android:padding="4dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/vec_drag_indicator"
-                app:tint="?colorPrimary" />
+                app:srcCompat="@drawable/vec_category_indicator"
+                 />
 
             <CheckBox
                 android:id="@+id/cb_bought"

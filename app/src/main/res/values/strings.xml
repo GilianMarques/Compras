@@ -61,6 +61,7 @@
     <string name="Categoria">Categoria</string>
     <string name="Adicionar_produto">Adicionar produto</string>
     <string name="O_nome_nao_pode_ficar_vazio">O nome não pode ficar vazio</string>
+    <string name="A_cor_nao_pode_ficar_vazia">A cor não pode ficar vazia</string>
     <string name="O_nome_deve_ter_no_m_nimo_x_caracteres">O nome deve ter no mínimo %1$d caracteres</string>
     <string name="O_nome_deve_ter_no_m_ximo_x_caracteres">O nome deve ter no máximo %1$d caracteres</string>
     <string name="Os_detalhes_devem_ter_ate_x_caracteres">Os detalhes devem ter no máximo %1$d caracteres</string>
@@ -71,6 +72,25 @@
     <string name="Editar_x">Editar %1$s</string>
     <string name="Fechar">Fechar</string>
     <string name="X_ja_existe_na_lista">%1$s já existe na lista</string>
+    <string name="X_ja_existe">%1$s já existe</string>
     <string name="Nao_foi_possivel_verificar_se_x_ja_existe_na_lista">Não foi possivel verificar se %1$s já existe na lista</string>
+    <string name="Nao_foi_possivel_verificar_se_x_ja_existe">Não foi possivel verificar se %1$s já existe</string>
     <string name="Salvar_produto">Salvar produto</string>
+    <string name="Salvar_categoria">Salvar categoria</string>
+    <string name="Data_de_criacao">Data de criação</string>
+    <string name="Nome">Nome</string>
+    <string name="Produtos_comprados_no_fim_da_lista">Produtos comprados no fim da lista</string>
+    <string name="produtos_em_ordem_crescente">Produtos em ordem crescente</string>
+    <string name="Selecione_uma_cor">Selecione uma cor</string>
+    <string name="Nome_ex_massas_graos">Nome (Ex.: Massas, grãos)</string>
+    <string name="Adicionar_categoria">Adicionar categoria</string>
+    <string name="Selecionar_categoria">Selecionar categoria</string>
+    <string name="Selecionar_cor">Selecionar cor</string>
+    <string name="Cor_selecionada">Cor selecionada</string>
+    <string name="Erro_ao_carregar_categorias_x">Erro ao carregar categorias %1$s</string>
+    <string name="Selecione_uma_categoria">Selecione uma categoria</string>
+    <string name="Nova_categoria">Nova categoria</string>
+    <string name="Clique_aqui_para_alterar_a_cor">Clique aqui para alterar a cor</string>
+    <string name="A_categoria_esta_em_uso_e_nao_pode_ser_removida">A categoria está em uso e não pode ser removida</string>
+    <string name="Nao_foi_possivel_verificar_se_a_categoria_esta_em_uso">Não foi possível verificar se a categoria está em uso</string>
 </resources>

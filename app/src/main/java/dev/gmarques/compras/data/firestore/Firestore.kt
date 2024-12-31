@@ -1,9 +1,9 @@
-package dev.gmarques.compras.data.data.firestore
+package dev.gmarques.compras.data.firestore
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import dev.gmarques.compras.BuildConfig
-import dev.gmarques.compras.data.data.repository.UserRepository
+import dev.gmarques.compras.data.repository.UserRepository
 
 class Firestore {
 
@@ -16,15 +16,20 @@ class Firestore {
 
         private const val DATABASE = "Database"
         private const val SHOP_LISTS = "ShopLists"
-        private const val LIST_PRODUCT = "Products"
+        private const val PRODUCTS = "Products"
+        private const val CATEGORIES = "Categories"
         private const val SUGGESTION_PRODUCT = "Suggestion_products"
 
         val shopListCollection by lazy {
             Firebase.firestore.collection(userRootPath).document(DATABASE).collection(SHOP_LISTS)
         }
 
+        val categoryCollection by lazy {
+            Firebase.firestore.collection(userRootPath).document(DATABASE).collection(CATEGORIES)
+        }
+
         val productCollection by lazy {
-            Firebase.firestore.collection(userRootPath).document(DATABASE).collection(LIST_PRODUCT)
+            Firebase.firestore.collection(userRootPath).document(DATABASE).collection(PRODUCTS)
         }
 
         val suggestionProductCollection by lazy {

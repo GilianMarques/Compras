@@ -9,6 +9,7 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import dev.gmarques.compras.App
 import java.text.NumberFormat
 import java.text.ParseException
 import java.util.Locale
@@ -55,7 +56,6 @@ class ExtFun {
             return this.replace("\\s+".toRegex(), " ").trim()
         }
 
-
         /**
          * Formata o valor Double como moeda considerando a localidade do usuário.
          */
@@ -76,7 +76,6 @@ class ExtFun {
             return Color.HSVToColor(hsl)
         }
 
-
         fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, observer: (T) -> Unit) {
             observe(owner, object : Observer<T> {
                 override fun onChanged(value: T) {
@@ -92,6 +91,13 @@ class ExtFun {
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
         }
 
+        /**
+         * Oculta o teclado virtual no Android.
+         */
+        fun View.hideKeyboard() {
+            val imm = App.getContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(this.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
     }
 
 

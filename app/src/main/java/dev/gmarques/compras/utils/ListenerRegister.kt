@@ -1,4 +1,4 @@
-package dev.gmarques.compras.data.data
+package dev.gmarques.compras.utils
 
 import com.google.firebase.firestore.ListenerRegistration
 

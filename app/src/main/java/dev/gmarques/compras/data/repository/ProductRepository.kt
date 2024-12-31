@@ -1,10 +1,10 @@
-package dev.gmarques.compras.data.data.repository
+package dev.gmarques.compras.data.repository
 
 import android.util.Log
 import com.google.firebase.firestore.toObject
-import dev.gmarques.compras.data.data.ListenerRegister
-import dev.gmarques.compras.data.data.firestore.Firestore
-import dev.gmarques.compras.data.data.model.Product
+import dev.gmarques.compras.data.firestore.Firestore
+import dev.gmarques.compras.data.model.Product
+import dev.gmarques.compras.utils.ListenerRegister
 
 // TODO: todas as funçoes de repositio devem ser suspensas com coroutines
 object ProductRepository {
@@ -14,8 +14,9 @@ object ProductRepository {
      * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
      * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
      * */
-    fun observeProductUpdates(shopListId: Long, onSnapshot: (List<Product>?, Exception?) -> Any): ListenerRegister {
+    fun observeProductUpdates(shopListId: String, onSnapshot: (List<Product>?, Exception?) -> Any): ListenerRegister {
         return ListenerRegister(
+            // TODO: deve baixar os produtos com categorias pra exibir as cores na lista de produtos! 
             Firestore.productCollection.whereEqualTo("shopListId", shopListId).addSnapshotListener { querySnapshot, fbException ->
 
                 if (fbException != null) onSnapshot(null, fbException)
@@ -29,7 +30,7 @@ object ProductRepository {
     }
 
     fun addOrUpdateProduct(product: Product) {
-        Firestore.productCollection.document(product.id.toString()).set(product.selfValidate())
+        Firestore.productCollection.document(product.id).set(product.selfValidate())
     }
 
     /**
@@ -38,7 +39,7 @@ object ProductRepository {
      */
     fun addProductAsSuggestion(product: Product) {
         Firestore.suggestionProductCollection
-            .document(product.id.toString())
+            .document(product.id)
             .set(product.withNewId().selfValidate())
     }
 
@@ -60,7 +61,7 @@ object ProductRepository {
                 val oldProductOnDb = documentSnapshot.documents[0].toObject<Product>()!!
                 val newProductWithOldId = newProduct.copy(id = oldProductOnDb.id)
 
-                Firestore.suggestionProductCollection.document(newProductWithOldId.id.toString())
+                Firestore.suggestionProductCollection.document(newProductWithOldId.id)
                     .set(newProductWithOldId.selfValidate())
 
             } else {
@@ -81,20 +82,63 @@ object ProductRepository {
     }
 
     fun removeSuggestionProduct(product: Product) {
-        Firestore.suggestionProductCollection.document(product.id.toString()).delete()
+        Firestore.suggestionProductCollection.document(product.id).delete()
     }
 
-    fun getProduct(idProduct: Long, callback: (result: Result<Product>) -> Unit) {
+    fun getProduct(idProduct: String, callback: (result: Result<Product>) -> Unit) {
 
-        Firestore.productCollection.document(idProduct.toString()).get().addOnSuccessListener { documentSnapshot ->
+        Firestore.productCollection.document(idProduct).get().addOnSuccessListener { documentSnapshot ->
             val targetProduct = documentSnapshot.toObject<Product>()!!
             callback(Result.success(targetProduct))
         }.addOnFailureListener { exception: java.lang.Exception ->
             callback(Result.failure(exception))
         }
     }
+    /**
+     * Verifica se há ao menos um produto ou sugestão de produto associado ao ID de categoria fornecido.
+     *
+     * A função consulta duas coleções no Firestore (`productCollection` e `suggestionProductCollection`),
+     * retornando `true` na primeira correspondência encontrada. Caso contrário, retorna `false`.
+     *
+     * @param categoryId ID da categoria a ser verificada.
+     * @param callback Callback que retorna um [Result] com `true` se algum documento for encontrado,
+     *                 `false` se nenhum documento for encontrado, ou uma exceção em caso de erro.
+     */
+    fun hasAnyProductWithCategoryId(categoryId: String, callback: (result: Result<Boolean>) -> Unit) {
 
-    fun getProductByName(name: String, listId: Long, callback: (Result<Product?>) -> Unit) {
+        // Função auxiliar para verificar a coleção de sugestões de produtos
+        fun checkSuggestions() {
+            Firestore.suggestionProductCollection
+                .whereEqualTo("categoryId", categoryId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener { documentSnapshot ->
+                    callback(Result.success(!documentSnapshot.isEmpty))
+                }
+                .addOnFailureListener { exception ->
+                    callback(Result.failure(exception))
+                }
+        }
+
+        // Verifica a coleção de produtos
+        Firestore.productCollection
+            .whereEqualTo("categoryId", categoryId)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (!documentSnapshot.isEmpty) {
+                    callback(Result.success(true))
+                } else {
+                    checkSuggestions() // Caso não encontre, verifica na coleção de sugestões
+                }
+            }
+            .addOnFailureListener { exception ->
+                callback(Result.failure(exception))
+            }
+    }
+
+
+    fun getProductByName(name: String, listId: String, callback: (Result<Product?>) -> Unit) {
         Firestore.productCollection.whereEqualTo("name", name).whereEqualTo("shopListId", listId).limit(1).get()
             .addOnSuccessListener { snapshot ->
 

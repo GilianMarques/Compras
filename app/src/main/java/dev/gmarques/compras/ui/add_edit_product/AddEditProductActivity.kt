@@ -1,8 +1,11 @@
-package dev.gmarques.compras.ui.add_product
+package dev.gmarques.compras.ui.add_edit_product
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
+import android.text.Spanned
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -13,10 +16,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.data.model.Product
-import dev.gmarques.compras.databinding.ActivityAddProductBinding
+import dev.gmarques.compras.data.model.Category
+import dev.gmarques.compras.data.model.Product
+import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
 import dev.gmarques.compras.ui.Vibrator
+import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
 import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
+import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
@@ -31,20 +37,21 @@ import kotlinx.coroutines.withContext
  */
 class AddEditProductActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAddProductBinding
-    private lateinit var viewModel: AddProductActivityViewModel
+    private var categoryDialog: BsdSelectCategory? = null
+    private lateinit var binding: ActivityAddEditProductBinding
+    private lateinit var viewModel: AddEditProductActivityViewModel
 
     companion object {
         private const val LIST_ID = "list_id"
         private const val PRODUCT_ID = "poduct_id"
 
-        fun newIntentAddProduct(context: Context, listId: Long): Intent {
+        fun newIntentAddProduct(context: Context, listId: String): Intent {
             return Intent(context, AddEditProductActivity::class.java).apply {
                 putExtra(LIST_ID, listId)
             }
         }
 
-        fun newIntentEditProduct(context: Context, listId: Long, productId: Long): Intent {
+        fun newIntentEditProduct(context: Context, listId: String, productId: String): Intent {
             return Intent(context, AddEditProductActivity::class.java).apply {
                 putExtra(LIST_ID, listId)
                 putExtra(PRODUCT_ID, productId)
@@ -55,12 +62,12 @@ class AddEditProductActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityAddProductBinding.inflate(layoutInflater)
+        binding = ActivityAddEditProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[AddProductActivityViewModel::class.java]
-        viewModel.listId = intent.getLongExtra(LIST_ID, -1)
-        viewModel.productId = intent.getLongExtra(PRODUCT_ID, -1)
+        viewModel = ViewModelProvider(this)[AddEditProductActivityViewModel::class.java]
+        viewModel.listId = intent.getStringExtra(LIST_ID)!!
+        viewModel.productId = intent.getStringExtra(PRODUCT_ID)
 
 
         setupToolbar()
@@ -69,6 +76,7 @@ class AddEditProductActivity : AppCompatActivity() {
         setupInputInfo()
         setupInputPrice()
         setupInputQuantity()
+        setupInputCategory()
         observeProduct()
         observeViewmodelErrorMessages()
         observeViewmodelFinishEvent()
@@ -88,6 +96,8 @@ class AddEditProductActivity : AppCompatActivity() {
         viewModel.errorEventFlow.collect { event ->
             Snackbar.make(binding.root, event, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
+            categoryDialog?.dismissBottomSheetDialog()
+
         }
     }
 
@@ -102,13 +112,23 @@ class AddEditProductActivity : AppCompatActivity() {
         viewModel.editingProductLD.observe(this@AddEditProductActivity) {
 
             it?.let {
-                viewModel.editingProduct = true
-                updateViewModelAndUiWithEditableProduct(it)
+                viewModel.loadCategory(it.categoryId)
+                observeCategory(it)
             }
         }
     }
 
-    private fun updateViewModelAndUiWithEditableProduct(product: Product) = binding.apply {
+    private fun observeCategory(product: Product) = lifecycleScope.launch {
+        viewModel.editingCategoryLD.observe(this@AddEditProductActivity) {
+
+            it?.let {
+                viewModel.editingProduct = true
+                updateViewModelAndUiWithEditableProduct(product, it)
+            }
+        }
+    }
+
+    private fun updateViewModelAndUiWithEditableProduct(product: Product, category: Category) = binding.apply {
         viewModel.apply {
             cbSuggestProduct.visibility = GONE
 
@@ -123,6 +143,11 @@ class AddEditProductActivity : AppCompatActivity() {
 
             edtQuantity.setText(String.format(getString(R.string.un), product.quantity))
             validatedQuantity = product.quantity
+
+            edtCategory.hint = category.name
+            (edtCategory.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(category.color)
+
+            validatedCategory = category
 
             toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), product.name)
             fabSave.text = getString(R.string.Salvar_produto)
@@ -141,6 +166,7 @@ class AddEditProductActivity : AppCompatActivity() {
                 if (validatedName.isEmpty()) edtName.requestFocus()
                 else if (validatedPrice <= 0) edtPrice.requestFocus()
                 else if (validatedQuantity <= 0) edtQuantity.requestFocus()
+                else if (validatedCategory == null) edtCategory.requestFocus()
                 else tryAndSaveProduct(cbSuggestProduct.isChecked)
                 root.clearFocus()
 
@@ -240,6 +266,45 @@ class AddEditProductActivity : AppCompatActivity() {
 
     }
 
+    private fun setupInputCategory() {
+
+        val edtTarget = binding.edtCategory
+        val tvTarget = binding.tvCaregoryError
+
+        edtTarget.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                resetFocus(edtTarget, tvTarget)
+                showCategoryDialog()
+            } else {
+
+                if (viewModel.validatedCategory != null) {
+                    edtTarget.hint = viewModel.validatedCategory!!.name
+                    (edtTarget.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(viewModel.validatedCategory!!.color)
+                } else {
+                    showError(edtTarget, tvTarget, getString(R.string.Selecione_uma_categoria))
+                }
+            }
+        }
+
+    }
+
+    private fun showCategoryDialog() {
+        categoryDialog = BsdSelectCategory.Builder(this).setOnConfirmListener { category ->
+            viewModel.validatedCategory = category
+            binding.edtCategory.clearFocus()
+        }.setOnEditListener { category ->
+            startActivityEditCategory(category)
+        }.setOnRemoveListener { category ->
+            confirmRemove(category)
+        }.setOnAddListener {
+            startActivityAddCategory()
+        }.setOnDismissListener {
+            categoryDialog = null
+            binding.edtCategory.clearFocus()
+        }.build()
+        categoryDialog!!.show()
+    }
+
     private fun resetFocus(edtTarget: AppCompatEditText, tvTarget: TextView) {
         edtTarget.setBackgroundResource(R.drawable.back_addproduct_edittext)
         tvTarget.visibility = GONE
@@ -261,4 +326,32 @@ class AddEditProductActivity : AppCompatActivity() {
         ivMenu.visibility = GONE
     }
 
+    private fun startActivityAddCategory() {
+
+        Vibrator.interaction()
+        val intent = AddEditCategoryActivity.newIntentAddCategory(this@AddEditProductActivity)
+        startActivity(intent)
+    }
+
+    private fun startActivityEditCategory(category: Category) {
+
+        Vibrator.interaction()
+        val intent = AddEditCategoryActivity.newIntentEditCategory(this@AddEditProductActivity, category.id)
+        startActivity(intent)
+    }
+
+    private fun confirmRemove(category: Category) {
+        val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x), category.name).formatHtml()
+
+        val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
+            .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
+                viewModel.removeCategory(category)
+                dialog.dismiss()
+            }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
+    }
 }

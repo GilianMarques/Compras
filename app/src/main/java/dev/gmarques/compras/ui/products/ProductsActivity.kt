@@ -18,11 +18,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.data.model.Product
-import dev.gmarques.compras.data.data.model.ShopList
+import dev.gmarques.compras.data.PreferencesHelper
+import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
+import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
+import dev.gmarques.compras.data.model.Product
+import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.ActivityProductsBinding
+import dev.gmarques.compras.domain.SortCriteria
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.add_product.AddEditProductActivity
+import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.main.BsdAddOrEditShopList
 import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
@@ -39,11 +43,15 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     private lateinit var rvAdapter: ProductAdapter
     private var fabHidden: Boolean = false
 
+    private var sortCriteria: SortCriteria = PrefsDefaultValue.SORT_CRITERIA
+    private var sortAscending = PrefsDefaultValue.SORT_ASCENDING
+    private var boughtProductsAtEnd = PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END
+
     companion object {
         private const val LIST_ID = "list_id"
 
 
-        fun newIntent(context: Context, list: Long): Intent {
+        fun newIntent(context: Context, list: String): Intent {
             return Intent(context, ProductsActivity::class.java).apply {
                 putExtra(LIST_ID, list)
             }
@@ -53,7 +61,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val shoplistId = intent.getLongExtra(LIST_ID, -1)
+        val shoplistId = intent.getStringExtra(LIST_ID)!!
 
         binding = ActivityProductsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -62,6 +70,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         viewModel.loadList(shoplistId)
 
         initToolbar()
+        loadPreferences()
         initRecyclerView()
         initSearch()
         initFabAddProduct()
@@ -84,8 +93,15 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                        ProductRepository.addOrUpdateProduct(x)
                }
            }*/
+        startActivityAddProduct() // TODO: remover
 
+    }
 
+    private fun loadPreferences() {
+        val prefs = PreferencesHelper()
+        sortCriteria = SortCriteria.fromValue(prefs.getValue(PrefsKeys.SORT_CRITERIA, PrefsDefaultValue.SORT_CRITERIA.value))!!
+        sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
+        boughtProductsAtEnd = prefs.getValue(PrefsKeys.BOUGHT_PRODUCTS_AT_END, PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END)
     }
 
     private fun observePrices() = viewModel.pricesLD.observe(this) {
@@ -160,7 +176,18 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     private fun observeProductsUpdates() {
         viewModel.productsLD.observe(this) { newData ->
-            val sorted = newData.sortedBy { it.position }
+
+            var sorted = newData
+                .sortedWith(compareBy({ if (boughtProductsAtEnd) it.hasBeenBought else false }, // Produtos comprados no final
+                    { if (sortCriteria == SortCriteria.NAME) it.name else null }, // Ordenar por nome
+                    { if (sortCriteria == SortCriteria.CATEGORY) it.name else null }, // Ordenar por categoria (TODO atualizar após implementar categorias)
+                    { if (sortCriteria == SortCriteria.CREATION_DATE) it.creationDate else null } // Ordenar por data de criação
+                )).let {
+                    if (!sortAscending) it.reversed() else it
+                }
+            sorted = sorted
+                .sortedWith(compareBy { if (boughtProductsAtEnd) it.hasBeenBought else false })
+
             rvAdapter.submitList(sorted)
 
             if (binding.edtSearch.text.toString().isNotEmpty()) {
@@ -234,8 +261,17 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                 showRenameDialog(renameList)
             }, { removeList ->
                 confirmRemove(removeList)
+            }, {
+                showOrderProductsDialog()
             }).show()
         }
+    }
+
+    private fun showOrderProductsDialog() {
+        BsdOrderProducts(this) {
+            loadPreferences()
+            viewModel.repostProductData()
+        }.show()
     }
 
     private fun showRenameDialog(renameList: ShopList) {
@@ -277,8 +313,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     override fun rvProductsOnEditItemClick(product: Product) {
 
         BsdEditProductPriceOrQuantity.Builder().setActivity(this@ProductsActivity).setActivity(this@ProductsActivity)
-            .setProduct(product)
-            .setEditListener {
+            .setProduct(product).setEditListener {
                 startActivityEditProduct(it)
 
             }.setRemoveListener {

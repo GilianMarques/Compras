@@ -9,14 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.data.model.ShopList
-import dev.gmarques.compras.data.data.repository.UserRepository
+import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityMainBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
-import dev.gmarques.compras.utils.App
 import java.util.Calendar
 
 

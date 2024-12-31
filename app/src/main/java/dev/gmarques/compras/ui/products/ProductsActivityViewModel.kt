@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import dev.gmarques.compras.data.data.ListenerRegister
-import dev.gmarques.compras.data.data.model.Product
-import dev.gmarques.compras.data.data.model.ShopList
-import dev.gmarques.compras.data.data.repository.ProductRepository
-import dev.gmarques.compras.data.data.repository.ShopListRepository
+import dev.gmarques.compras.data.model.Product
+import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.data.repository.ShopListRepository
+import dev.gmarques.compras.utils.ListenerRegister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
@@ -128,7 +128,10 @@ class ProductsActivityViewModel : ViewModel() {
         ShopListRepository.removeShopList(shopList)
     }
 
-    fun loadList(shoplistId: Long) {
+    /**
+     * Carrega a lista de compras, apenas a lista e seus atributos, nao inclui os produtos
+     */
+    fun loadList(shoplistId: String) {
         shopListDatabaseListener = ShopListRepository.observeList(shoplistId) { shopList, error ->
             if (error == null) shopList.let {
                 _shopListLD.postValue(shopList!!)
@@ -138,6 +141,14 @@ class ProductsActivityViewModel : ViewModel() {
 
     fun removeProduct(product: Product) {
         ProductRepository.removeProduct(product)
+    }
+
+    /**
+     * Força os dados a serem atualizados na UI sem recarrega-los do banco de dados
+     * Isso é util pra quando o ususario troca a forma que o app deve ordenar os itens
+     */
+    fun repostProductData() {
+        postDataWithThrottling(_productsLD.value!!, _pricesLD.value!!)
     }
 
 

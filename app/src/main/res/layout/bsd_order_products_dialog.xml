@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="false"
+        android:paddingTop="8dp">
+
+        <ImageView
+            android:id="@+id/iv_list_icon"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/back_list_icon"
+            android:importantForAccessibility="no"
+            android:padding="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_title"
+            app:layout_constraintEnd_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toTopOf="@id/tv_title"
+            app:srcCompat="@drawable/vec_sort"
+            app:tint="?colorPrimary" />
+
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="42dp"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="@font/lexend_deca_bold"
+            android:padding="16dp"
+            android:text="@string/Ordenar_produtos"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@id/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="16dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintBottom_toTopOf="@id/ll_options" />
+
+        <RadioGroup
+            android:id="@+id/ll_options"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rb_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/back_textview_menu"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/Nome"
+                android:textColor="?attr/colorPrimaryVariant"
+                app:drawableStartCompat="@drawable/vec_order_name"
+                app:drawableTint="?attr/colorPrimaryVariant" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rb_creation_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/back_textview_menu"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/Data_de_criacao"
+                android:textColor="?attr/colorPrimaryVariant"
+                app:drawableStartCompat="@drawable/vec_order_date"
+                app:drawableTint="?attr/colorPrimaryVariant" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rb_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/back_textview_menu"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/Categoria"
+                android:textColor="?attr/colorPrimaryVariant"
+                app:drawableStartCompat="@drawable/vec_category"
+                app:drawableTint="?attr/colorPrimaryVariant" />
+
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintBottom_toTopOf="@id/ll_options" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sw_ascending_order"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/back_textview_menu"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/produtos_em_ordem_crescente"
+                android:textColor="?attr/colorPrimaryVariant"
+                app:drawableStartCompat="@drawable/vec_order_settings"
+                app:drawableTint="?attr/colorPrimaryVariant" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sw_bought_at_end"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/back_textview_menu"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/Produtos_comprados_no_fim_da_lista"
+                android:textColor="?attr/colorPrimaryVariant"
+                app:drawableStartCompat="@drawable/vec_order_settings"
+                app:drawableTint="?attr/colorPrimaryVariant" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fab_confirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="48dp"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:text="@string/Fechar"
+                android:textColor="?colorOnPrimary"
+                app:icon="@drawable/vec_check"
+                app:iconTint="?attr/colorOnPrimary" />
+
+
+        </RadioGroup>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

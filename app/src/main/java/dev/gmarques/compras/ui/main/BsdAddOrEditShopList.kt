@@ -5,11 +5,9 @@ import android.graphics.Color
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.data.model.ShopList
-import dev.gmarques.compras.data.data.repository.ShopListRepository
+import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.BsdAddShoplistDialogBinding
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.utils.RequestResult
 
 class BsdAddOrEditShopList(
     targetActivity: Activity,
@@ -47,16 +45,16 @@ class BsdAddOrEditShopList(
 
     private fun validateUserInput(name: String) {
 
-        val result = ShopListRepository.validateName(name)
+        val result = ShopList.Validator.validateName(name)
 
-        if (result is RequestResult.Success) {
+        if (result.isSuccess) {
 
             if (editShopList != null) updateListAndClose(name)
             else createListAndClose(name)
             Vibrator.success()
 
-        } else if (result is RequestResult.Error) {
-            Snackbar.make(binding.root, result.exception.message!!, Snackbar.LENGTH_LONG).show()
+        } else if (result.isFailure) {
+            Snackbar.make(binding.root, result.exceptionOrNull()?.message!!, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
         }
     }
@@ -89,7 +87,7 @@ class BsdAddOrEditShopList(
         dialog.show()
         binding.edtInput.requestFocus()
 
-        // Acesse o comportamento do BottomSheet e defina o estado para expandido
+        
         // val behavior = BottomSheetBehavior.from(binding.root.parent as View)
         // behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }

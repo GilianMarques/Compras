@@ -6,7 +6,7 @@ import android.os.CombinedVibration
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import dev.gmarques.compras.utils.App
+import dev.gmarques.compras.App
 
 /**
  * Classe responsável por fornecer feedback de interface, como vibração.

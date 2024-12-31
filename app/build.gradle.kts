@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.dropdown)
     implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.flexbox)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

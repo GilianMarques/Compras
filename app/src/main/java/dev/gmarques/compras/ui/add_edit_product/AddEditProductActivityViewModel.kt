@@ -1,20 +1,22 @@
-package dev.gmarques.compras.ui.add_product
+package dev.gmarques.compras.ui.add_edit_product
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.data.model.Product
-import dev.gmarques.compras.data.data.repository.ProductRepository
-import dev.gmarques.compras.utils.App
+import dev.gmarques.compras.data.model.Category
+import dev.gmarques.compras.data.model.Product
+import dev.gmarques.compras.data.repository.CategoryRepository
+import dev.gmarques.compras.data.repository.ProductRepository
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 
 
-class AddProductActivityViewModel : ViewModel() {
+class AddEditProductActivityViewModel : ViewModel() {
 
     fun tryAndSaveProduct(saveAsSuggestion: Boolean) {
 
@@ -31,8 +33,7 @@ class AddProductActivityViewModel : ViewModel() {
                     }
                 } else {
                     val msg = String.format(
-                        App.getContext().getString(R.string.Nao_foi_possivel_verificar_se_x_ja_existe_na_lista),
-                        validatedName
+                        App.getContext().getString(R.string.Nao_foi_possivel_verificar_se_x_ja_existe_na_lista), validatedName
                     )
                     _errorEventFlow.tryEmit(msg)
                 }
@@ -49,11 +50,10 @@ class AddProductActivityViewModel : ViewModel() {
             name = validatedName,
             price = validatedPrice,
             quantity = validatedQuantity,
-            info = validatedInfo
+            info = validatedInfo,
+            categoryId = validatedCategory!!.id
         )
-        else Product(
-            listId, validatedName, 0, validatedPrice, validatedQuantity, validatedInfo
-        )
+        else Product(listId, validatedCategory!!.id, validatedName, 0, validatedPrice, validatedQuantity, validatedInfo)
 
         ProductRepository.addOrUpdateProduct(newProduct)
 
@@ -65,29 +65,48 @@ class AddProductActivityViewModel : ViewModel() {
     }
 
     suspend fun loadProduct() = withContext(IO) {
-        if (productId != -1L) ProductRepository.getProduct(productId) { result ->
+        productId?.let {
+            ProductRepository.getProduct(productId!!) { result ->
 
-            if (result.isSuccess) _editingProductLD.postValue(result.getOrThrow())
+                if (result.isSuccess) _editingProductLD.postValue(result.getOrThrow())
+                else Log.d(
+                    "USUK", "AddProductActivityViewModel.loadProduct: erro obtendo produto do firebase${result.exceptionOrNull()}"
+                )
+            }
+        }
+    }
+
+    fun loadCategory(categoryId: String) {
+        CategoryRepository.getCategory(categoryId) { result ->
+
+            if (result.isSuccess) _editingCategoryLD.postValue(result.getOrThrow())
             else Log.d(
-                "USUK",
-                "AddProductActivityViewModel.loadProduct: erro obtendo produto do firebase${result.exceptionOrNull()}"
+                "USUK", "AddProductActivityViewModel.loadCategory: erro obtendo categoria do firebase${result.exceptionOrNull()}"
             )
+        }
+    }
 
+    fun removeCategory(category: Category) {
+        CategoryRepository.tryAndRemoveCategory(category) { result ->
+            if (result.isFailure) _errorEventFlow.tryEmit(result.exceptionOrNull()!!.message!!)
         }
     }
 
     var editingProduct: Boolean = false
-    var productId: Long = -1L
-    var listId: Long = -1L
+    var productId: String? = null
+    var listId: String = "-1"
     var validatedName: String = ""
     var validatedInfo: String = ""
     var validatedPrice: Double = -1.0
     var validatedQuantity: Int = -1
-    var validatedCategory: String = ""
+    var validatedCategory: Category? = null
 
 
     private val _editingProductLD = MutableLiveData<Product>()
     val editingProductLD: LiveData<Product> get() = _editingProductLD
+
+    private val _editingCategoryLD = MutableLiveData<Category>()
+    val editingCategoryLD: LiveData<Category> get() = _editingCategoryLD
 
     private val _errorEventFlow = MutableSharedFlow<String>(replay = 1)
     val errorEventFlow = _errorEventFlow.asSharedFlow()

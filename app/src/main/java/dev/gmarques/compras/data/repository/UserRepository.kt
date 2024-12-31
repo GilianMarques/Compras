@@ -1,4 +1,4 @@
-package dev.gmarques.compras.data.data.repository
+package dev.gmarques.compras.data.repository
 
 import android.content.Context
 import com.google.android.gms.auth.api.signin.GoogleSignIn

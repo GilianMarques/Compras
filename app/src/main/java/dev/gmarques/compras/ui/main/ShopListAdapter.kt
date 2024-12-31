@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.data.model.ShopList
+import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.RvItemShopListBinding
 import dev.gmarques.compras.utils.ExtFun.Companion.adjustSaturation
 
@@ -35,7 +35,7 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
         fun bind(shopList: ShopList) = binding.apply {
             // TODO: remover quando terminar tela de produtos
             if (!x) {
-                //   onItemClick(shopList)
+                onItemClick(shopList)
                 x = true
             }
             itemView.alpha = 0f // Inicia a view invisível
@@ -49,11 +49,12 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
                 if (this is GradientDrawable) setColor(saturatedColor)
             }
 
-            if (!darkModeEnable) {
-                val drawable = cvChild.background as? GradientDrawable
-                drawable?.setColor(shopList.color)
-                drawable?.setStroke(0, Color.TRANSPARENT)
+            if (!darkModeEnable) (cvChild.background as? GradientDrawable)!!.apply {
+                mutate()
+                setColor(shopList.color)
+                setStroke(0, Color.TRANSPARENT)
             }
+
 
             // Anima a entrada da view
             itemView.animate()

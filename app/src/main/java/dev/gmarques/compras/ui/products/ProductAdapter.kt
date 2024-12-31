@@ -7,10 +7,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.data.model.Product
+import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.RvItemProductBinding
-import dev.gmarques.compras.utils.App
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 
 class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapter.ListViewHolder>(ProductDiffCallback()) {
@@ -44,7 +44,7 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
                 tvProductPrice.text = (product.price * product.quantity).toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
                 cbBought.isChecked = product.hasBeenBought
-
+                // TODO:  (ivHandle.drawable as GradientDrawable).setColor()
 
             }
 
@@ -87,11 +87,7 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
 
         override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
             // deve comparar toda a informação que é exibida na view pro usuario
-            return oldItem.name == newItem.name &&
-                    oldItem.info == newItem.info &&
-                    oldItem.price == newItem.price &&
-                    oldItem.quantity == newItem.quantity &&
-                    oldItem.hasBeenBought == newItem.hasBeenBought
+            return oldItem == newItem
         }
     }
 

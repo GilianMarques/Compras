@@ -1,4 +1,4 @@
-package dev.gmarques.compras.utils
+package dev.gmarques.compras
 
 import android.app.Application
 import android.content.Context

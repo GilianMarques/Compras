@@ -6,14 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.add_product.AddEditProductActivity">
+    tools:context=".ui.add_edit_category.AddEditCategoryActivity">
 
     <LinearLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.add_product.AddProduct">
+        tools:context=".ui.add_edit_product.AddProduct">
 
         <include
             android:id="@+id/toolbar"
@@ -166,16 +166,17 @@
                     tools:visibility="visible" />
 
                 <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/edt_caregory"
+                    android:id="@+id/edt_category"
                     style="@style/Margins_edittext"
                     android:layout_width="match_parent"
+                    android:textColorHint="?attr/editTextColor"
                     android:layout_height="wrap_content"
                     android:background="@drawable/back_addproduct_edittext"
                     android:drawableStart="@drawable/vec_category"
                     android:hint="@string/Categoria"
                     android:importantForAutofill="no"
                     android:inputType="textCapSentences"
-                    android:maxLength="25"
+                    android:maxLength="0"
                     tools:text="algum  texto  algum  texto  algum  texto  " />
 
                 <TextView
