@@ -57,7 +57,7 @@ class ProductsActivityViewModel : ViewModel() {
         _shopListLD.value = ShopList(shoplistId)
 
         viewModelScope.launch(IO) {
-            loadPreferences()
+            loadSortPreferences()
             loadList(shoplistId)
 
         }
@@ -233,7 +233,7 @@ class ProductsActivityViewModel : ViewModel() {
         ProductRepository.removeProduct(product)
     }
 
-    fun loadPreferences() {
+    fun loadSortPreferences() {
         val prefs = PreferencesHelper()
         sortCriteria = SortCriteria.fromValue(prefs.getValue(PrefsKeys.SORT_CRITERIA, PrefsDefaultValue.SORT_CRITERIA.value))!!
         sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)

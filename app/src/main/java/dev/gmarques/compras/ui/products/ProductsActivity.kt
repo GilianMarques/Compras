@@ -243,7 +243,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     private fun showSortProductsDialog() {
         BsdSortProducts(this) {
-            viewModel.loadPreferences()
+            viewModel.loadSortPreferences()
             viewModel.searchProduct("")//força os dados a serem recarregados, filtrados e ordenados
         }.show()
     }
@@ -300,7 +300,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
             }
             .setConfirmListener {
                 viewModel.updateProductAsIs(it)
-
             }
             .build().show()
     }
