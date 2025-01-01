@@ -38,9 +38,10 @@ object ProductRepository {
      * Essa função nao faz atualizaçoes apenas inserçoes.
      */
     fun addProductAsSuggestion(product: Product) {
+        val validatedSuggestionProductWithNewId = product.withNewId().selfValidate()
         Firestore.suggestionProductCollection
-            .document(product.id)
-            .set(product.withNewId().selfValidate())
+            .document(validatedSuggestionProductWithNewId.id)
+            .set(validatedSuggestionProductWithNewId)
     }
 
     /**
@@ -94,6 +95,7 @@ object ProductRepository {
             callback(Result.failure(exception))
         }
     }
+
     /**
      * Verifica se há ao menos um produto ou sugestão de produto associado ao ID de categoria fornecido.
      *

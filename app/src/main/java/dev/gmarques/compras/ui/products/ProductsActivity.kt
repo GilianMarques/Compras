@@ -312,17 +312,23 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     override fun rvProductsOnEditItemClick(product: Product) {
 
-        BsdEditProductPriceOrQuantity.Builder().setActivity(this@ProductsActivity).setActivity(this@ProductsActivity)
-            .setProduct(product).setEditListener {
+        BsdEditProductPriceOrQuantity
+            .Builder()
+            .setActivity(this@ProductsActivity)
+            .setProduct(product)
+            .setEditListener {
                 startActivityEditProduct(it)
 
-            }.setRemoveListener {
+            }
+            .setRemoveListener {
                 confirmRemove(it)
 
-            }.setConfirmListener {
+            }
+            .setConfirmListener {
                 viewModel.updateProductAsIs(it)
 
-            }.build().show()
+            }
+            .build().show()
     }
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {

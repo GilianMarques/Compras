@@ -48,7 +48,7 @@ class ProductsActivityViewModel : ViewModel() {
     }
 
     fun observeProducts() {
-        if (_shopListLD.value == null) throw NullPointerException("Carrege a lista primeiro, só entao chame a função para carregar os produtos")
+        if (_shopListLD.value == null) throw NullPointerException("Carregue a lista primeiro, só entao chame a função para carregar os produtos")
         if (productsDatabaseListener != null) return
         observeUpdates()
     }
@@ -83,8 +83,6 @@ class ProductsActivityViewModel : ViewModel() {
      */
     private fun postDataWithThrottling(products: List<Product>, prices: Pair<Double, Double>) {
 
-        Log.d("USUK", "ProductsActivityViewModel.postDataWithThrottling: called ")
-
         productsToBePosted = products
         pricesToBePosted = prices
 
@@ -94,7 +92,6 @@ class ProductsActivityViewModel : ViewModel() {
         scope = CoroutineScope(IO)
         scope!!.launch {
             delay(delayMillis)
-            Log.d("USUK", "ProductsActivityViewModel.postDataWithThrottling: posting data ")
             _productsLD.postValue(productsToBePosted)
             _pricesLD.postValue(pricesToBePosted)
             productsToBePosted = emptyList()
@@ -103,21 +100,31 @@ class ProductsActivityViewModel : ViewModel() {
 
     }
 
+    /**
+     * Atualiza o produto no banco de dados e sua sugestao de produto relativa, caso exista
+     */
     fun updateProductAsIs(updatedProduct: Product) {
         ProductRepository.addOrUpdateProduct(updatedProduct)
+        ProductRepository.updateSuggestionProduct(updatedProduct, updatedProduct)
     }
 
+    /**
+     * Atualiza o produto com o valor recebido. Nao atualiza a sugestao de produto relativa, caso exista
+     */
     fun updateProductBoughtState(product: Product, isBought: Boolean) {
         val newProduct = product.copy(hasBeenBought = isBought)
         ProductRepository.addOrUpdateProduct(newProduct)
     }
 
+    /**
+     * Funciona definindo o termo de busca numa variável global, removendo e nulificando o listener que observa o banco de dados,
+     * no fim redefinindo o listening para disparar uma atualização com os dados para então serem filtrados pelo viewmodel antes
+     * de irem para a ui*/
     fun searchProduct(searchTerm: String) {
         this.searchTerm = searchTerm
         productsDatabaseListener?.remove()
         productsDatabaseListener = null
         observeProducts()
-
     }
 
     fun addOrUpdateShopList(shopList: ShopList) {
