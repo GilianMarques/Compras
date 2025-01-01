@@ -36,6 +36,8 @@ data class ShopList(
     @Suppress("unused") // necessario pra uso com firebase
     constructor() : this("not_initialized", 0)
 
+    constructor(id: String) : this("", 0, id)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

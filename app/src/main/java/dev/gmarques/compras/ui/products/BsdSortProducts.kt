@@ -9,15 +9,15 @@ import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys.Companion.BOUGHT_PRODUCTS_AT_END
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys.Companion.SORT_ASCENDING
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys.Companion.SORT_CRITERIA
-import dev.gmarques.compras.databinding.BsdOrderProductsDialogBinding
+import dev.gmarques.compras.databinding.BsdSortProductsDialogBinding
 import dev.gmarques.compras.domain.SortCriteria
 
-class BsdOrderProducts(
+class BsdSortProducts(
     targetActivity: Activity,
     private var onConfirmListener: (() -> Unit),
 ) {
 
-    private var binding = BsdOrderProductsDialogBinding.inflate(targetActivity.layoutInflater)
+    private var binding = BsdSortProductsDialogBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
 
     private var sortCriteria: SortCriteria = PrefsDefaultValue.SORT_CRITERIA

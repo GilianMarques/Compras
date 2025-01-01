@@ -1,11 +1,14 @@
 package dev.gmarques.compras.data.repository
 
+import android.util.Log
 import com.google.firebase.firestore.toObject
+import com.google.firebase.firestore.toObjects
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.utils.ListenerRegister
+import kotlinx.coroutines.tasks.await
 
 
 object CategoryRepository {
@@ -67,6 +70,25 @@ object CategoryRepository {
             callback(Result.success(targetCategory))
         }.addOnFailureListener { exception: java.lang.Exception ->
             callback(Result.failure(exception))
+        }
+    }
+
+    suspend fun getCategory(idCategory: String): Category? {
+        return try {
+            val documentSnapshot = Firestore.categoryCollection.document(idCategory).get().await()
+            documentSnapshot.toObject<Category>()
+        } catch (exception: Exception) {
+            Log.d("USUK", "CategoryRepository.getCategory: ${exception.message}")
+            null
+        }
+    }
+    suspend fun getCategories(): List<Category>? {
+        return try {
+            val documentSnapshot = Firestore.categoryCollection.get().await()
+            documentSnapshot.toObjects<Category>()
+        } catch (exception: Exception) {
+            Log.d("USUK", "CategoryRepository.getCategory: ${exception.message}")
+            null
         }
     }
 

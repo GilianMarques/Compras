@@ -99,6 +99,4 @@ class ExtFun {
             imm.hideSoftInputFromWindow(this.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         }
     }
-
-
 }

@@ -14,18 +14,21 @@ object ProductRepository {
      * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
      * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
      * */
-    fun observeProductUpdates(shopListId: String, onSnapshot: (List<Product>?, Exception?) -> Any): ListenerRegister {
+     fun observeProductUpdates(
+        shopListId: String,
+        onSnapshot: (List<Product>?, Exception?) -> Any,
+    ): ListenerRegister {
         return ListenerRegister(
-            // TODO: deve baixar os produtos com categorias pra exibir as cores na lista de produtos! 
-            Firestore.productCollection.whereEqualTo("shopListId", shopListId).addSnapshotListener { querySnapshot, fbException ->
+            Firestore.productCollection.whereEqualTo("shopListId", shopListId)
+                .addSnapshotListener { querySnapshot, fbException ->
 
-                if (fbException != null) onSnapshot(null, fbException)
-                else querySnapshot?.let {
-                    val products = arrayListOf<Product>()
-                    products.addAll(querySnapshot.map { it.toObject<Product>() })
-                    onSnapshot(products, null)
-                }
-            })
+                    if (fbException != null) onSnapshot(null, fbException)
+                    else querySnapshot?.let {
+                        val products = arrayListOf<Product>()
+                        products.addAll(querySnapshot.map { it.toObject<Product>() })
+                        onSnapshot(products, null)
+                    }
+                })
 
     }
 

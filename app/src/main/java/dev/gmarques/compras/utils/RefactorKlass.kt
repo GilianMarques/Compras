@@ -8,8 +8,3 @@ package dev.gmarques.compras.utils
  */
 class RefactorKlass
 
-
-
-
-
-

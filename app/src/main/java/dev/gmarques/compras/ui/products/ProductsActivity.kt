@@ -18,13 +18,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.PreferencesHelper
-import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
-import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.ActivityProductsBinding
-import dev.gmarques.compras.domain.SortCriteria
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.main.BsdAddOrEditShopList
@@ -43,9 +39,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     private lateinit var rvAdapter: ProductAdapter
     private var fabHidden: Boolean = false
 
-    private var sortCriteria: SortCriteria = PrefsDefaultValue.SORT_CRITERIA
-    private var sortAscending = PrefsDefaultValue.SORT_ASCENDING
-    private var boughtProductsAtEnd = PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END
 
     companion object {
         private const val LIST_ID = "list_id"
@@ -67,10 +60,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this)[ProductsActivityViewModel::class.java]
-        viewModel.loadList(shoplistId)
+        viewModel.init(shoplistId)
 
         initToolbar()
-        loadPreferences()
         initRecyclerView()
         initSearch()
         initFabAddProduct()
@@ -93,16 +85,10 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                        ProductRepository.addOrUpdateProduct(x)
                }
            }*/
-        startActivityAddProduct() // TODO: remover
+        // startActivityAddProduct() // TODO: remover
 
     }
 
-    private fun loadPreferences() {
-        val prefs = PreferencesHelper()
-        sortCriteria = SortCriteria.fromValue(prefs.getValue(PrefsKeys.SORT_CRITERIA, PrefsDefaultValue.SORT_CRITERIA.value))!!
-        sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
-        boughtProductsAtEnd = prefs.getValue(PrefsKeys.BOUGHT_PRODUCTS_AT_END, PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END)
-    }
 
     private fun observePrices() = viewModel.pricesLD.observe(this) {
         binding.apply {
@@ -136,9 +122,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         }
     }
 
+
     private fun observeShopList() = viewModel.shopListLD.observe(this) {
         binding.toolbar.tvActivityTitle.text = it.name
-        viewModel.observeProducts()
     }
 
     @Suppress("UNUSED_ANONYMOUS_PARAMETER")
@@ -176,22 +162,10 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     private fun observeProductsUpdates() {
         viewModel.productsLD.observe(this) { newData ->
-
-            var sorted = newData
-                .sortedWith(compareBy({ if (boughtProductsAtEnd) it.hasBeenBought else false }, // Produtos comprados no final
-                    { if (sortCriteria == SortCriteria.NAME) it.name else null }, // Ordenar por nome
-                    { if (sortCriteria == SortCriteria.CATEGORY) it.name else null }, // Ordenar por categoria (TODO atualizar após implementar categorias)
-                    { if (sortCriteria == SortCriteria.CREATION_DATE) it.creationDate else null } // Ordenar por data de criação
-                )).let {
-                    if (!sortAscending) it.reversed() else it
-                }
-            sorted = sorted
-                .sortedWith(compareBy { if (boughtProductsAtEnd) it.hasBeenBought else false })
-
-            rvAdapter.submitList(sorted)
+            rvAdapter.submitList(newData)
 
             if (binding.edtSearch.text.toString().isNotEmpty()) {
-                when (sorted.isEmpty()) {
+                when (newData.isEmpty()) {
                     true -> Vibrator.error()
                     false -> Vibrator.success()
                 }
@@ -262,15 +236,15 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
             }, { removeList ->
                 confirmRemove(removeList)
             }, {
-                showOrderProductsDialog()
+                showSortProductsDialog()
             }).show()
         }
     }
 
-    private fun showOrderProductsDialog() {
-        BsdOrderProducts(this) {
-            loadPreferences()
-            viewModel.repostProductData()
+    private fun showSortProductsDialog() {
+        BsdSortProducts(this) {
+            viewModel.loadPreferences()
+            viewModel.searchProduct("")//força os dados a serem recarregados, filtrados e ordenados
         }.show()
     }
 

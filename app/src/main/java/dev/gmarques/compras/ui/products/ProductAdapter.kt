@@ -1,6 +1,7 @@
 package dev.gmarques.compras.ui.products
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -11,9 +12,12 @@ import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.RvItemProductBinding
+import dev.gmarques.compras.domain.model.ProductWithCategory
+import dev.gmarques.compras.utils.ExtFun.Companion.adjustSaturation
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 
-class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapter.ListViewHolder>(ProductDiffCallback()) {
+class ProductAdapter(val callback: Callback) :
+    ListAdapter<ProductWithCategory, ProductAdapter.ListViewHolder>(ProductDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
 
@@ -33,10 +37,12 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
         val callback: Callback,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bindData(product: Product) {
+        fun bindData(productWithCategory: ProductWithCategory) {
+
             clearListener()
             animarView()
 
+            val product = productWithCategory.product
             binding.apply {
 
                 tvProductName.text = product.name
@@ -44,7 +50,7 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
                 tvProductPrice.text = (product.price * product.quantity).toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
                 cbBought.isChecked = product.hasBeenBought
-                // TODO:  (ivHandle.drawable as GradientDrawable).setColor()
+                (ivHandle.drawable as GradientDrawable).setColor(productWithCategory.category.color.adjustSaturation(2f))
 
             }
 
@@ -79,15 +85,15 @@ class ProductAdapter(val callback: Callback) : ListAdapter<Product, ProductAdapt
     /**
      * Compara as listas de dados pra atualizar o recyclerview
      * */
-    class ProductDiffCallback : DiffUtil.ItemCallback<Product>() {
+    class ProductDiffCallback : DiffUtil.ItemCallback<ProductWithCategory>() {
 
-        override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
-            return oldItem.id == newItem.id
+        override fun areItemsTheSame(oldItem: ProductWithCategory, newItem: ProductWithCategory): Boolean {
+            return oldItem.product.id == newItem.product.id
         }
 
-        override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
+        override fun areContentsTheSame(oldItem: ProductWithCategory, newItem: ProductWithCategory): Boolean {
             // deve comparar toda a informação que é exibida na view pro usuario
-            return oldItem == newItem
+            return oldItem.product == newItem.product
         }
     }
 
