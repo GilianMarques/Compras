@@ -36,7 +36,7 @@ class ProductsActivityViewModel : ViewModel() {
     private var shopListDatabaseListener: ListenerRegister? = null
     private var categoriesDatabaseListener: ListenerRegister? = null
 
-    private var scope: CoroutineScope? = null
+    private var throttlingScope: CoroutineScope? = null
 
     private val _productsLD = MutableLiveData<List<ProductWithCategory>>()
     val productsLD: LiveData<List<ProductWithCategory>> get() = _productsLD
@@ -84,7 +84,7 @@ class ProductsActivityViewModel : ViewModel() {
         productsDatabaseListener?.remove()
         shopListDatabaseListener?.remove()
         categoriesDatabaseListener?.remove()
-        scope?.cancel()
+        throttlingScope?.cancel()
 
         super.onCleared()
     }
@@ -166,9 +166,9 @@ class ProductsActivityViewModel : ViewModel() {
 
 
         var delayMillis = 0L
-        scope?.apply { delayMillis = 250; cancel() }
-        scope = CoroutineScope(IO)
-        scope!!.launch {
+        throttlingScope?.apply { delayMillis = 250; cancel() }
+        throttlingScope = CoroutineScope(IO)
+        throttlingScope!!.launch {
             delay(delayMillis)
             _productsLD.postValue(productsToBePosted)
             _pricesLD.postValue(pricesToBePosted)

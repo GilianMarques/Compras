@@ -1,10 +1,12 @@
 package dev.gmarques.compras.data.repository
 
 import android.util.Log
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.utils.ListenerRegister
+import kotlinx.coroutines.tasks.await
 
 // TODO: todas as funçoes de repositio devem ser suspensas com coroutines
 object ProductRepository {
@@ -14,7 +16,7 @@ object ProductRepository {
      * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
      * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
      * */
-     fun observeProductUpdates(
+    fun observeProductUpdates(
         shopListId: String,
         onSnapshot: (List<Product>?, Exception?) -> Any,
     ): ListenerRegister {
@@ -29,6 +31,32 @@ object ProductRepository {
                         onSnapshot(products, null)
                     }
                 })
+
+    }
+
+
+    suspend fun getProducts(shopListId: String): List<String> {
+        val querySnapshot: QuerySnapshot = Firestore.productCollection.whereEqualTo("shopListId", shopListId).get().await()
+        return querySnapshot.map { it.toObject<Product>().name }
+    }
+
+    /**
+     * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
+     * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
+     * */
+    fun observeSuggestionProductUpdates(
+        onSnapshot: (List<Product>?, Exception?) -> Any,
+    ): ListenerRegister {
+        return ListenerRegister(
+            Firestore.suggestionProductCollection.addSnapshotListener { querySnapshot, fbException ->
+
+                if (fbException != null) onSnapshot(null, fbException)
+                else querySnapshot?.let {
+                    val products = arrayListOf<Product>()
+                    products.addAll(querySnapshot.map { it.toObject<Product>() })
+                    onSnapshot(products, null)
+                }
+            })
 
     }
 
@@ -141,7 +169,6 @@ object ProductRepository {
                 callback(Result.failure(exception))
             }
     }
-
 
     fun getProductByName(name: String, listId: String, callback: (Result<Product?>) -> Unit) {
         Firestore.productCollection.whereEqualTo("name", name).whereEqualTo("shopListId", listId).limit(1).get()

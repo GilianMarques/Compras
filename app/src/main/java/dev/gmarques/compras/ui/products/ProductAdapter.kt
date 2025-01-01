@@ -13,26 +13,27 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.RvItemProductBinding
 import dev.gmarques.compras.domain.model.ProductWithCategory
+import dev.gmarques.compras.ui.products.ProductAdapter.ProductViewHolder
 import dev.gmarques.compras.utils.ExtFun.Companion.adjustSaturation
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 
 class ProductAdapter(val callback: Callback) :
-    ListAdapter<ProductWithCategory, ProductAdapter.ListViewHolder>(ProductDiffCallback()) {
+    ListAdapter<ProductWithCategory, ProductViewHolder>(ProductDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
 
         val binding = DataBindingUtil.inflate<RvItemProductBinding>(
             LayoutInflater.from(parent.context), R.layout.rv_item_product, parent, false
         )
 
-        return ListViewHolder(binding, callback)
+        return ProductViewHolder(binding, callback)
     }
 
-    override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         holder.bindData(getItem(position))
     }
 
-    class ListViewHolder(
+    class ProductViewHolder(
         private val binding: RvItemProductBinding,
         val callback: Callback,
     ) : RecyclerView.ViewHolder(binding.root) {

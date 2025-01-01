@@ -20,7 +20,7 @@
             app:layout_constraintBottom_toBottomOf="@id/tv_title"
             app:layout_constraintEnd_toStartOf="@id/tv_title"
             app:layout_constraintTop_toTopOf="@id/tv_title"
-            app:srcCompat="@drawable/vec_grocery"
+            app:srcCompat="@drawable/vec_product"
             app:tint="?colorPrimary" />
 
 
@@ -155,7 +155,7 @@
                 android:textColor="?attr/colorPrimaryVariant"
                 app:drawableStartCompat="@drawable/vec_remove"
                 app:drawableTint="?attr/colorPrimaryVariant"
-                app:layout_constraintBottom_toTopOf="@id/tv_order_items"
+                app:layout_constraintBottom_toTopOf="@id/tv_sort_products"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 

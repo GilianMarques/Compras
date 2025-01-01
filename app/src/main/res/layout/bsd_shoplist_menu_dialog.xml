@@ -59,7 +59,7 @@
 
 
             <TextView
-                android:id="@+id/tv_order_items"
+                android:id="@+id/tv_sort_products"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -75,6 +75,29 @@
                 android:text="@string/Ordenar_produtos"
                 android:textColor="?attr/colorPrimaryVariant"
                 app:drawableStartCompat="@drawable/vec_sort"
+                app:drawableTint="?attr/colorPrimaryVariant"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+            <TextView
+                android:id="@+id/tv_product_suggestion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/back_textview_menu"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/Sugestao_de_produtos"
+                android:textColor="?attr/colorPrimaryVariant"
+                app:drawableStartCompat="@drawable/vec_product"
                 app:drawableTint="?attr/colorPrimaryVariant"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -121,7 +144,7 @@
                 android:textColor="?attr/colorPrimaryVariant"
                 app:drawableStartCompat="@drawable/vec_remove"
                 app:drawableTint="?attr/colorPrimaryVariant"
-                app:layout_constraintBottom_toTopOf="@id/tv_order_items"
+                app:layout_constraintBottom_toTopOf="@id/tv_sort_products"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 

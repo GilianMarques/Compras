@@ -35,6 +35,7 @@
     <string name="Renomear_lista">Renomear lista</string>
     <string name="Por_favor_confirme">Por favor, confirme:</string>
     <string name="Deseja_mesmo_remover_x">Deseja mesmo remover <b>%1$s</b>?</string>
+    <string name="Deseja_mesmo_remover_x_das_sugestoes">Deseja mesmo remover <b>%1$s</b> das sugestões?</string>
     <string name="Cancelar">Cancelar</string>
     <string name="un">%1$d UN</string>
     <string name="Editar_outros_atributos">Editar outros atributos</string>
@@ -93,4 +94,10 @@
     <string name="Clique_aqui_para_alterar_a_cor">Clique aqui para alterar a cor</string>
     <string name="A_categoria_esta_em_uso_e_nao_pode_ser_removida">A categoria está em uso e não pode ser removida</string>
     <string name="Nao_foi_possivel_verificar_se_a_categoria_esta_em_uso">Não foi possível verificar se a categoria está em uso</string>
+    <string name="Selecionar">Selecionar</string>
+    <string name="Sugestao_de_produtos">Sugestão de produtos</string>
+    <string name="Adicionar">Adicionar</string>
+    <string name="Incluir_na_lista">Incluir na lista</string>
+    <string name="Concluir">Concluir</string>
+    <string name="Produtos_repetidos_x_nao_foram_incluidos_na_lista">Produtos repetidos (%1$d) não foram incluídos na lista</string>
 </resources>

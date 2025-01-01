@@ -11,6 +11,7 @@ class BsdShopListMenu(
     private var renameListener: ((ShopList) -> Unit),
     private var removeListener: ((ShopList) -> Unit),
     private var orderListener: (() -> Unit),
+    private var suggestionListener: (() -> Unit),
 ) {
 
     private var binding = BsdShoplistMenuDialogBinding.inflate(targetActivity.layoutInflater)
@@ -32,8 +33,13 @@ class BsdShopListMenu(
                 dialog.dismiss()
             }
 
-            tvOrderItems.setOnClickListener {
+            tvSortProducts.setOnClickListener {
                 orderListener()
+                dialog.dismiss()
+            }
+
+            tvProductSuggestion.setOnClickListener {
+                suggestionListener()
                 dialog.dismiss()
             }
 
@@ -44,12 +50,7 @@ class BsdShopListMenu(
 
 
     fun show() {
-
         dialog.show()
-
-        
-        // val behavior = BottomSheetBehavior.from(binding.root.parent as View)
-        // behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
 

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_weight="1"
+    android:background="@drawable/back_round"
+    android:backgroundTint="?colorPrimary"
+    android:textAlignment="center"
+    tools:context=".ui.products.ProductsActivity">
+
+    <TextView
+        android:id="@+id/tv_minus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:background="?selectableItemBackgroundBorderless"
+        android:fontFamily="@font/lexend_deca_bold"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:textAlignment="center"
+        android:textColor="?colorOnPrimary"
+        android:text="-" />
+
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        android:background="?android:attr/listDivider"
+        android:backgroundTint="?colorOnPrimary" />
+
+    <TextView
+        android:id="@+id/tv_quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/lexend_deca_bold"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:textColor="?colorOnPrimary"
+        tools:text="2" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        android:background="?android:attr/listDivider"
+        android:backgroundTint="?colorOnPrimary" />
+
+    <TextView
+        android:id="@+id/tv_plus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:background="?selectableItemBackgroundBorderless"
+        android:fontFamily="@font/lexend_deca_bold"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:textAlignment="center"
+        android:textColor="?colorOnPrimary"
+        android:text="+" />
+</LinearLayout>

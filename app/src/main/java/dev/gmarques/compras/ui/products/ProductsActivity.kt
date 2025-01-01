@@ -24,6 +24,7 @@ import dev.gmarques.compras.databinding.ActivityProductsBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.main.BsdAddOrEditShopList
+import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.utils.ExtFun.Companion.observeOnce
@@ -85,10 +86,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                        ProductRepository.addOrUpdateProduct(x)
                }
            }*/
-        // startActivityAddProduct() // TODO: remover
 
     }
-
 
     private fun observePrices() = viewModel.pricesLD.observe(this) {
         binding.apply {
@@ -121,7 +120,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
         }
     }
-
 
     private fun observeShopList() = viewModel.shopListLD.observe(this) {
         binding.toolbar.tvActivityTitle.text = it.name
@@ -218,6 +216,13 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         }
     }
 
+    private fun startActivitySuggestProduct() {
+        Vibrator.interaction()
+        val intent = SuggestProductsActivity.newIntent(this@ProductsActivity, viewModel.shopListLD.value!!.id)
+        startActivity(intent)
+
+    }
+
     private fun startActivityEditProduct(product: Product) {
         viewModel.shopListLD.observeOnce(this@ProductsActivity) { shopList ->
 
@@ -237,6 +242,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                 confirmRemove(removeList)
             }, {
                 showSortProductsDialog()
+            }, {
+                startActivitySuggestProduct()
             }).show()
         }
     }
