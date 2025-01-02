@@ -7,7 +7,7 @@ import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.utils.ListenerRegister
+import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.tasks.await
 
 

@@ -1,4 +1,4 @@
-package dev.gmarques.compras.utils
+package dev.gmarques.compras.domain.utils
 
 /**
  * Autor: Gilian
@@ -6,5 +6,12 @@ package dev.gmarques.compras.utils
  *
  * serve pra fazer renomeaçoes de variaveis e objetos, nao tem uso prático direto no projeto em si.
  */
-class RefactorKlass
+class RefactorKlass {
+    init {
 
+
+
+
+
+    }
+}

@@ -1,4 +1,4 @@
-package dev.gmarques.compras.utils
+package dev.gmarques.compras.domain.utils
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

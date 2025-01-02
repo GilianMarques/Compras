@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.ProductNameSuggestion
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.CategoryRepository
@@ -66,7 +67,7 @@ class AddEditProductActivityViewModel : ViewModel() {
 
     }
 
-    suspend fun loadProduct() = withContext(IO) {
+    suspend fun loadEditingProduct() = withContext(IO) {
         productId?.let {
             ProductRepository.getProduct(productId!!) { result ->
 
@@ -95,16 +96,28 @@ class AddEditProductActivityViewModel : ViewModel() {
     }
 
     fun loadSuggestions(term: String) = viewModelScope.launch(IO) {
-        Log.d("USUK", "AddEditProductActivityViewModel.".plus("loadSuggestions() "))
         if (suggestions == null) suggestions = ProductRepository.getSuggestions()
-        val filteredSuggestions = suggestions!!.filter { it.name.contains(term, ignoreCase = true) }
+
+        val filteredSuggestions = suggestions!!.filter { it.name.contains(term, ignoreCase = true) }.toMutableList()
+
 
         _suggestionsLD.postValue(filteredSuggestions)
     }
 
+    fun loadNameSuggestions(term: String) = viewModelScope.launch(IO) {
+
+        val namesSuggestion = productNameSuggestion.getSuggestion(term)
+        val filteredNamesSuggestion = namesSuggestion.filter { namesSuggestion.contains(it) }
+
+        _nameSuggestionsLD.postValue(filteredNamesSuggestion)
+    }
+
+    private val productNameSuggestion = ProductNameSuggestion()
     private var suggestions: List<Product>? = null
-    var suggestingProduct: Boolean = false
+
+    var canLoadSuggestion: Boolean = true
     var editingProduct: Boolean = false
+
     var productId: String? = null
     var listId: String = "-1"
     var validatedName: String = ""
@@ -119,6 +132,9 @@ class AddEditProductActivityViewModel : ViewModel() {
 
     private val _suggestionsLD = MutableLiveData<List<Product>>()
     val suggestionsLD: LiveData<List<Product>> get() = _suggestionsLD
+
+    private val _nameSuggestionsLD = MutableLiveData<List<String>>()
+    val nameSuggestionsLD: LiveData<List<String>> get() = _nameSuggestionsLD
 
     private val _editingCategoryLD = MutableLiveData<Category>()
     val editingCategoryLD: LiveData<Category> get() = _editingCategoryLD

@@ -13,9 +13,9 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.RvItemProductBinding
 import dev.gmarques.compras.domain.model.ProductWithCategory
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.adjustSaturation
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.products.ProductAdapter.ProductViewHolder
-import dev.gmarques.compras.utils.ExtFun.Companion.adjustSaturation
-import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 
 class ProductAdapter(val callback: Callback) :
     ListAdapter<ProductWithCategory, ProductViewHolder>(ProductDiffCallback()) {

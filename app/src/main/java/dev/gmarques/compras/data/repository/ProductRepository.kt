@@ -5,7 +5,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Product
-import dev.gmarques.compras.utils.ListenerRegister
+import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.tasks.await
 
 // TODO: todas as funçoes de repository  devem ser suspensas com coroutines e usar await. receber um validatedProduct

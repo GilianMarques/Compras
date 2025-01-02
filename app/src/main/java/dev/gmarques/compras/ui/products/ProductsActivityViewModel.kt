@@ -15,7 +15,7 @@ import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.ShopListRepository
 import dev.gmarques.compras.domain.SortCriteria
 import dev.gmarques.compras.domain.model.ProductWithCategory
-import dev.gmarques.compras.utils.ListenerRegister
+import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel

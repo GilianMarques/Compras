@@ -13,10 +13,10 @@ import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.RvItemSuggestionProductBinding
+import dev.gmarques.compras.domain.model.SelectableProduct
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivityViewModel.SelectableProduct
 import dev.gmarques.compras.ui.suggest_products.SuggestionProductAdapter.SuggestionProductViewHolder
-import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 
 class SuggestionProductAdapter(private val onRemoveListener: (Product,Int) -> Unit) :
     ListAdapter<SelectableProduct, SuggestionProductViewHolder>(ProductDiffCallback()) {

@@ -16,8 +16,8 @@ import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.databinding.ActivityAddEditCategoryBinding
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.utils.ExtFun.Companion.showKeyboard
 import kotlinx.coroutines.launch
 
 /**

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.RvItemShopListBinding
-import dev.gmarques.compras.utils.ExtFun.Companion.adjustSaturation
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.adjustSaturation
 
 class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (ShopList) -> Any) :
     ListAdapter<ShopList, ShopListAdapter.ListViewHolder>(ShopListDiffCallback()) {

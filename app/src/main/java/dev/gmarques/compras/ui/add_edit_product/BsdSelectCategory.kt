@@ -18,8 +18,8 @@ import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.databinding.BsdSelectCategoryDialogBinding
 import dev.gmarques.compras.databinding.RvItemCategoryBinding
+import dev.gmarques.compras.domain.utils.ListenerRegister
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.utils.ListenerRegister
 
 class BsdSelectCategory private constructor(
     private val targetActivity: Activity,

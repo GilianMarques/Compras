@@ -54,13 +54,13 @@
             android:layout_width="0dp"
 
             android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
             android:drawableStart="@drawable/vec_rename"
             android:hint="@string/Digite_o_nome_aqui"
             android:importantForAutofill="no"
             android:inputType="textCapSentences"
             android:theme="@style/Theme.EditText.Dialog"
             app:layout_constraintBottom_toTopOf="@id/fab_confirm"
-            android:layout_marginBottom="48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:text="Compras de Janeiro" />
@@ -70,8 +70,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:backgroundTint="?attr/colorPrimary"
             android:text="@string/Adicionar_lista"
+            android:textColor="?colorOnPrimary"
             app:icon="@drawable/vec_check"
+            app:iconTint="?attr/colorOnPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

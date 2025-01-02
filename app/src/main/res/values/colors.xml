@@ -40,4 +40,31 @@
         <item>#F7E9E6</item>
         <item>#F6E7FA</item>
     </string-array>
+
+    <string-array name="vivid_colors">
+        <item>#E792FF</item> <!-- Vivid Violet -->
+        <item>#FF3380</item> <!-- Vivid Raspberry -->
+        <item>#FF33A6</item> <!-- Bright Magenta -->
+        <item>#9D33FF</item> <!-- Bright Purple -->
+        <item>#6E18DE</item> <!-- Electric Indigo -->
+        <item>#4C00FF</item> <!-- Vivid Blue -->
+        <item>#33B3FF</item> <!-- Sky Blue -->
+        <item>#28C7FA</item> <!-- Bright Cyan -->
+        <item>#33FFC1</item> <!-- Bright Teal -->
+        <item>#33FFD0</item> <!-- Bright Turquoise -->
+        <item>#33FF77</item> <!-- Fresh Green -->
+        <item>#4EFF33</item> <!-- Lime Green -->
+        <item>#33FF57</item> <!-- Vivid Green -->
+        <item>#A6FF33</item> <!-- Chartreuse Green -->
+        <item>#FFDA33</item> <!-- Golden Yellow -->
+        <item>#FFC300</item> <!-- Bright Yellow -->
+        <item>#FFB533</item> <!-- Rich Orange -->
+        <item>#FF8D1A</item> <!-- Vibrant Orange -->
+        <item>#FF6F33</item> <!-- Soft Orange -->
+        <item>#FF5733</item> <!-- Vivid Red -->
+        <item>#FF3333</item> <!-- Strong Red -->
+    </string-array>
+
+
+
 </resources>

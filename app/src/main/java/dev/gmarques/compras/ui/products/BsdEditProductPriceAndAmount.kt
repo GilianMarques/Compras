@@ -8,10 +8,10 @@ import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.BsdEditProductPriceAndQuantityDialogBinding
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
-import dev.gmarques.compras.utils.ExtFun.Companion.onlyIntegerNumbers
-import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 
 class BsdEditProductPriceOrQuantity private constructor() {
 

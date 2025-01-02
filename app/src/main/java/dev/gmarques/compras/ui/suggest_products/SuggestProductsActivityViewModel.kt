@@ -11,7 +11,8 @@ import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.ProductRepository
-import dev.gmarques.compras.utils.ListenerRegister
+import dev.gmarques.compras.domain.model.SelectableProduct
+import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
@@ -185,5 +186,4 @@ class SuggestProductsActivityViewModel : ViewModel() {
         ProductRepository.removeSuggestionProduct(product)
     }
 
-    class SelectableProduct(val product: Product, var isSelected: Boolean, var quantity: Int)
 }

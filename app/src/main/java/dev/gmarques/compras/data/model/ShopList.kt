@@ -4,7 +4,7 @@ import dev.gmarques.compras.App
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_nimo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_ximo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_nao_pode_ficar_vazio
-import dev.gmarques.compras.utils.ExtFun.Companion.removeSpaces
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeSpaces
 import java.io.Serializable
 import java.util.Locale
 import java.util.UUID

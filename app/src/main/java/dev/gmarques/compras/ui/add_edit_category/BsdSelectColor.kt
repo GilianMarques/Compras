@@ -22,7 +22,7 @@ class BsdSelectColor(
 ) {
 
     private var dismissListener: (() -> Unit)? = null
-    private var pastelColors: List<Int>? = null
+    private var vividColors: List<Int>? = null
     private var binding = BsdSelectColorDialogBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
 
@@ -31,13 +31,13 @@ class BsdSelectColor(
         dialog.setOnDismissListener {
             dismissListener?.invoke()
         }
-        pastelColors = targetActivity.resources.getStringArray(R.array.pastel_colors).asList().map { Color.parseColor(it) }
+        vividColors = targetActivity.resources.getStringArray(R.array.vivid_colors).asList().map { Color.parseColor(it) }
         setupAdapter()
 
     }
 
     private fun setupAdapter() {
-        val adapter = ColorAdapter(pastelColors!!) { selectedColor ->
+        val adapter = ColorAdapter(vividColors!!) { selectedColor ->
             onConfirmListener(selectedColor) // Passa a cor selecionada para o listener
             dialog.dismiss() // Fecha o diálogo após a seleção
         }

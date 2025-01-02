@@ -16,8 +16,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dev.gmarques.compras.R
 import dev.gmarques.compras.databinding.ActivityLoginBinding
+import dev.gmarques.compras.domain.utils.InternetConnectionChecker
 import dev.gmarques.compras.ui.main.MainActivity
-import dev.gmarques.compras.utils.InternetConnectionChecker
 import java.text.MessageFormat
 
 // TODO: usa api credentials 

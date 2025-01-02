@@ -9,9 +9,11 @@ import android.text.Spanned
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
@@ -22,14 +24,15 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
-import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
-import dev.gmarques.compras.utils.ExtFun.Companion.dp
-import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
-import dev.gmarques.compras.utils.ExtFun.Companion.onlyIntegerNumbers
-import dev.gmarques.compras.utils.ExtFun.Companion.showKeyboard
-import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,7 +44,6 @@ import kotlinx.coroutines.withContext
  */
 class AddEditProductActivity : AppCompatActivity() {
 
-    private var canLoadSuggestion: Boolean = true
     private var categoryDialog: BsdSelectCategory? = null
     private lateinit var binding: ActivityAddEditProductBinding
     private lateinit var viewModel: AddEditProductActivityViewModel
@@ -84,6 +86,7 @@ class AddEditProductActivity : AppCompatActivity() {
         setupInputCategory()
         observeProduct()
         observeSuggestions()
+        observeNameSuggestions()
         observeViewmodelErrorMessages()
         observeViewmodelFinishEvent()
 
@@ -114,10 +117,11 @@ class AddEditProductActivity : AppCompatActivity() {
     }
 
     private fun observeProduct() = lifecycleScope.launch {
-        viewModel.loadProduct()
+        viewModel.loadEditingProduct()
         viewModel.editingProductLD.observe(this@AddEditProductActivity) {
 
             it?.let {
+                viewModel.editingProduct = true
                 viewModel.loadCategory(it.categoryId)
                 observeCategory(it)
             }
@@ -126,48 +130,65 @@ class AddEditProductActivity : AppCompatActivity() {
 
     private fun observeSuggestions() = lifecycleScope.launch {
         viewModel.suggestionsLD.observe(this@AddEditProductActivity) { suggestions ->
-            showSuggestions(suggestions)
+            if (suggestions.isEmpty()) viewModel.loadNameSuggestions(binding.edtName.text.toString())
+            else showSuggestions(suggestions)
         }
     }
 
-    private fun showSuggestions(suggestions: List<Product>) {
+    private fun observeNameSuggestions() = lifecycleScope.launch {
+        viewModel.nameSuggestionsLD.observe(this@AddEditProductActivity) { suggestions ->
+            if (suggestions.isNotEmpty()) showSuggestions(suggestions)
+        }
+    }
 
-        if (suggestions.isEmpty()) return
+    private fun showSuggestions(suggestions: List<Any>) {
 
         binding.tvSuggestion.visibility = VISIBLE
         binding.llSuggestion.removeAllViews()
 
+        val layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+            .apply { marginStart = 4.dp(); marginEnd = 4.dp() }
 
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        ).apply { marginStart = 4.dp(); marginEnd = 4.dp() }
-
-
-        suggestions.forEach { product ->
-
+        suggestions.forEach { suggestion ->
             val chip = Chip(this@AddEditProductActivity)
-            chip.text = product.name
             chip.layoutParams = layoutParams
+            binding.llSuggestion.addView(chip)
+
+            if (suggestion is Product) {
+                chip.text = suggestion.name
+                chip.chipIcon = AppCompatResources.getDrawable(this@AddEditProductActivity, R.drawable.vec_product)
+            } else {
+                val nameSuggestion = suggestion as String
+                chip.text = nameSuggestion
+                chip.chipIcon = AppCompatResources.getDrawable(this@AddEditProductActivity, R.drawable.vec_name)
+            }
+
             chip.setOnClickListener {
-                canLoadSuggestion = false
-                viewModel.suggestingProduct = true
-                viewModel.loadCategory(product.categoryId)
-                observeCategory(product)
+                binding.edtName.requestFocus()
+                viewModel.canLoadSuggestion = false
                 binding.tvSuggestion.visibility = GONE
                 binding.llSuggestion.removeAllViews()
-                lifecycleScope.launch(IO) { delay(1500); canLoadSuggestion = true }
+                lifecycleScope.launch(IO) { delay(1500); viewModel.canLoadSuggestion = true }
+
+                if (suggestion is Product) {
+                    viewModel.loadCategory(suggestion.categoryId)
+                    observeCategory(suggestion)
+                    binding.edtName.hideKeyboard()
+                } else {
+                    val nameSuggestion = suggestion as String
+                    binding.edtName.setText(nameSuggestion)
+                    binding.edtInfo.requestFocus()
+                }
+
             }
-            binding.llSuggestion.addView(chip)
 
         }
     }
-
 
     private fun observeCategory(product: Product) = lifecycleScope.launch {
         viewModel.editingCategoryLD.observe(this@AddEditProductActivity) {
 
             it?.let {
-                if (!viewModel.suggestingProduct) viewModel.editingProduct = true
                 updateViewModelAndUiWithEditableProduct(product, it)
             }
         }
@@ -193,7 +214,7 @@ class AddEditProductActivity : AppCompatActivity() {
 
             validatedCategory = category
 
-            if (editingProduct && !suggestingProduct) {
+            if (editingProduct) {
                 cbSuggestProduct.visibility = GONE
                 toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), product.name)
                 fabSave.text = getString(R.string.Salvar_produto)
@@ -229,6 +250,9 @@ class AddEditProductActivity : AppCompatActivity() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
+                binding.tvSuggestion.visibility = GONE
+                binding.llSuggestion.removeAllViews()
+
                 val term = edtTarget.text.toString()
                 val result = Product.Validator.validateName(term)
 
@@ -243,8 +267,9 @@ class AddEditProductActivity : AppCompatActivity() {
         }
 
         edtTarget.doOnTextChanged { text, _, _, _ ->
-            if (!text.isNullOrEmpty() && text.length > 2 && canLoadSuggestion) viewModel.loadSuggestions(text.toString())
-            else {
+            if (edtTarget.hasFocus() && !text.isNullOrEmpty() && text.length > 2 && viewModel.canLoadSuggestion) {
+                viewModel.loadSuggestions(text.toString())
+            } else {
                 binding.tvSuggestion.visibility = GONE
                 binding.llSuggestion.removeAllViews()
             }

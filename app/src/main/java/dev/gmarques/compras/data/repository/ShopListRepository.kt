@@ -3,7 +3,7 @@ package dev.gmarques.compras.data.repository
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.ShopList
-import dev.gmarques.compras.utils.ListenerRegister
+import dev.gmarques.compras.domain.utils.ListenerRegister
 
 
 object ShopListRepository {

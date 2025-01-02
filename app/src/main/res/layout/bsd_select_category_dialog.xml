@@ -67,8 +67,8 @@
             android:backgroundTint="?attr/colorPrimary"
             android:text="@string/Nova_categoria"
             android:textColor="?colorOnPrimary"
-            app:icon="@drawable/vec_add"
             app:iconTint="?attr/colorOnPrimary"
+            app:icon="@drawable/vec_add"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
