@@ -101,6 +101,11 @@ class MainActivity : AppCompatActivity() {
         BsdAddOrEditShopList(this, rvAdapter.itemCount)
             .setOnConfirmListener { shopList ->
                 viewModel.addOrUpdateShopList(shopList)
+
+                /*Se houver alguma lista ja criada é mais provavel que hajam produtos para serem sugeridos, caso contrario
+                 nao faz sentido abrir a tela de sugestão*/
+                startActivityProducts(shopList, rvAdapter.itemCount > 0)
+
             }.show()
     }
 
@@ -112,8 +117,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun rvItemClick(shopList: ShopList) {
+        startActivityProducts(shopList, false)
+    }
+
+    private fun startActivityProducts(shopList: ShopList, suggestProducts: Boolean) {
         Vibrator.interaction()
-        val intent = ProductsActivity.newIntent(this, shopList.id)
+        val intent = ProductsActivity.newIntent(this, shopList.id, suggestProducts)
         startActivity(intent)
     }
 }

@@ -11,35 +11,31 @@
     <color name="app_icon_bg_color_end">#6340A2</color>
 
     <string-array name="pastel_colors">
-        <item>#D3F2EE</item>
-        <item>#E3E4FD</item>
-        <item>#FAD5D7</item>
-        <item>#F9E4FA</item>
-        <item>#FEEDCC</item>
-        <item>#F9D6E9</item>
-        <item>#D1F7C4</item>
-        <item>#FCE4CE</item>
-        <item>#FBE4E6</item>
-        <item>#E1F7DF</item>
-        <item>#E4FBFA</item>
-        <item>#F9E4FF</item>
-        <item>#FFEFE4</item>
-        <item>#D9F1FF</item>
-        <item>#E7E8FA</item>
-        <item>#E3EEFF</item>
-        <item>#FCE6E4</item>
-        <item>#FBE4F4</item>
-        <item>#E4F7E8</item>
-        <item>#F2EBF9</item>
-        <item>#E4F7FA</item>
-        <item>#F2E6FA</item>
-        <item>#FBE6ED</item>
-        <item>#E6FAED</item>
-        <item>#F3E5E8</item>
-        <item>#E9F2F7</item>
-        <item>#F7E9E6</item>
-        <item>#F6E7FA</item>
+        <item>#D3B9FF</item> <!-- Soft Purple -->
+        <item>#C4C2FF</item> <!-- Soft Purple -->
+        <item>#D1D0FF</item> <!-- Lavender -->
+        <item>#E0E0FF</item> <!-- Powder Blue -->
+        <item>#B3C9FF</item> <!-- Soft Blue -->
+        <item>#B7D0FF</item> <!-- Light Sky Blue -->
+        <item>#A0D7EB</item> <!-- Light Cyan -->
+        <item>#FFDFC0</item> <!-- Peach -->
+        <item>#FFEBCC</item> <!-- Pastel Orange -->
+        <item>#F9E0F2</item> <!-- Light Magenta -->
+        <item>#FFB8B8</item> <!-- Soft Coral -->
+        <item>#FFDBBB</item> <!-- Warm Peach -->
+        <item>#F9C4C4</item> <!-- Rose Pink -->
+        <item>#E1F9E2</item> <!-- Blush Pink -->
+        <item>#E1F4D9</item> <!-- Pale Green -->
+        <item>#F2F4C4</item> <!-- Pale Lime -->
+        <item>#A8F9E8</item> <!-- Mint Green -->
+        <item>#F5F9C6</item> <!-- Light Yellow -->
+        <item>#FFECBC</item> <!-- Lemon Chiffon -->
+        <item>#FFCAE2</item> <!-- Off White -->
     </string-array>
+
+
+
+
 
     <string-array name="vivid_colors">
         <item>#E792FF</item> <!-- Vivid Violet -->

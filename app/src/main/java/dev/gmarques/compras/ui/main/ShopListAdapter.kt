@@ -33,18 +33,14 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
     inner class ListViewHolder(private val binding: RvItemShopListBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(shopList: ShopList) = binding.apply {
-            // TODO: remover quando terminar tela de produtos
-            if (!x) {
-                onItemClick(shopList)
-                x = true
-            }
+
             itemView.alpha = 0f // Inicia a view invisível
 
             tvListName.text = shopList.name
 
             cvChild.setOnClickListener { onItemClick(shopList) }
 
-            val saturatedColor = shopList.color.adjustSaturation(2.99f)
+            val saturatedColor = shopList.color.adjustSaturation(1.5f)
             ivListIcon.background?.mutate()?.apply {
                 if (this is GradientDrawable) setColor(saturatedColor)
             }

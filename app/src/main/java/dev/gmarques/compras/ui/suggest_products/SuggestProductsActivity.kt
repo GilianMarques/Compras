@@ -8,6 +8,7 @@ import android.text.Spanned
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
@@ -20,6 +21,8 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivitySuggestProductsBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
 
@@ -60,6 +63,18 @@ class SuggestProductsActivity : AppCompatActivity() {
         observeProductsUpdates()
         observeViewmodelErrorMessages()
         observeFinishEvent()
+        setupOnBackPressed()
+    }
+
+    private fun setupOnBackPressed() {
+        onBackPressedDispatcher.addCallback {
+            if (binding.edtSearch.text.isNullOrEmpty()) {
+                finish()
+            } else {
+                binding.edtSearch.setText("")
+                binding.edtSearch.hideKeyboard()
+            }
+        }
     }
 
     private fun initSearch() {
@@ -69,7 +84,7 @@ class SuggestProductsActivity : AppCompatActivity() {
             val term = text.toString()
 
             rvAdapter.submitList(emptyList())
-            viewModel.searchProduct(term)
+            viewModel.searchProduct(term.removeAccents())
 
             binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
         }
@@ -84,7 +99,7 @@ class SuggestProductsActivity : AppCompatActivity() {
 
     private fun initToolbar() {
 
-        binding.toolbar.ivGoBack.setOnClickListener { finish() }
+        binding.toolbar.ivGoBack.setOnClickListener { this.onBackPressedDispatcher.onBackPressed() }
         binding.toolbar.tvActivityTitle.text = getString(R.string.Sugestao_de_produtos)
         binding.toolbar.ivMenu.visibility = GONE
 

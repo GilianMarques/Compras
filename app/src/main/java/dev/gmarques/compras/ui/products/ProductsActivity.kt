@@ -10,6 +10,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AnticipateInterpolator
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +24,9 @@ import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.ActivityProductsBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.observeOnce
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
@@ -43,11 +46,12 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     companion object {
         private const val LIST_ID = "list_id"
+        private const val SUGGEST_PRODUCTS = "suggest_products"
 
-
-        fun newIntent(context: Context, list: String): Intent {
+        fun newIntent(context: Context, list: String, suggestProducts: Boolean = false): Intent {
             return Intent(context, ProductsActivity::class.java).apply {
                 putExtra(LIST_ID, list)
+                putExtra(SUGGEST_PRODUCTS, suggestProducts)
             }
         }
     }
@@ -55,13 +59,14 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val shoplistId = intent.getStringExtra(LIST_ID)!!
+        val shopListId = intent.getStringExtra(LIST_ID)!!
+        val suggestProducts = intent.getBooleanExtra(SUGGEST_PRODUCTS, false)
 
         binding = ActivityProductsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this)[ProductsActivityViewModel::class.java]
-        viewModel.init(shoplistId)
+        viewModel.init(shopListId)
 
         initToolbar()
         initRecyclerView()
@@ -70,7 +75,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         observeProductsUpdates()
         observePrices()
         observeShopList()
-
+        setupOnBackPressed()
+        if (suggestProducts) startActivitySuggestProduct()
         /*   runBlocking {
                repeat(15) {
                    delay(100)
@@ -132,7 +138,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
             val term = text.toString()
 
             rvAdapter.submitList(emptyList())
-            viewModel.searchProduct(term)
+            viewModel.searchProduct(term.removeAccents())
 
             binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
         }
@@ -145,10 +151,19 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     }
 
-    private fun initToolbar() {
-        binding.toolbar.ivGoBack.setOnClickListener {
-            finish()
+    private fun setupOnBackPressed() {
+        onBackPressedDispatcher.addCallback {
+            if (binding.edtSearch.text.isNullOrEmpty()) {
+                finish()
+            } else {
+                binding.edtSearch.setText("")
+                binding.edtSearch.hideKeyboard()
+            }
         }
+    }
+
+    private fun initToolbar() {
+        binding.toolbar.ivGoBack.setOnClickListener { this.onBackPressedDispatcher.onBackPressed() }
 
         binding.toolbar.ivMenu.setOnClickListener {
             showMenuDialog()

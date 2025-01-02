@@ -1,5 +1,6 @@
 package dev.gmarques.compras.data
 
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 
@@ -14,7 +15,7 @@ class ProductNameSuggestion {
      */
     suspend fun getSuggestion(term: String): List<String> {
         if (suggestions.isEmpty()) loadSuggestions()
-        return suggestions.filter { it.contains(term, ignoreCase = true) }
+        return suggestions.filter { it.removeAccents().contains(term.removeAccents(), ignoreCase = true) }
     }
 
     private suspend fun loadSuggestions() = withContext(IO) {
@@ -339,6 +340,11 @@ class ProductNameSuggestion {
                 "Cotonetes 👂",
                 "Creme para barbear 🧴",
                 "Lâmina de barbear 🪒",
+                "Gilete 🪒",
+                "Esponja de aço 🧽✨",
+                "Bom bril 🧽✨",
+                "Detergente 🧴🧽",
+                "Prestobarba 🪒",
                 "Gel de barbear 🧴",
                 "Aparelho de depilação 🪒",
                 "Hidratante 🧴",
@@ -373,6 +379,8 @@ class ProductNameSuggestion {
                 "Cloro 🧴",
                 "Álcool 70% 🍶",
                 "Sabão em barra 🧼",
+                "Sabão em pó 🧼",
+                "Sabão líquido 🧴🧼",
                 "Inseticida 🪲",
                 "Removedor de manchas 🧴",
                 "Papel toalha 🧻",
@@ -418,13 +426,15 @@ class ProductNameSuggestion {
                 "Suco 🍹",
                 "Smoothie 🍓🥭",
                 "Arroz 🍚",
-                "Feijão 🫘",
+                "Feijão preto 🫘",
+                "Feijão marrom 🫘",
                 "Lentilha 🥣",
                 "Grão-de-bico 🧆",
                 "Aveia 🥣",
                 "Soja 🌱",
                 "Ervilha 🟢",
-                "Pão 🍞",
+                "Pão francês 🥖",
+                "Pão de forma 🍞",
                 "Bolo 🎂",
                 "Donut 🍩",
                 "Queijo 🧀",
@@ -443,6 +453,13 @@ class ProductNameSuggestion {
                 "Picanha 🥩",
                 "Maminha 🥩",
                 "Fraldinha 🥩",
+                "Chã de dentro 🥩",
+                "Chã de fora 🥩",
+                "Ovos 🥚",
+                "Nugget 🐔",
+                "Coxinha da asa 🐔",
+                "Lasanha 🍛",
+                "Miojo 🍜",
                 "Contrafilé 🥩",
                 "Filé mignon 🥩",
                 "Costela 🥩",
@@ -542,6 +559,9 @@ class ProductNameSuggestion {
                 "Espátula 🍳",
                 "Escorredor de arroz 🍚",
                 "Escorredor de macarrão 🍝",
+                "Macarrão parafuso 🍝",
+                "Macarrão espaguete 🍝",
+                "Macarrão talharim🍝",
                 "Espremedor de alho 🧄",
                 "Espremedor de frutas 🍋",
                 "Grelha 🍖",

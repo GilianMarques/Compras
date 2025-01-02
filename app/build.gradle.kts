@@ -22,8 +22,8 @@ android {
     buildTypes {
 
         release {
-            isMinifyEnabled = true // Habilite ou desabilite minificação
-            isShrinkResources = true // Remove recursos não utilizados
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -31,9 +31,9 @@ android {
         }
 
         debug {
-            isMinifyEnabled = false // Evita minificação no modo debug
-            applicationIdSuffix = ".debug" // Adiciona um sufixo ao applicationId
-            versionNameSuffix = "-debug" // Adiciona sufixo à versão do app
+            isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
 

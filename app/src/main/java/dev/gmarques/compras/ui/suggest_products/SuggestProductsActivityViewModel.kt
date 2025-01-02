@@ -12,6 +12,7 @@ import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.domain.model.SelectableProduct
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -87,7 +88,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
             val product = lists[i]
 
-            if (searchTerm.isEmpty() || product.name.contains(searchTerm, true)) {
+            if (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true)) {
                 filteredProducts.add(SelectableProduct(product, false, product.quantity))
             }
         }

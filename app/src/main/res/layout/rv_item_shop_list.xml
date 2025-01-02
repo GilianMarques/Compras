@@ -38,7 +38,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/vec_shopping_cart"
+                    app:srcCompat="@drawable/vec_list"
                     app:tint="?colorPrimarySurface" />
 
                 <TextView

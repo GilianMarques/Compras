@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import dev.gmarques.compras.App
+import java.text.Normalizer
 import java.text.NumberFormat
 import java.text.ParseException
 import java.util.Locale
@@ -55,6 +56,15 @@ class ExtFun {
         fun String.removeSpaces(): String {
             return this.replace("\\s+".toRegex(), " ").trim()
         }
+
+        fun String.removeAccents(): String {
+            return Normalizer.normalize(this, Normalizer.Form.NFD) // split 'ã' to 'a' + '~'
+                .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "") // remove all accents
+
+        }
+
+        //-------------------------------------------------------------------
+
 
         /**
          * Formata o valor Double como moeda considerando a localidade do usuário.

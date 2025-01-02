@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
 import android.graphics.drawable.GradientDrawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -139,7 +138,6 @@ class BsdSelectCategory private constructor(
 
         @SuppressLint("NotifyDataSetChanged")
         fun submitList(categories: List<Category>) {
-            Log.d("USUK", "CategoryAdapter.".plus("submitList() categories = $categories"))
             this.categories = categories
             notifyDataSetChanged()
         }

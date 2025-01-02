@@ -146,8 +146,8 @@ class AddEditProductActivity : AppCompatActivity() {
         binding.tvSuggestion.visibility = VISIBLE
         binding.llSuggestion.removeAllViews()
 
-        val layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-            .apply { marginStart = 4.dp(); marginEnd = 4.dp() }
+        val layoutParams =
+            LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { marginStart = 4.dp(); marginEnd = 4.dp() }
 
         suggestions.forEach { suggestion ->
             val chip = Chip(this@AddEditProductActivity)
@@ -165,10 +165,8 @@ class AddEditProductActivity : AppCompatActivity() {
 
             chip.setOnClickListener {
                 binding.edtName.requestFocus()
-                viewModel.canLoadSuggestion = false
                 binding.tvSuggestion.visibility = GONE
                 binding.llSuggestion.removeAllViews()
-                lifecycleScope.launch(IO) { delay(1500); viewModel.canLoadSuggestion = true }
 
                 if (suggestion is Product) {
                     viewModel.loadCategory(suggestion.categoryId)
@@ -176,7 +174,9 @@ class AddEditProductActivity : AppCompatActivity() {
                     binding.edtName.hideKeyboard()
                 } else {
                     val nameSuggestion = suggestion as String
+                    viewModel.canLoadSuggestion = false
                     binding.edtName.setText(nameSuggestion)
+                    viewModel.canLoadSuggestion = true
                     binding.edtInfo.requestFocus()
                 }
 
@@ -197,7 +197,9 @@ class AddEditProductActivity : AppCompatActivity() {
     private fun updateViewModelAndUiWithEditableProduct(product: Product, category: Category) = binding.apply {
         viewModel.apply {
 
+            viewModel.canLoadSuggestion = false
             edtName.setText(product.name)
+            viewModel.canLoadSuggestion = true
             validatedName = product.name
 
             edtInfo.setText(product.info)

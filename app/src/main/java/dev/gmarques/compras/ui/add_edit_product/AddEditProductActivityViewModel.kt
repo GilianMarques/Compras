@@ -12,6 +12,7 @@ import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -96,20 +97,19 @@ class AddEditProductActivityViewModel : ViewModel() {
     }
 
     fun loadSuggestions(term: String) = viewModelScope.launch(IO) {
+
         if (suggestions == null) suggestions = ProductRepository.getSuggestions()
 
-        val filteredSuggestions = suggestions!!.filter { it.name.contains(term, ignoreCase = true) }.toMutableList()
+        val filteredSuggestions = suggestions!!
+            .filter { it.name.removeAccents().contains(term.removeAccents(), ignoreCase = true) }
+            .toMutableList()
 
 
         _suggestionsLD.postValue(filteredSuggestions)
     }
 
     fun loadNameSuggestions(term: String) = viewModelScope.launch(IO) {
-
-        val namesSuggestion = productNameSuggestion.getSuggestion(term)
-        val filteredNamesSuggestion = namesSuggestion.filter { namesSuggestion.contains(it) }
-
-        _nameSuggestionsLD.postValue(filteredNamesSuggestion)
+        _nameSuggestionsLD.postValue(productNameSuggestion.getSuggestion(term))
     }
 
     private val productNameSuggestion = ProductNameSuggestion()
