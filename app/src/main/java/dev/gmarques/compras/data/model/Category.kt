@@ -28,46 +28,18 @@ data class Category(
     /**
      * Garante que nenhuma categoria entre no banco de dados sem atender às regras de negócio
      */
-    fun selfValidate(): Category {
+    fun selfValidate() {
 
         if (Validator.validateName(name).isFailure) throw Exception("Nome da categoria é invalido: '${name}'")
         if (Validator.validateColor(color).isFailure) throw Exception("Cor da categoria é invalida: '${color}'")
-
-        return this
     }
 
     @Suppress("unused") // necessario pra uso com firebase
     constructor() : this("not_initialized", 0)
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Category
-
-        if (name != other.name) return false
-        if (color != other.color) return false
-        if (id != other.id) return false
-        if (creationDate != other.creationDate) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + color
-        result = 31 * result + id.hashCode()
-        result = 31 * result + creationDate.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "Category(name='$name', color=$color, id='$id', creationDate=$creationDate)"
-    }
-
     class Validator {
         companion object {
-            // Constantes privadas
+
             private const val MAX_CHARS = 30
             private const val MIN_CHARS = 3
             private const val EMPTY_COLOR = -1
@@ -114,7 +86,4 @@ data class Category(
             }
         }
     }
-
-
 }
-

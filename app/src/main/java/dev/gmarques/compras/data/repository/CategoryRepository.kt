@@ -1,95 +1,51 @@
 package dev.gmarques.compras.data.repository
 
-import android.util.Log
 import com.google.firebase.firestore.toObject
-import com.google.firebase.firestore.toObjects
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Category
+import dev.gmarques.compras.data.repository.model.ValidatedCategory
 import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.tasks.await
 
-
 object CategoryRepository {
 
-    fun addOrUpdateCategory(category: Category) {
-        Firestore.categoryCollection.document(category.id)
-            .set(category.selfValidate())
+    fun addOrUpdateCategory(validatedCategory: ValidatedCategory) {
+        val category = validatedCategory.category
+        Firestore.categoryCollection.document(category.id).set(category)
     }
 
-    fun tryAndRemoveCategory(category: Category, callback: (Result<Boolean>) -> Unit) {
+    suspend fun tryAndRemoveCategory(validatedCategory: ValidatedCategory): Result<Boolean> {
+        val category = validatedCategory.category
 
-        ProductRepository.hasAnyProductWithCategoryId(category.id) { result ->
-            if (result.isSuccess) {
-                //categoria em uso nao pode ser removida
-                if (result.getOrThrow()) {
-                    callback(
-                        Result.failure(
-                            Exception(
-                                App.getContext().getString(R.string.A_categoria_esta_em_uso_e_nao_pode_ser_removida)
-                            )
-                        )
-                    )
-                } else {
-                    Firestore.categoryCollection.document(category.id).delete()
-                    callback(Result.success(true))
-                }
-            } else callback(
-                Result.failure(
-                    Exception(
-                        App.getContext().getString(R.string.Nao_foi_possivel_verificar_se_a_categoria_esta_em_uso)
-                    )
-                )
+        val result = ProductRepository.hasAnyProductWithCategoryId(category.id)
+        val categoryInUse = result.getOrThrow()
+
+        if (categoryInUse) {
+            return Result.failure(
+                Exception(App.getContext().getString(R.string.A_categoria_esta_em_uso_e_nao_pode_ser_removida))
             )
-        }
-
-
-    }
-
-    fun getCategoryByName(name: String, callback: (Result<Category?>) -> Unit) {
-        Firestore.categoryCollection.whereEqualTo("name", name).limit(1).get()
-            .addOnSuccessListener { snapshot ->
-
-                if (snapshot.isEmpty) callback(Result.success(null))
-                else {
-                    val targetCategory = snapshot.documents[0].toObject<Category>()
-                    callback(Result.success(targetCategory))
-                }
-            }.addOnFailureListener { exception ->
-                callback(Result.failure(exception))
-            }
-
-
-    }
-
-    fun getCategory(idCategory: String, callback: (result: Result<Category>) -> Unit) {
-
-        Firestore.categoryCollection.document(idCategory).get().addOnSuccessListener { documentSnapshot ->
-            val targetCategory = documentSnapshot.toObject<Category>()!!
-            callback(Result.success(targetCategory))
-        }.addOnFailureListener { exception: java.lang.Exception ->
-            callback(Result.failure(exception))
+        } else {
+            Firestore.categoryCollection.document(category.id).delete()
+            return Result.success(true)
         }
     }
 
-    suspend fun getCategory(idCategory: String): Category? {
-        return try {
-            val documentSnapshot = Firestore.categoryCollection.document(idCategory).get().await()
-            documentSnapshot.toObject<Category>()
-        } catch (exception: Exception) {
-            Log.d("USUK", "CategoryRepository.getCategory: ${exception.message}")
-            null
-        }
+    suspend fun getCategoryByName(name: String): Result<Category?> {
+        val querySnapshot = Firestore.categoryCollection.whereEqualTo("name", name).limit(1).get().await()
+
+        return if (!querySnapshot.isEmpty) {
+            val targetCategory = querySnapshot.documents[0].toObject<Category>()
+            Result.success(targetCategory)
+        } else Result.success(null)
     }
-    suspend fun getCategories(): List<Category>? {
-        return try {
-            val documentSnapshot = Firestore.categoryCollection.get().await()
-            documentSnapshot.toObjects<Category>()
-        } catch (exception: Exception) {
-            Log.d("USUK", "CategoryRepository.getCategory: ${exception.message}")
-            null
-        }
+
+    suspend fun getCategory(idCategory: String): Result<Category> {
+        val querySnapshot = Firestore.categoryCollection.document(idCategory).get().await()
+
+        val targetCategory = querySnapshot.toObject<Category>()!!
+        return Result.success(targetCategory)
     }
 
     /**
@@ -97,16 +53,15 @@ object CategoryRepository {
      * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
      * */
     fun observeCategoryUpdates(onSnapshot: (List<Category>?, Exception?) -> Any): ListenerRegister {
-        return ListenerRegister(
-            Firestore.categoryCollection.addSnapshotListener { querySnapshot, fbException ->
+        return ListenerRegister(Firestore.categoryCollection.addSnapshotListener { querySnapshot, fbException ->
 
-                if (fbException != null) onSnapshot(null, fbException)
-                else querySnapshot?.let {
-                    val categories = arrayListOf<Category>()
-                    categories.addAll(querySnapshot.map { it.toObject<Category>() })
-                    onSnapshot(categories, null)
-                }
-            })
+            if (fbException != null) onSnapshot(null, fbException)
+            else querySnapshot?.let {
+                val categories = arrayListOf<Category>()
+                categories.addAll(querySnapshot.map { it.toObject<Category>() })
+                onSnapshot(categories, null)
+            }
+        })
 
     }
 

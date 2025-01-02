@@ -12,12 +12,10 @@ import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.data.repository.model.ValidatedCategory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class AddEditProductActivityViewModel : ViewModel() {
@@ -33,13 +31,13 @@ class AddEditProductActivityViewModel : ViewModel() {
                     if (result.getOrNull() == null) saveProduct(saveAsSuggestion)// o produto nao existe na lista, posso salvar
                     else {
                         val msg = String.format(App.getContext().getString(R.string.X_ja_existe_na_lista), validatedName)
-                        _errorEventFlow.tryEmit(msg)
+                        _errorEventLD.postValue(msg)
                     }
                 } else {
                     val msg = String.format(
                         App.getContext().getString(R.string.Nao_foi_possivel_verificar_se_x_ja_existe_na_lista), validatedName
                     )
-                    _errorEventFlow.tryEmit(msg)
+                    _errorEventLD.postValue(msg)
                 }
             }
 
@@ -64,11 +62,11 @@ class AddEditProductActivityViewModel : ViewModel() {
         if (editingProduct) ProductRepository.updateSuggestionProduct(editingProductLD.value!!, newProduct)
         else if (saveAsSuggestion) ProductRepository.updateOrAddProductAsSuggestion(newProduct)
 
-        _finishEventFlow.tryEmit(true)
+        _finishEventLD.postValue(true)
 
     }
 
-    suspend fun loadEditingProduct() = withContext(IO) {
+    fun loadEditingProduct() = viewModelScope.launch(IO) {
         productId?.let {
             ProductRepository.getProduct(productId!!) { result ->
 
@@ -80,20 +78,14 @@ class AddEditProductActivityViewModel : ViewModel() {
         }
     }
 
-    fun loadCategory(categoryId: String) {
-        CategoryRepository.getCategory(categoryId) { result ->
-
-            if (result.isSuccess) _editingCategoryLD.postValue(result.getOrThrow())
-            else Log.d(
-                "USUK", "AddProductActivityViewModel.loadCategory: erro obtendo categoria do firebase${result.exceptionOrNull()}"
-            )
-        }
+    fun loadCategory(categoryId: String) = viewModelScope.launch(IO) {
+        val result = CategoryRepository.getCategory(categoryId)
+        _editingCategoryLD.postValue(result.getOrThrow())
     }
 
-    fun removeCategory(category: Category) {
-        CategoryRepository.tryAndRemoveCategory(category) { result ->
-            if (result.isFailure) _errorEventFlow.tryEmit(result.exceptionOrNull()!!.message!!)
-        }
+    fun removeCategory(category: Category) = viewModelScope.launch(IO) {
+        val result = CategoryRepository.tryAndRemoveCategory(ValidatedCategory(category))
+        if (result.isFailure) _errorEventLD.postValue(result.exceptionOrNull()!!.message!!)
     }
 
     fun loadSuggestions(term: String) = viewModelScope.launch(IO) {
@@ -139,10 +131,10 @@ class AddEditProductActivityViewModel : ViewModel() {
     private val _editingCategoryLD = MutableLiveData<Category>()
     val editingCategoryLD: LiveData<Category> get() = _editingCategoryLD
 
-    private val _errorEventFlow = MutableSharedFlow<String>(replay = 1)
-    val errorEventFlow = _errorEventFlow.asSharedFlow()
+    private val _errorEventLD = MutableLiveData<String>()
+    val errorEventLD: LiveData<String> get() = _errorEventLD
 
-    private val _finishEventFlow = MutableSharedFlow<Any?>(replay = 1)
-    val finishEventFlow = _finishEventFlow.asSharedFlow()
+    private val _finishEventLD = MutableLiveData<Boolean>()
+    val finishEventLD: LiveData<Boolean> get() = _finishEventLD
 
 }

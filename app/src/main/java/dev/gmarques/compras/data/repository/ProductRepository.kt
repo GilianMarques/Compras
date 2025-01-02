@@ -20,17 +20,16 @@ object ProductRepository {
         shopListId: String,
         onSnapshot: (List<Product>?, Exception?) -> Any,
     ): ListenerRegister {
-        return ListenerRegister(
-            Firestore.productCollection.whereEqualTo("shopListId", shopListId)
-                .addSnapshotListener { querySnapshot, fbException ->
+        return ListenerRegister(Firestore.productCollection.whereEqualTo("shopListId", shopListId)
+            .addSnapshotListener { querySnapshot, fbException ->
 
-                    if (fbException != null) onSnapshot(null, fbException)
-                    else querySnapshot?.let {
-                        val products = arrayListOf<Product>()
-                        products.addAll(querySnapshot.map { it.toObject<Product>() })
-                        onSnapshot(products, null)
-                    }
-                })
+                if (fbException != null) onSnapshot(null, fbException)
+                else querySnapshot?.let {
+                    val products = arrayListOf<Product>()
+                    products.addAll(querySnapshot.map { it.toObject<Product>() })
+                    onSnapshot(products, null)
+                }
+            })
 
     }
 
@@ -47,16 +46,15 @@ object ProductRepository {
     fun observeSuggestionProductUpdates(
         onSnapshot: (List<Product>?, Exception?) -> Any,
     ): ListenerRegister {
-        return ListenerRegister(
-            Firestore.suggestionProductCollection.addSnapshotListener { querySnapshot, fbException ->
+        return ListenerRegister(Firestore.suggestionProductCollection.addSnapshotListener { querySnapshot, fbException ->
 
-                if (fbException != null) onSnapshot(null, fbException)
-                else querySnapshot?.let {
-                    val products = arrayListOf<Product>()
-                    products.addAll(querySnapshot.map { it.toObject<Product>() })
-                    onSnapshot(products, null)
-                }
-            })
+            if (fbException != null) onSnapshot(null, fbException)
+            else querySnapshot?.let {
+                val products = arrayListOf<Product>()
+                products.addAll(querySnapshot.map { it.toObject<Product>() })
+                onSnapshot(products, null)
+            }
+        })
 
     }
 
@@ -65,7 +63,7 @@ object ProductRepository {
     }
 
     /**
-     * Verifica se a sugestão existe no banco de dados com base em seu nome, e a atualize.
+     * Verifica se a sugestão existe no banco de dados com base em seu nome, e a atualiza.
      * Caso não exista, a sugestão é adicionada ao banco de dados.
      * */
     suspend fun updateOrAddProductAsSuggestion(product: Product) {
@@ -78,9 +76,7 @@ object ProductRepository {
             product.copy(id = oldProduct.id)
         }
 
-        Firestore.suggestionProductCollection
-            .document(suggestionProduct.id)
-            .set(suggestionProduct)
+        Firestore.suggestionProductCollection.document(suggestionProduct.id).set(suggestionProduct)
     }
 
     /**
@@ -101,14 +97,12 @@ object ProductRepository {
                 val oldProductOnDb = documentSnapshot.documents[0].toObject<Product>()!!
                 val newProductWithOldId = newProduct.copy(id = oldProductOnDb.id)
 
-                Firestore.suggestionProductCollection.document(newProductWithOldId.id)
-                    .set(newProductWithOldId.selfValidate())
+                Firestore.suggestionProductCollection.document(newProductWithOldId.id).set(newProductWithOldId.selfValidate())
 
             } else {
                 // O documento não existe
                 Log.d(
-                    "USUK",
-                    "ProductRepository.updateSuggestionProductIfExists: sem sugestao de produto pra atualizar no firebase"
+                    "USUK", "ProductRepository.updateSuggestionProductIfExists: sem sugestao de produto pra atualizar no firebase"
                 )
             }
         }.addOnFailureListener { exception ->
@@ -145,40 +139,18 @@ object ProductRepository {
      * retornando `true` na primeira correspondência encontrada. Caso contrário, retorna `false`.
      *
      * @param categoryId ID da categoria a ser verificada.
-     * @param callback Callback que retorna um [Result] com `true` se algum documento for encontrado,
-     *                 `false` se nenhum documento for encontrado, ou uma exceção em caso de erro.
      */
-    fun hasAnyProductWithCategoryId(categoryId: String, callback: (result: Result<Boolean>) -> Unit) {
+    suspend fun hasAnyProductWithCategoryId(categoryId: String): Result<Boolean> {
 
-        // Função auxiliar para verificar a coleção de sugestões de produtos
-        fun checkSuggestions() {
-            Firestore.suggestionProductCollection
-                .whereEqualTo("categoryId", categoryId)
-                .limit(1)
-                .get()
-                .addOnSuccessListener { documentSnapshot ->
-                    callback(Result.success(!documentSnapshot.isEmpty))
-                }
-                .addOnFailureListener { exception ->
-                    callback(Result.failure(exception))
-                }
-        }
+        val productsSnapshot = Firestore.productCollection.whereEqualTo("categoryId", categoryId).limit(1).get().await()
 
-        // Verifica a coleção de produtos
-        Firestore.productCollection
-            .whereEqualTo("categoryId", categoryId)
-            .limit(1)
-            .get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (!documentSnapshot.isEmpty) {
-                    callback(Result.success(true))
-                } else {
-                    checkSuggestions() // Caso não encontre, verifica na coleção de sugestões
-                }
-            }
-            .addOnFailureListener { exception ->
-                callback(Result.failure(exception))
-            }
+        return if (productsSnapshot.isEmpty) {
+
+            val suggestionProductsSnapshot = Firestore.suggestionProductCollection
+                .whereEqualTo("categoryId", categoryId).limit(1).get().await()
+            Result.success(!suggestionProductsSnapshot.isEmpty)
+
+        } else Result.success(true)
     }
 
     fun getProductByName(name: String, listId: String, callback: (Result<Product?>) -> Unit) {

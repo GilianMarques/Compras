@@ -101,34 +101,33 @@ class AddEditProductActivity : AppCompatActivity() {
 
     }
 
-    private fun observeViewmodelErrorMessages() = lifecycleScope.launch {
-        viewModel.errorEventFlow.collect { event ->
+    private fun observeViewmodelErrorMessages() {
+        viewModel.errorEventLD.observe(this@AddEditProductActivity) { event ->
             Snackbar.make(binding.root, event, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
             categoryDialog?.dismissBottomSheetDialog()
-
         }
     }
 
-    private fun observeViewmodelFinishEvent() = lifecycleScope.launch {
-        viewModel.finishEventFlow.collect {
+    private fun observeViewmodelFinishEvent() {
+        viewModel.finishEventLD.observe(this@AddEditProductActivity) {
             finish()
         }
     }
 
-    private fun observeProduct() = lifecycleScope.launch {
-        viewModel.loadEditingProduct()
-        viewModel.editingProductLD.observe(this@AddEditProductActivity) {
+    private fun observeProduct() = viewModel.apply {
+        loadEditingProduct()
+        editingProductLD.observe(this@AddEditProductActivity) {
 
             it?.let {
-                viewModel.editingProduct = true
-                viewModel.loadCategory(it.categoryId)
+                editingProduct = true
+                loadCategory(it.categoryId)
                 observeCategory(it)
             }
         }
     }
 
-    private fun observeSuggestions() = lifecycleScope.launch {
+    private fun observeSuggestions() {
         viewModel.suggestionsLD.observe(this@AddEditProductActivity) { suggestions ->
             if (suggestions.isEmpty()) viewModel.loadNameSuggestions(binding.edtName.text.toString())
             else showSuggestions(suggestions)

@@ -51,7 +51,6 @@ data class Product(
         val resultValidateCategoryId = Validator.validateCategoryId(categoryId)
         if (resultValidateCategoryId.isFailure) throw Exception("Id da categoria associada ao produto é invalida '${categoryId}' -> ${resultValidateCategoryId.exceptionOrNull()!!.message}'")
 
-
         return this
     }
 

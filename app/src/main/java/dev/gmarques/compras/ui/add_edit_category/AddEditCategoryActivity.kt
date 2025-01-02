@@ -67,14 +67,14 @@ class AddEditCategoryActivity : AppCompatActivity() {
     }
 
     private fun observeViewmodelErrorMessages() = lifecycleScope.launch {
-        viewModel.errorEventFlow.collect { event ->
+        viewModel.errorEventLD.observe(this@AddEditCategoryActivity) { event ->
             Snackbar.make(binding.root, event, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
         }
     }
 
     private fun observeViewmodelFinishEvent() = lifecycleScope.launch {
-        viewModel.finishEventFlow.collect {
+        viewModel.finishEventLD.observe(this@AddEditCategoryActivity) {
             finish()
         }
     }
@@ -120,7 +120,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
                     edtColor.requestFocus()
                 } else {
                     root.clearFocus()
-                    tryAndSaveCategory()
+                    lifecycleScope.launch { tryAndSaveCategory() }
                 }
 
             }
