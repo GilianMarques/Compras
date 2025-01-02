@@ -107,7 +107,7 @@ class BsdSelectCategory private constructor(
             fun bind(category: Category) {
                 with(binding) {
                     tvCategoryName.text = category.name
-                    (ivListIcon.background as GradientDrawable).setColor(category.color)
+                    (ivListIcon.background as GradientDrawable).also { it.mutate(); it.setColor(category.color) }
 
                     ivRemove.setOnClickListener {
                         onRemoveListener.invoke(category)

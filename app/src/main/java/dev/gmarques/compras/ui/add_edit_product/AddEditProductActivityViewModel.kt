@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
@@ -13,6 +14,7 @@ import dev.gmarques.compras.data.repository.ProductRepository
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -44,7 +46,7 @@ class AddEditProductActivityViewModel : ViewModel() {
 
     }
 
-    private fun saveProduct(saveAsSuggestion: Boolean) {
+    private fun saveProduct(saveAsSuggestion: Boolean) = viewModelScope.launch(IO) {
 
         val newProduct = if (editingProduct) _editingProductLD.value!!.copy(
             name = validatedName,
@@ -58,7 +60,7 @@ class AddEditProductActivityViewModel : ViewModel() {
         ProductRepository.addOrUpdateProduct(newProduct)
 
         if (editingProduct) ProductRepository.updateSuggestionProduct(editingProductLD.value!!, newProduct)
-        else if (saveAsSuggestion) ProductRepository.addProductAsSuggestion(newProduct)
+        else if (saveAsSuggestion) ProductRepository.updateOrAddProductAsSuggestion(newProduct)
 
         _finishEventFlow.tryEmit(true)
 
@@ -92,6 +94,16 @@ class AddEditProductActivityViewModel : ViewModel() {
         }
     }
 
+    fun loadSuggestions(term: String) = viewModelScope.launch(IO) {
+        Log.d("USUK", "AddEditProductActivityViewModel.".plus("loadSuggestions() "))
+        if (suggestions == null) suggestions = ProductRepository.getSuggestions()
+        val filteredSuggestions = suggestions!!.filter { it.name.contains(term, ignoreCase = true) }
+
+        _suggestionsLD.postValue(filteredSuggestions)
+    }
+
+    private var suggestions: List<Product>? = null
+    var suggestingProduct: Boolean = false
     var editingProduct: Boolean = false
     var productId: String? = null
     var listId: String = "-1"
@@ -104,6 +116,9 @@ class AddEditProductActivityViewModel : ViewModel() {
 
     private val _editingProductLD = MutableLiveData<Product>()
     val editingProductLD: LiveData<Product> get() = _editingProductLD
+
+    private val _suggestionsLD = MutableLiveData<List<Product>>()
+    val suggestionsLD: LiveData<List<Product>> get() = _suggestionsLD
 
     private val _editingCategoryLD = MutableLiveData<Category>()
     val editingCategoryLD: LiveData<Category> get() = _editingCategoryLD

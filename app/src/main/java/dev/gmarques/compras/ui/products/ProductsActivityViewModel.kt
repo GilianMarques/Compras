@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class ProductsActivityViewModel : ViewModel() {
@@ -212,7 +213,10 @@ class ProductsActivityViewModel : ViewModel() {
         ShopListRepository.addOrAttShopList(shopList)
     }
 
-    fun removeShopList(shopList: ShopList) {
+    suspend fun removeShopList(shopList: ShopList) = withContext(IO) {
+        shopListDatabaseListener?.remove()
+
+        ProductRepository.removeAllProductsFromList(shopList.id)
         ShopListRepository.removeShopList(shopList)
     }
 

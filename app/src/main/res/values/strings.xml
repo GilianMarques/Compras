@@ -82,4 +82,5 @@
     <string name="Incluir_na_lista">Incluir na lista</string>
     <string name="Concluir">Concluir</string>
     <string name="Produtos_repetidos_x_nao_foram_incluidos_na_lista">Produtos repetidos (%1$d) não foram incluídos na lista</string>
+    <string name="Voce_esta_pensando_em">Você está pensando em:</string>
 </resources>

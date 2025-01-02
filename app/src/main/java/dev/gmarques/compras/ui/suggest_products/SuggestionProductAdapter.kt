@@ -18,7 +18,7 @@ import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivityViewModel
 import dev.gmarques.compras.ui.suggest_products.SuggestionProductAdapter.SuggestionProductViewHolder
 import dev.gmarques.compras.utils.ExtFun.Companion.toCurrency
 
-class SuggestionProductAdapter(private val onRemoveListener: (Product) -> Unit) :
+class SuggestionProductAdapter(private val onRemoveListener: (Product,Int) -> Unit) :
     ListAdapter<SelectableProduct, SuggestionProductViewHolder>(ProductDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SuggestionProductViewHolder {
@@ -34,9 +34,16 @@ class SuggestionProductAdapter(private val onRemoveListener: (Product) -> Unit) 
         holder.bindData(getItem(position))
     }
 
+    fun removeProduct(position: Int) {
+        val newList = currentList.toMutableList()
+        newList.removeAt(position)
+        submitList(newList)
+
+    }
+
     class SuggestionProductViewHolder(
         private val binding: RvItemSuggestionProductBinding,
-        private val onRemoveListener: (Product) -> Unit,
+        private val onRemoveListener: (Product,Int) -> Unit,
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -75,7 +82,7 @@ class SuggestionProductAdapter(private val onRemoveListener: (Product) -> Unit) 
             }
 
             ivRemove.setOnClickListener {
-                onRemoveListener(selectableProduct.product)
+                onRemoveListener(selectableProduct.product, adapterPosition)
                 Vibrator.interaction()
             }
 

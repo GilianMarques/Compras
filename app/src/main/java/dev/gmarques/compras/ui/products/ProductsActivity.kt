@@ -125,13 +125,11 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         binding.toolbar.tvActivityTitle.text = it.name
     }
 
-    @Suppress("UNUSED_ANONYMOUS_PARAMETER")
     private fun initSearch() {
 
-        binding.edtSearch.doOnTextChanged { text, start, before, count ->
+        binding.edtSearch.doOnTextChanged { text, _, _, _ ->
 
             val term = text.toString()
-            // if (term.length in 1..2) return@doOnTextChanged
 
             rvAdapter.submitList(emptyList())
             viewModel.searchProduct(term)
@@ -266,8 +264,11 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
         val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
             .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
-                viewModel.removeShopList(shopList)
-                dialog.dismiss()
+                lifecycleScope.launch {
+                    viewModel.removeShopList(shopList)
+                    dialog.dismiss()
+                    finish()
+                }
             }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
                 dialog.dismiss()
             }

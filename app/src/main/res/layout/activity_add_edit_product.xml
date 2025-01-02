@@ -57,6 +57,29 @@
                     android:paddingEnd="16dp"
                     android:text="@string/Sugerir_produto_ao_criar_nova_lista" />
 
+
+                <TextView
+                    android:id="@+id/tv_suggestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:fontFamily="@font/lexend_deca_bold"
+                    android:padding="4dp"
+                    android:text="@string/Voce_esta_pensando_em"
+                    android:textAlignment="viewStart"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:id="@+id/ll_suggestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    tools:context=".ui.add_edit_product.AddProduct" />
+
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/edt_name"
                     style="@style/Margins_edittext"
@@ -169,7 +192,6 @@
                     android:id="@+id/edt_category"
                     style="@style/Margins_edittext"
                     android:layout_width="match_parent"
-                    android:textColorHint="?attr/editTextColor"
                     android:layout_height="wrap_content"
                     android:background="@drawable/back_addproduct_edittext"
                     android:drawableStart="@drawable/vec_category"
@@ -177,6 +199,7 @@
                     android:importantForAutofill="no"
                     android:inputType="textCapSentences"
                     android:maxLength="0"
+                    android:textColorHint="?attr/editTextColor"
                     tools:text="algum  texto  algum  texto  algum  texto  " />
 
                 <TextView

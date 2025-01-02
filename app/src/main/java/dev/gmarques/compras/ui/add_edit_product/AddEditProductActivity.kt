@@ -9,11 +9,14 @@ import android.text.Spanned
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
@@ -22,6 +25,7 @@ import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
 import dev.gmarques.compras.utils.ExtFun.Companion.currencyToDouble
+import dev.gmarques.compras.utils.ExtFun.Companion.dp
 import dev.gmarques.compras.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.utils.ExtFun.Companion.showKeyboard
@@ -37,6 +41,7 @@ import kotlinx.coroutines.withContext
  */
 class AddEditProductActivity : AppCompatActivity() {
 
+    private var canLoadSuggestion: Boolean = true
     private var categoryDialog: BsdSelectCategory? = null
     private lateinit var binding: ActivityAddEditProductBinding
     private lateinit var viewModel: AddEditProductActivityViewModel
@@ -78,6 +83,7 @@ class AddEditProductActivity : AppCompatActivity() {
         setupInputQuantity()
         setupInputCategory()
         observeProduct()
+        observeSuggestions()
         observeViewmodelErrorMessages()
         observeViewmodelFinishEvent()
 
@@ -118,11 +124,50 @@ class AddEditProductActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeSuggestions() = lifecycleScope.launch {
+        viewModel.suggestionsLD.observe(this@AddEditProductActivity) { suggestions ->
+            showSuggestions(suggestions)
+        }
+    }
+
+    private fun showSuggestions(suggestions: List<Product>) {
+
+        if (suggestions.isEmpty()) return
+
+        binding.tvSuggestion.visibility = VISIBLE
+        binding.llSuggestion.removeAllViews()
+
+
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply { marginStart = 4.dp(); marginEnd = 4.dp() }
+
+
+        suggestions.forEach { product ->
+
+            val chip = Chip(this@AddEditProductActivity)
+            chip.text = product.name
+            chip.layoutParams = layoutParams
+            chip.setOnClickListener {
+                canLoadSuggestion = false
+                viewModel.suggestingProduct = true
+                viewModel.loadCategory(product.categoryId)
+                observeCategory(product)
+                binding.tvSuggestion.visibility = GONE
+                binding.llSuggestion.removeAllViews()
+                lifecycleScope.launch(IO) { delay(1500); canLoadSuggestion = true }
+            }
+            binding.llSuggestion.addView(chip)
+
+        }
+    }
+
+
     private fun observeCategory(product: Product) = lifecycleScope.launch {
         viewModel.editingCategoryLD.observe(this@AddEditProductActivity) {
 
             it?.let {
-                viewModel.editingProduct = true
+                if (!viewModel.suggestingProduct) viewModel.editingProduct = true
                 updateViewModelAndUiWithEditableProduct(product, it)
             }
         }
@@ -130,7 +175,6 @@ class AddEditProductActivity : AppCompatActivity() {
 
     private fun updateViewModelAndUiWithEditableProduct(product: Product, category: Category) = binding.apply {
         viewModel.apply {
-            cbSuggestProduct.visibility = GONE
 
             edtName.setText(product.name)
             validatedName = product.name
@@ -149,8 +193,11 @@ class AddEditProductActivity : AppCompatActivity() {
 
             validatedCategory = category
 
-            toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), product.name)
-            fabSave.text = getString(R.string.Salvar_produto)
+            if (editingProduct && !suggestingProduct) {
+                cbSuggestProduct.visibility = GONE
+                toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), product.name)
+                fabSave.text = getString(R.string.Salvar_produto)
+            }
         }
     }
 
@@ -195,6 +242,13 @@ class AddEditProductActivity : AppCompatActivity() {
             }
         }
 
+        edtTarget.doOnTextChanged { text, _, _, _ ->
+            if (!text.isNullOrEmpty() && text.length > 2 && canLoadSuggestion) viewModel.loadSuggestions(text.toString())
+            else {
+                binding.tvSuggestion.visibility = GONE
+                binding.llSuggestion.removeAllViews()
+            }
+        }
     }
 
     private fun setupInputInfo() {

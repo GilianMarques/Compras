@@ -76,6 +76,14 @@ class ExtFun {
             return Color.HSVToColor(hsl)
         }
 
+        /**
+         * Converte um valor em dp para pixels.
+         * Se o valor da variavel this for 4 o resultado sera o total de pixels que 4dp equivale
+         */
+        fun Int.dp(): Int {
+            return (this * App.getContext().resources.displayMetrics.density).toInt()
+        }
+
         fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, observer: (T) -> Unit) {
             observe(owner, object : Observer<T> {
                 override fun onChanged(value: T) {

@@ -8,7 +8,7 @@ import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.utils.ListenerRegister
 import kotlinx.coroutines.tasks.await
 
-// TODO: todas as funçoes de repositio devem ser suspensas com coroutines
+// TODO: todas as funçoes de repository  devem ser suspensas com coroutines e usar await. receber um validatedProduct
 object ProductRepository {
 
 
@@ -65,14 +65,22 @@ object ProductRepository {
     }
 
     /**
-     * O produto de lista  a ser modificado e incluido como sugestao no DB
-     * Essa função nao faz atualizaçoes apenas inserçoes.
-     */
-    fun addProductAsSuggestion(product: Product) {
-        val validatedSuggestionProductWithNewId = product.withNewId().selfValidate()
+     * Verifica se a sugestão existe no banco de dados com base em seu nome, e a atualize.
+     * Caso não exista, a sugestão é adicionada ao banco de dados.
+     * */
+    suspend fun updateOrAddProductAsSuggestion(product: Product) {
+
+        val querySnapshot = Firestore.suggestionProductCollection.whereEqualTo("name", product.name).limit(1).get().await()
+
+        val suggestionProduct = if (querySnapshot.isEmpty) product.withNewId().selfValidate()
+        else {
+            val oldProduct = querySnapshot.documents[0].toObject<Product>()!!
+            product.copy(id = oldProduct.id)
+        }
+
         Firestore.suggestionProductCollection
-            .document(validatedSuggestionProductWithNewId.id)
-            .set(validatedSuggestionProductWithNewId)
+            .document(suggestionProduct.id)
+            .set(suggestionProduct)
     }
 
     /**
@@ -105,7 +113,10 @@ object ProductRepository {
             }
         }.addOnFailureListener { exception ->
             // Falha ao acessar o banco
-            Log.d("USUK", "ProductRepository.updateSuggestionProductIfExists: Erro obtendo sugestoes de produto do firebase $exception")
+            Log.d(
+                "USUK",
+                "ProductRepository.updateSuggestionProductIfExists: Erro obtendo sugestoes de produto do firebase $exception"
+            )
         }
     }
 
@@ -184,5 +195,19 @@ object ProductRepository {
             }
 
 
+    }
+
+    suspend fun getSuggestions(): List<Product> {
+        val querySnapshot = Firestore.suggestionProductCollection.get().await()
+        return querySnapshot.map { it.toObject<Product>() }
+    }
+
+    suspend fun removeAllProductsFromList(shopListId: String) {
+        val querySnapshot = Firestore.productCollection.whereEqualTo("shopListId", shopListId).get().await()
+
+        for (document in querySnapshot.documents) {
+            document.reference.delete()
+            Log.d("USUK", "ProductRepository.removeAllProductsFromList: removendo: ${document.get("name")}")
+        }
     }
 }

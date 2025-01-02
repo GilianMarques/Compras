@@ -123,12 +123,13 @@ class SuggestProductsActivity : AppCompatActivity() {
         binding.rvProducts.adapter = rvAdapter
     }
 
-    private fun removeSuggestionProduct(product: Product) {
+    private fun removeSuggestionProduct(product: Product, position: Int) {
         val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x_das_sugestoes), product.name).formatHtml()
 
         val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
             .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
                 viewModel.removeSuggestionProduct(product)
+                rvAdapter.removeProduct(position)
                 dialog.dismiss()
             }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
                 dialog.dismiss()
