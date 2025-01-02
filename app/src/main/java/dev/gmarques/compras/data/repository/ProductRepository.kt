@@ -105,12 +105,12 @@ object ProductRepository {
             }
         }.addOnFailureListener { exception ->
             // Falha ao acessar o banco
-            Log.d("USUK", "ProductRepository.updateSuggestionProductIfExists: Erro obtendo sugestoes de produto do firebase")
+            Log.d("USUK", "ProductRepository.updateSuggestionProductIfExists: Erro obtendo sugestoes de produto do firebase $exception")
         }
     }
 
     fun removeProduct(product: Product) {
-        Firestore.productCollection.document(product.id.toString()).delete()
+        Firestore.productCollection.document(product.id).delete()
     }
 
     fun removeSuggestionProduct(product: Product) {

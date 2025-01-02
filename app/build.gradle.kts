@@ -20,16 +20,22 @@ android {
     }
 
     buildTypes {
+
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true // Habilite ou desabilite minificação
+            isShrinkResources = true // Remove recursos não utilizados
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+
+        debug {
+            isMinifyEnabled = false // Evita minificação no modo debug
+            applicationIdSuffix = ".debug" // Adiciona um sufixo ao applicationId
+            versionNameSuffix = "-debug" // Adiciona sufixo à versão do app
+        }
     }
-
-
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

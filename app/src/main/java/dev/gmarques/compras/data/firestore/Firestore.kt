@@ -10,9 +10,7 @@ class Firestore {
     // TODO: ajustar regras de acesso no console do firebase ate 10/01/25 ou o app nao vai mais conseguir acessar os dados
     companion object {
 
-        // TODO: usar flavors ou modulos
         private val userRootPath = if (BuildConfig.DEBUG) "debug_database" else UserRepository.getUser()!!.email!!
-
 
         private const val DATABASE = "Database"
         private const val SHOP_LISTS = "ShopLists"

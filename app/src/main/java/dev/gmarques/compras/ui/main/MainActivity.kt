@@ -49,8 +49,11 @@ class MainActivity : AppCompatActivity() {
     private fun checkUserAuthenticated() {
         val user = UserRepository.getUser()
 
-        if (user != null) attUiWithUserData(user)
-        else {
+        if (user != null) {
+            attUiWithUserData(user)
+            viewModel.observeUpdates()
+
+        } else {
             startActivity(
                 Intent(
                     applicationContext, LoginActivity::class.java

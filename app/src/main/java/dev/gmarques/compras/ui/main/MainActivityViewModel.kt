@@ -11,15 +11,13 @@ import dev.gmarques.compras.utils.ListenerRegister
 
 class MainActivityViewModel : ViewModel() {
 
-    init {
-        observeUpdates()
-    }
-
-    private fun observeUpdates() {
+    fun observeUpdates() {
 
         listenerRegister = ShopListRepository.observeListUpdates { lists, error ->
-            if (error == null) lists.let { _listsLiveData.postValue(lists) }
-            else Log.d("USUK", "ShopListRepository.getAllLists: erro obtendo snapshot e $error")
+            if (error == null) {
+                val nonNullableList = lists!!
+                _listsLiveData.postValue(nonNullableList)
+            } else Log.d("USUK", "ShopListRepository.getAllLists: erro obtendo snapshot e $error")
         }
 
     }
@@ -29,7 +27,7 @@ class MainActivityViewModel : ViewModel() {
     }
 
     override fun onCleared() {
-        listenerRegister.remove()
+        listenerRegister?.remove()
         super.onCleared()
     }
 
@@ -37,7 +35,7 @@ class MainActivityViewModel : ViewModel() {
         ShopListRepository.removeShopList(shopList)
     }
 
-    private lateinit var listenerRegister: ListenerRegister
+    private var listenerRegister: ListenerRegister? = null
     private val _listsLiveData = MutableLiveData<List<ShopList>>()
     val listsLiveData: LiveData<List<ShopList>> get() = _listsLiveData
 

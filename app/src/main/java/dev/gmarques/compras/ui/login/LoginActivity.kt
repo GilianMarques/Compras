@@ -95,17 +95,23 @@ class LoginActivity : AppCompatActivity() {
         } catch (e: ApiException) {
             this.binding.progressBar.visibility = View.GONE
             this.binding.btnTentarNovamente.visibility = View.VISIBLE
-            if (e.statusCode == GoogleSignInStatusCodes.SIGN_IN_CANCELLED) {
-                this.binding.tvInfo.setText(R.string.Voce_cancelou_o_login)
-            } else if (e.statusCode == GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS) {
-                this.binding.tvInfo.setText(R.string.Hamaisdeumprocessodeloginemandamentoquantas)
-            } else if (e.statusCode == GoogleSignInStatusCodes.SIGN_IN_FAILED) {
-                this.binding.tvInfo.text =
-                    MessageFormat.format(getString(R.string.Ologinfalhou), e.statusCode)
-            } else {
-                this.binding.tvInfo.text = MessageFormat.format(
-                    getString(R.string.Houveumerroaocontactaraapidogoole), e.statusCode
-                )
+
+            when (e.statusCode) {
+                GoogleSignInStatusCodes.SIGN_IN_CANCELLED -> {
+                    this.binding.tvInfo.setText(R.string.Voce_cancelou_o_login)
+                }
+                GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS -> {
+                    this.binding.tvInfo.setText(R.string.Hamaisdeumprocessodeloginemandamentoquantas)
+                }
+                GoogleSignInStatusCodes.SIGN_IN_FAILED -> {
+                    this.binding.tvInfo.text =
+                        MessageFormat.format(getString(R.string.Ologinfalhou), e.statusCode)
+                }
+                else -> {
+                    this.binding.tvInfo.text = MessageFormat.format(
+                        getString(R.string.Houveumerroaocontactaraapidogoole), e.statusCode
+                    )
+                }
             }
         }
     }
