@@ -67,11 +67,13 @@ data class Category(
 
     class Validator {
         companion object {
+            // Constantes privadas
+            private const val MAX_CHARS = 30
+            private const val MIN_CHARS = 3
+            private const val EMPTY_COLOR = -1
+            private const val COLOR_LENGTH_THRESHOLD = 2
 
             fun validateName(input: String): Result<String> {
-                val maxChars = 30
-                val minChars = 3
-
                 return when {
                     input.isEmpty() -> Result.failure(
                         Exception(
@@ -79,15 +81,15 @@ data class Category(
                         )
                     )
 
-                    input.length < minChars -> Result.failure(
+                    input.length < MIN_CHARS -> Result.failure(
                         Exception(
-                            String.format(App.getContext().getString(O_nome_deve_ter_no_m_nimo_x_caracteres), minChars)
+                            String.format(App.getContext().getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS)
                         )
                     )
 
-                    input.length > maxChars -> Result.failure(
+                    input.length > MAX_CHARS -> Result.failure(
                         Exception(
-                            String.format(App.getContext().getString(O_nome_deve_ter_no_m_ximo_x_caracteres), maxChars)
+                            String.format(App.getContext().getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS)
                         )
                     )
 
@@ -98,9 +100,8 @@ data class Category(
             }
 
             fun validateColor(input: Int): Result<Int> {
-
                 return when {
-                    input == -1 || input.toString().length <= 2 -> Result.failure(
+                    input == EMPTY_COLOR || input.toString().length <= COLOR_LENGTH_THRESHOLD -> Result.failure(
                         Exception(
                             App.getContext().getString(A_cor_nao_pode_ficar_vazia)
                         )
@@ -111,9 +112,9 @@ data class Category(
                     }
                 }
             }
-
         }
     }
+
 
 }
 
