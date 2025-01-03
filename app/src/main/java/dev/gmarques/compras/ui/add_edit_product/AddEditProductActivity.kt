@@ -128,8 +128,9 @@ class AddEditProductActivity : AppCompatActivity() {
     }
 
     private fun observeSuggestions() {
-        viewModel.suggestionsLD.observe(this@AddEditProductActivity) { suggestions ->
-            if (suggestions.isEmpty()) viewModel.loadNameSuggestions(binding.edtName.text.toString())
+        viewModel.suggestionsLD.observe(this@AddEditProductActivity) { result ->
+            val (suggestions, term) = result
+            if (suggestions.isEmpty()) viewModel.loadNameSuggestions(term)
             else showSuggestions(suggestions)
         }
     }
@@ -137,6 +138,7 @@ class AddEditProductActivity : AppCompatActivity() {
     private fun observeNameSuggestions() = lifecycleScope.launch {
         viewModel.nameSuggestionsLD.observe(this@AddEditProductActivity) { suggestions ->
             if (suggestions.isNotEmpty()) showSuggestions(suggestions)
+            else hideSuggestions()
         }
     }
 
@@ -164,8 +166,7 @@ class AddEditProductActivity : AppCompatActivity() {
 
             chip.setOnClickListener {
                 binding.edtName.requestFocus()
-                binding.tvSuggestion.visibility = GONE
-                binding.llSuggestion.removeAllViews()
+                hideSuggestions()
 
                 if (suggestion is Product) {
                     viewModel.loadCategory(suggestion.categoryId)
@@ -182,6 +183,11 @@ class AddEditProductActivity : AppCompatActivity() {
             }
 
         }
+    }
+
+    private fun hideSuggestions() {
+        binding.tvSuggestion.visibility = GONE
+        binding.llSuggestion.removeAllViews()
     }
 
     private fun observeCategory(product: Product) = lifecycleScope.launch {
@@ -251,8 +257,7 @@ class AddEditProductActivity : AppCompatActivity() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
-                binding.tvSuggestion.visibility = GONE
-                binding.llSuggestion.removeAllViews()
+                hideSuggestions()
 
                 val term = edtTarget.text.toString()
                 val result = Product.Validator.validateName(term)
@@ -268,12 +273,10 @@ class AddEditProductActivity : AppCompatActivity() {
         }
 
         edtTarget.doOnTextChanged { text, _, _, _ ->
-            if (edtTarget.hasFocus() && !text.isNullOrEmpty() && text.length > 2 && viewModel.canLoadSuggestion) {
+            if (edtTarget.hasFocus() && !text.isNullOrEmpty() && text.length > 1 && viewModel.canLoadSuggestion) {
                 viewModel.loadSuggestions(text.toString())
-            } else {
-                binding.tvSuggestion.visibility = GONE
-                binding.llSuggestion.removeAllViews()
-            }
+            } else hideSuggestions()
+
         }
     }
 

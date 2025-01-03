@@ -39,9 +39,8 @@ class ProductAdapter(val callback: Callback) :
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bindData(productWithCategory: ProductWithCategory) {
-
+            animate()
             clearListener()
-            animarView()
 
             val product = productWithCategory.product
             binding.apply {
@@ -73,11 +72,11 @@ class ProductAdapter(val callback: Callback) :
                 callback.rvProductsOnBoughtItemClick(product, checked)
             }
 
-
         }
 
 
-        private fun animarView() {
+        private fun animate() {
+            itemView.clearAnimation()
             itemView.alpha = 0f
             itemView.animate().alpha(1f).setDuration(150).setStartDelay(3L * adapterPosition).start()
         }

@@ -3,6 +3,7 @@ package dev.gmarques.compras.data
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
+import kotlin.math.min
 
 class ProductNameSuggestion {
 
@@ -13,9 +14,12 @@ class ProductNameSuggestion {
      * @param term Termo a ser buscado.
      * @return Lista de sugestões contendo o termo.
      */
-    suspend fun getSuggestion(term: String): List<String> {
+    suspend fun getSuggestion(term: String, limit: Int): List<String> {
         if (suggestions.isEmpty()) loadSuggestions()
-        return suggestions.filter { it.removeAccents().contains(term.removeAccents(), ignoreCase = true) }
+
+        val filteredSuggestions = suggestions.filter { it.removeAccents().contains(term.removeAccents(), ignoreCase = true) }
+        return filteredSuggestions.subList(0, min(filteredSuggestions.size, limit))
+
     }
 
     private suspend fun loadSuggestions() = withContext(IO) {
@@ -73,8 +77,6 @@ class ProductNameSuggestion {
                 "Amendoim 🥜",
                 "Andu 🌿",
                 "Arachachá 🌿",
-                "Arroz 🌾",
-                "Arroz-selvagem 🌾",
                 "Aveia 🌾",
                 "Avelã 🌰",
                 "Azeitona 🫒",
@@ -583,6 +585,7 @@ class ProductNameSuggestion {
                 "Tigela 🍲",
                 "Tábua de corte 🔪",
                 "Torradeira 🍞",
+                "Pasta de dentes 🦷🪥",
                 "Vassoura 🧹"
             )
         )

@@ -39,7 +39,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:animateLayoutChanges="false"
                 android:orientation="vertical"
                 android:paddingBottom="100dp">
 
@@ -63,22 +62,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:visibility="gone"
-                    tools:visibility="visible"
                     android:fontFamily="@font/lexend_deca_bold"
                     android:padding="4dp"
                     android:text="@string/Voce_esta_pensando_em"
                     android:textAlignment="viewStart"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
-                <LinearLayout
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginStart="16dp"
-                    android:id="@+id/ll_suggestion"
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    tools:context=".ui.add_edit_product.AddProduct" />
+                    android:scrollIndicators="none"
+                    android:fillViewport="false"
+                    android:scrollbarSize="0dp">
+
+                    <LinearLayout
+                        android:id="@+id/ll_suggestion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:orientation="horizontal"
+                        tools:context=".ui.add_edit_product.AddProduct" />
+                </HorizontalScrollView>
+
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/edt_name"

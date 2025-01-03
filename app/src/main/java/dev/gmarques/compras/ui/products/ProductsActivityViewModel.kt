@@ -75,10 +75,11 @@ class ProductsActivityViewModel : ViewModel() {
      */
     private fun observeCategoriesUpdates() {
         if (categoriesDatabaseListener != null) return
-        categoriesDatabaseListener = CategoryRepository.observeCategoryUpdates { cat, exception ->
+
+        categoriesDatabaseListener = CategoryRepository.observeCategoryUpdates { dbCategories, exception ->
 
             if (exception != null) throw exception
-            if (cat != null) categories = cat.associateBy { it.id }.toMap(HashMap())
+            if (dbCategories != null) categories = dbCategories.associateBy { it.id }.toMap(HashMap())
             observeProductsUpdates()
 
         }
@@ -99,13 +100,12 @@ class ProductsActivityViewModel : ViewModel() {
      */
     private fun observeProductsUpdates() {
         if (productsDatabaseListener != null) return
-        else productsDatabaseListener = ProductRepository.observeProductUpdates(_shopListLD.value!!.id) { lists, error ->
+        productsDatabaseListener = ProductRepository.observeProductUpdates(_shopListLD.value!!.id) { products, error ->
 
             if (error != null) throw error
+            if (products != null) viewModelScope.launch(IO) {
 
-            if (lists != null) viewModelScope.launch {
-
-                val filteredProductsWithCategories = filterProductsAndLoadCategory(lists)
+                val filteredProductsWithCategories = filterProductsAndLoadCategory(products)
                 val sortedProductsWithPrices = sortProducts(filteredProductsWithCategories)
 
                 postDataWithThrottling(sortedProductsWithPrices)
@@ -117,6 +117,8 @@ class ProductsActivityViewModel : ViewModel() {
      * Aplica os termos de busca do ususario, caso hajam, aproveita o loop para carregar as categorias
      */
     private fun filterProductsAndLoadCategory(lists: List<Product>?): ProductsWithPrices {
+
+        requireNotNull(categories) { "Carregue as categorias antes de carregar os produtos." }
 
         val filteredProducts = mutableListOf<ProductWithCategory>()
         var fullPrice = 0.0
@@ -147,14 +149,14 @@ class ProductsActivityViewModel : ViewModel() {
     private fun sortProducts(filteredProductsWithPrices: ProductsWithPrices): ProductsWithPrices {
         val newData = filteredProductsWithPrices.productsWithCategory
 
-        var sorted =
-            newData.sortedWith(compareBy({ if (boughtProductsAtEnd) it.product.hasBeenBought else false }, // Produtos comprados no final
+        var sorted = newData.sortedWith(
+            compareBy({ if (boughtProductsAtEnd) it.product.hasBeenBought else false }, // Produtos comprados no final
                 { if (sortCriteria == SortCriteria.NAME) it.product.name else null },
                 { if (sortCriteria == SortCriteria.CATEGORY) it.category.name else null },
-                { if (sortCriteria == SortCriteria.CREATION_DATE) it.product.creationDate else null }
-            )).let {
-                if (!sortAscending) it.reversed() else it
-            }
+                { if (sortCriteria == SortCriteria.CREATION_DATE) it.product.creationDate else null })
+        ).let {
+            if (!sortAscending) it.reversed() else it
+        }
         sorted = sorted.sortedWith(compareBy { if (boughtProductsAtEnd) it.product.hasBeenBought else false })
 
         return filteredProductsWithPrices.copy(productsWithCategory = sorted)
@@ -202,7 +204,11 @@ class ProductsActivityViewModel : ViewModel() {
      * Funciona definindo o termo de busca numa variável global, removendo e nulificando o listener que observa o banco de dados e
      * no fim redefinindo, o listener para disparar uma atualização com os dados para então serem filtrados pelo viewmodel antes
      * de irem para a ui*/
-    fun searchProduct(searchTerm: String) {
+    fun searchProduct(term: String) {
+
+        val searchTerm = term.removeAccents()
+
+        if (this.searchTerm == searchTerm) return
 
         this.searchTerm = searchTerm
 

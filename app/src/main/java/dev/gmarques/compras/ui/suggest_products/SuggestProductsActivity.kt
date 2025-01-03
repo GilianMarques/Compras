@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Spanned
+import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
@@ -22,7 +22,6 @@ import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivitySuggestProductsBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
 
@@ -82,18 +81,15 @@ class SuggestProductsActivity : AppCompatActivity() {
         binding.edtSearch.doOnTextChanged { text, _, _, _ ->
 
             val term = text.toString()
-
-            rvAdapter.submitList(emptyList())
-            viewModel.searchProduct(term.removeAccents())
-
+            viewModel.searchProduct(term)
             binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
         }
 
         binding.ivClearSearch.setOnClickListener {
             binding.edtSearch.setText("")
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
+            binding.edtSearch.hideKeyboard()
         }
+
 
     }
 
@@ -133,18 +129,20 @@ class SuggestProductsActivity : AppCompatActivity() {
 
     private fun initRecyclerView() {
 
-        rvAdapter = SuggestionProductAdapter(::removeSuggestionProduct)
+        rvAdapter = SuggestionProductAdapter(
+            ::adapterOnRemoveListener,
+            ::adapterOnSelectionChangedListener
+        )
         binding.rvProducts.layoutManager = LinearLayoutManager(this)
         binding.rvProducts.adapter = rvAdapter
     }
 
-    private fun removeSuggestionProduct(product: Product, position: Int) {
+    private fun adapterOnRemoveListener(product: Product) {
         val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x_das_sugestoes), product.name).formatHtml()
 
         val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
             .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
                 viewModel.removeSuggestionProduct(product)
-                rvAdapter.removeProduct(position)
                 dialog.dismiss()
             }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
                 dialog.dismiss()
@@ -153,6 +151,16 @@ class SuggestProductsActivity : AppCompatActivity() {
         val dialog = dialogBuilder.create()
         dialog.show()
     }
+
+
+    private fun adapterOnSelectionChangedListener(product: Product, selected: Boolean, quantity: Int) {
+        viewModel.updateSelectionData(product, selected, quantity)
+        Log.d(
+            "USUK",
+            "SuggestProductsActivity.".plus("adapterOnSelectionChangedListener() product = ${product.name}, selected = $selected, quantity = $quantity")
+        )
+    }
+
 
     private fun initFabIncludeProducts() = binding.apply {
 

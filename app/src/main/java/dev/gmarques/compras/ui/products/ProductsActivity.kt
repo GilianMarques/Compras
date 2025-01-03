@@ -9,7 +9,6 @@ import android.text.Spanned
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AnticipateInterpolator
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
@@ -135,17 +134,13 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         binding.edtSearch.doOnTextChanged { text, _, _, _ ->
 
             val term = text.toString()
-
-            rvAdapter.submitList(emptyList())
             viewModel.searchProduct(term)
-
             binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
         }
 
         binding.ivClearSearch.setOnClickListener {
             binding.edtSearch.setText("")
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
+            binding.edtSearch.hideKeyboard()
         }
 
     }
@@ -263,7 +258,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     private fun showSortProductsDialog() {
         BsdSortProducts(this) {
             viewModel.loadSortPreferences()
-            viewModel.searchProduct("")//força os dados a serem recarregados, filtrados e ordenados
+            //força os dados a serem recarregados, filtrados e ordenados
+            viewModel.searchProduct("a")
+            viewModel.searchProduct("")
         }.show()
     }
 

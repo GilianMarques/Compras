@@ -34,8 +34,7 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
 
         fun bind(shopList: ShopList) = binding.apply {
 
-            itemView.alpha = 0f // Inicia a view invisível
-
+            animate()
             tvListName.text = shopList.name
 
             cvChild.setOnClickListener { onItemClick(shopList) }
@@ -50,17 +49,13 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
                 setColor(shopList.color)
                 setStroke(0, Color.TRANSPARENT)
             }
-
-
-            // Anima a entrada da view
-            itemView.animate()
-                .alpha(1f)
-                .setDuration(150)
-                .setStartDelay(10L * adapterPosition) // Adiciona um atraso baseado na posição
-                .start()
-
         }
 
+        private fun animate() {
+            itemView.clearAnimation()
+            itemView.alpha = 0f
+            itemView.animate().alpha(1f).setDuration(150).setStartDelay(3L * adapterPosition).start()
+        }
 
     }
 

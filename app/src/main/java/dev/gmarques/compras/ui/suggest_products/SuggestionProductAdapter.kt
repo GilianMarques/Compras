@@ -18,7 +18,10 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.suggest_products.SuggestionProductAdapter.SuggestionProductViewHolder
 
-class SuggestionProductAdapter(private val onRemoveListener: (Product,Int) -> Unit) :
+class SuggestionProductAdapter(
+    private val onRemoveListener: (Product) -> Unit,
+    private val onSelectionChangedListener: (Product, Boolean, Int) -> Unit,
+) :
     ListAdapter<SelectableProduct, SuggestionProductViewHolder>(ProductDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SuggestionProductViewHolder {
@@ -27,23 +30,17 @@ class SuggestionProductAdapter(private val onRemoveListener: (Product,Int) -> Un
             LayoutInflater.from(parent.context), R.layout.rv_item_suggestion_product, parent, false
         )
 
-        return SuggestionProductViewHolder(binding, onRemoveListener)
+        return SuggestionProductViewHolder(binding, onRemoveListener, onSelectionChangedListener)
     }
 
     override fun onBindViewHolder(holder: SuggestionProductViewHolder, position: Int) {
         holder.bindData(getItem(position))
     }
 
-    fun removeProduct(position: Int) {
-        val newList = currentList.toMutableList()
-        newList.removeAt(position)
-        submitList(newList)
-
-    }
-
     class SuggestionProductViewHolder(
         private val binding: RvItemSuggestionProductBinding,
-        private val onRemoveListener: (Product,Int) -> Unit,
+        private val onRemoveListener: (Product) -> Unit,
+        private val onSelectionDataChangedListener: (Product, Boolean, Int) -> Unit,
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -53,18 +50,18 @@ class SuggestionProductAdapter(private val onRemoveListener: (Product,Int) -> Un
             this.selectableProduct = selectableProduct
 
             clearListener()
-            animarView()
+            animate()
 
             val product = selectableProduct.product
             binding.apply {
 
+                cbSelected.isChecked = selectableProduct.isSelected
                 tvProductName.text = product.name
-                tvProductPrice.text = (product.price * product.quantity).toCurrency()
                 quantitySelector.tvQuantity.text =
                     String.format(App.getContext().getString(R.string.un), selectableProduct.quantity)
 
             }
-
+            updateItemView(selectableProduct.isSelected)
             setListeners(binding)
         }
 
@@ -75,46 +72,75 @@ class SuggestionProductAdapter(private val onRemoveListener: (Product,Int) -> Un
         @SuppressLint("ClickableViewAccessibility")
         private fun setListeners(binding: RvItemSuggestionProductBinding) = binding.apply {
 
+            /* Permite que o usuario altere a quantidade de produto rapidamente sem precisar esperar que cada alteração seja
+            salva no db e recarregada, ainda permite que a alteraçao feita seja refletida imediatamente na ui já que as atualizações
+            do db tem throttling, o que tambem garante que de todas as  alteraçõe feitas rapidamente só a mais recente será refletida  */
+            var mutableQuantity = selectableProduct.quantity
+
             cbSelected.setOnCheckedChangeListener { _, checked ->
-                selectableProduct.isSelected = checked
-                quantitySelector.root.visibility = if (checked) VISIBLE else GONE
-                ivRemove.visibility = if (checked) GONE else VISIBLE
+                onSelectionDataChangedListener(selectableProduct.product, checked, selectableProduct.quantity)
+                updateItemView(checked)
             }
 
             ivRemove.setOnClickListener {
-                onRemoveListener(selectableProduct.product, adapterPosition)
+                onRemoveListener(selectableProduct.product)
                 Vibrator.interaction()
             }
 
             quantitySelector.apply {
                 val reflectAction = {
-                    tvQuantity.text = String.format(App.getContext().getString(R.string.un), selectableProduct.quantity)
-                    tvProductPrice.text = (selectableProduct.product.price * selectableProduct.quantity).toCurrency()
+                    tvQuantity.text = String.format(App.getContext().getString(R.string.un), mutableQuantity)
+                    tvProductPrice.text = (selectableProduct.product.price * mutableQuantity).toCurrency()
                     Vibrator.interaction()
                 }
 
                 tvPlus.setOnClickListener {
-                    if (selectableProduct.quantity <= Product.Validator.MAX_QUANTITY) selectableProduct.quantity++
-                    reflectAction()
+                    if (mutableQuantity <= Product.Validator.MAX_QUANTITY) {
+                        reflectAction()
+                        onSelectionDataChangedListener(
+                            selectableProduct.product,
+                            selectableProduct.isSelected,
+                            mutableQuantity++
+                        )
+                    }
                 }
+
                 tvMinus.setOnClickListener {
-                    if (selectableProduct.quantity > Product.Validator.MIN_QUANTITY) selectableProduct.quantity--
-                    reflectAction()
+                    if (mutableQuantity >= Product.Validator.MIN_QUANTITY) {
+                        reflectAction()
+                        onSelectionDataChangedListener(
+                            selectableProduct.product,
+                            selectableProduct.isSelected,
+                            mutableQuantity--
+                        )
+                    }
                 }
-
-
             }
 
         }
 
 
-        private fun animarView() {
+        private fun updateItemView(checked: Boolean) = binding.apply {
+            if (checked) {
+                tvProductPrice.text = (selectableProduct.product.price * selectableProduct.quantity).toCurrency()
+
+                quantitySelector.root.visibility = VISIBLE
+                ivRemove.visibility = GONE
+
+            } else {
+                tvProductPrice.text = (0.0).toCurrency()
+                quantitySelector.root.visibility = GONE
+                ivRemove.visibility = VISIBLE
+
+            }
+        }
+
+        private fun animate() {
             itemView.alpha = 0f
             itemView.animate().alpha(1f).setDuration(150).setStartDelay(3L * adapterPosition).start()
         }
     }
 }
-
 
 /**
  * Compara as listas de dados pra atualizar o recyclerview
@@ -128,6 +154,8 @@ class ProductDiffCallback : DiffUtil.ItemCallback<SelectableProduct>() {
     override fun areContentsTheSame(oldItem: SelectableProduct, newItem: SelectableProduct): Boolean {
         // deve comparar toda a informação que é exibida na view pro usuario
         return oldItem.product == newItem.product
+                && oldItem.isSelected == newItem.isSelected
+                && oldItem.quantity == newItem.quantity
     }
 }
 

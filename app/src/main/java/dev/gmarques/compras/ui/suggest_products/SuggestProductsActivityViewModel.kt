@@ -28,6 +28,9 @@ class SuggestProductsActivityViewModel : ViewModel() {
     private lateinit var shopListId: String
     private var searchTerm: String = ""
 
+    // necessario para que os dados de seleçao não se percam caso haja uma mudança de tela ou atualização no banco de dados
+    private val selectionData = HashMap<String, Pair<Boolean, Int>>()
+
     private lateinit var productsToBePosted: List<SelectableProduct>
 
     private var productsDatabaseListener: ListenerRegister? = null
@@ -52,36 +55,37 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
         viewModelScope.launch(IO) {
             loadSortPreferences()
-            loadProducts()
+            observeProductsUpdates()
         }
     }
 
     override fun onCleared() {
         throttlingScope?.cancel()
+        productsDatabaseListener?.remove()
         super.onCleared()
     }
 
-    private fun loadProducts() {
-        productsDatabaseListener = ProductRepository.observeSuggestionProductUpdates { lists, error ->
+    private fun observeProductsUpdates() {
+        if (productsDatabaseListener != null) return
+        productsDatabaseListener = ProductRepository.observeSuggestionProductUpdates { products, error ->
 
             if (error != null) throw error
 
-            if (lists != null) viewModelScope.launch {
+            if (products != null) viewModelScope.launch {
 
-                val filteredProducts = filterProducts(lists)
+                val filteredProducts = filterAndCreateSelectableProducts(products)
                 val sortedProducts = sortProducts(filteredProducts)
 
                 postDataWithThrottling(sortedProducts)
             }
 
-            productsDatabaseListener!!.remove()
         }
     }
 
     /**
      * Aplica os termos de busca do ususario, caso hajam, aproveita o loop para carregar as categorias
      */
-    private fun filterProducts(lists: List<Product>?): MutableList<SelectableProduct> {
+    private fun filterAndCreateSelectableProducts(lists: List<Product>?): MutableList<SelectableProduct> {
 
         val filteredProducts = mutableListOf<SelectableProduct>()
 
@@ -90,7 +94,9 @@ class SuggestProductsActivityViewModel : ViewModel() {
             val product = lists[i]
 
             if (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true)) {
-                filteredProducts.add(SelectableProduct(product, false, product.quantity))
+
+                val (selected, quantity) = selectionData[product.id] ?: (false to product.quantity)
+                filteredProducts.add(SelectableProduct(product, selected, quantity))
             }
         }
         return filteredProducts
@@ -128,14 +134,21 @@ class SuggestProductsActivityViewModel : ViewModel() {
      * Funciona definindo o termo de busca numa variável global, removendo e nulificando o listener que observa o banco de dados e
      * no fim redefinindo, o listener para disparar uma atualização com os dados para então serem filtrados pelo viewmodel antes
      * de irem para a ui*/
-    fun searchProduct(searchTerm: String) {
+    fun searchProduct(term: String) {
 
+        val searchTerm = term.removeAccents()
+
+        if (this.searchTerm == searchTerm) return
         this.searchTerm = searchTerm
 
+        reObserveProductsUpdates()
+    }
+
+    private fun reObserveProductsUpdates() {
         productsDatabaseListener?.remove()
         productsDatabaseListener = null
 
-        loadProducts()
+        observeProductsUpdates()
     }
 
     private fun loadSortPreferences() {
@@ -184,6 +197,12 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
     fun removeSuggestionProduct(product: Product) {
         ProductRepository.removeSuggestionProduct(ValidatedProduct(product))
+        reObserveProductsUpdates()
+    }
+
+    fun updateSelectionData(product: Product, selected: Boolean, quantity: Int) {
+        selectionData[product.id] = selected to quantity
+        reObserveProductsUpdates()
     }
 
 }

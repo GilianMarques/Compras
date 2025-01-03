@@ -16,6 +16,7 @@ import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 
 class AddEditProductActivityViewModel : ViewModel() {
@@ -76,23 +77,25 @@ class AddEditProductActivityViewModel : ViewModel() {
     }
 
     fun loadSuggestions(term: String) = viewModelScope.launch(IO) {
-
         if (suggestions == null) suggestions = ProductRepository.getSuggestions()
 
         val filteredSuggestions = suggestions!!
             .filter { it.name.removeAccents().contains(term.removeAccents(), ignoreCase = true) }
-            .toMutableList()
+            .sortedBy { it.name.length }
 
+        val sub = filteredSuggestions.subList(0, min(filteredSuggestions.size, maxSuggestions))
 
-        _suggestionsLD.postValue(filteredSuggestions)
+        _suggestionsLD.postValue(sub to term)
     }
 
     fun loadNameSuggestions(term: String) = viewModelScope.launch(IO) {
-        _nameSuggestionsLD.postValue(productNameSuggestion.getSuggestion(term))
+        _nameSuggestionsLD.postValue(productNameSuggestion.getSuggestion(term, maxSuggestions).sortedBy { it.length })
     }
 
     private val productNameSuggestion = ProductNameSuggestion()
     private var suggestions: List<Product>? = null
+
+    private val maxSuggestions = 5
 
     var canLoadSuggestion: Boolean = true
     var editingProduct: Boolean = false
@@ -109,8 +112,8 @@ class AddEditProductActivityViewModel : ViewModel() {
     private val _editingProductLD = MutableLiveData<Product>()
     val editingProductLD: LiveData<Product> get() = _editingProductLD
 
-    private val _suggestionsLD = MutableLiveData<List<Product>>()
-    val suggestionsLD: LiveData<List<Product>> get() = _suggestionsLD
+    private val _suggestionsLD = MutableLiveData<Pair<List<Product>, String>>()
+    val suggestionsLD: LiveData<Pair<List<Product>, String>> get() = _suggestionsLD
 
     private val _nameSuggestionsLD = MutableLiveData<List<String>>()
     val nameSuggestionsLD: LiveData<List<String>> get() = _nameSuggestionsLD
