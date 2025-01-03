@@ -29,13 +29,14 @@ class SuggestProductsActivityViewModel : ViewModel() {
     private var searchTerm: String = ""
 
     // necessario para que os dados de seleçao não se percam caso haja uma mudança de tela ou atualização no banco de dados
-    private val selectionData = HashMap<String, Pair<Boolean, Int>>()
+    private val updatedSelectionData = HashMap<String, Pair<Boolean, Int>>()
 
     private lateinit var productsToBePosted: List<SelectableProduct>
 
     private var productsDatabaseListener: ListenerRegister? = null
 
-    private var throttlingScope: CoroutineScope? = null
+    private var databaseThrottlingScope: CoroutineScope? = null
+    private var selectionDataThrottlingScope: CoroutineScope? = null
 
     private val _finishEventLD = MutableLiveData<Boolean>()
     val finishEventLD: LiveData<Boolean> get() = _finishEventLD
@@ -60,7 +61,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
     }
 
     override fun onCleared() {
-        throttlingScope?.cancel()
+        databaseThrottlingScope?.cancel()
         productsDatabaseListener?.remove()
         super.onCleared()
     }
@@ -95,7 +96,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
             if (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true)) {
 
-                val (selected, quantity) = selectionData[product.id] ?: (false to product.quantity)
+                val (selected, quantity) = updatedSelectionData[product.id] ?: (false to product.quantity)
                 filteredProducts.add(SelectableProduct(product, selected, quantity))
             }
         }
@@ -120,9 +121,9 @@ class SuggestProductsActivityViewModel : ViewModel() {
         productsToBePosted = newProducts
 
         var delayMillis = 0L
-        throttlingScope?.apply { delayMillis = 250; cancel() }
-        throttlingScope = CoroutineScope(IO)
-        throttlingScope!!.launch {
+        databaseThrottlingScope?.apply { delayMillis = 250; cancel() }
+        databaseThrottlingScope = CoroutineScope(IO)
+        databaseThrottlingScope!!.launch {
             delay(delayMillis)
             _productsLD.postValue(productsToBePosted)
             productsToBePosted = emptyList()
@@ -156,24 +157,25 @@ class SuggestProductsActivityViewModel : ViewModel() {
         sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
     }
 
-    fun saveProducts(currentList: List<SelectableProduct>) = viewModelScope.launch(IO) {
+    fun saveProducts() = viewModelScope.launch(IO) {
         var repeatedProductsCount = 0
         val currentShopListProductsNames = ProductRepository.getProducts(shopListId)
 
-        currentList.forEach {
+        _productsLD.value!!.map { it.product }.forEach { product ->
 
-            if (it.isSelected) if (!currentShopListProductsNames.contains(it.product.name)) {
-                val newProduct = it.product.copy(
-                    shopListId = shopListId, quantity = it.quantity, hasBeenBought = false
+            val (selected, quantity) = updatedSelectionData[product.id] ?: (false to product.quantity)
+
+            if (selected) if (!currentShopListProductsNames.contains(product.name)) {
+                val newProduct = product.copy(
+                    shopListId = shopListId, quantity = quantity, hasBeenBought = false
                 ).withNewId()
 
-                saveProduct(it.product, newProduct)
+                saveProduct(product, newProduct)
             } else repeatedProductsCount++
 
 
         }
         finish(repeatedProductsCount)
-
     }
 
     private suspend fun saveProduct(oldProduct: Product, newProduct: Product) {
@@ -200,9 +202,8 @@ class SuggestProductsActivityViewModel : ViewModel() {
         reObserveProductsUpdates()
     }
 
-    fun updateSelectionData(product: Product, selected: Boolean, quantity: Int) {
-        selectionData[product.id] = selected to quantity
-        reObserveProductsUpdates()
+    fun updateSelectionData(sp: SelectableProduct) {
+        updatedSelectionData[sp.product.id] = sp.isSelected to sp.quantity
     }
 
 }

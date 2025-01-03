@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Spanned
-import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.activity.addCallback
@@ -20,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivitySuggestProductsBinding
+import dev.gmarques.compras.domain.model.SelectableProduct
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.ui.Vibrator
@@ -153,12 +153,8 @@ class SuggestProductsActivity : AppCompatActivity() {
     }
 
 
-    private fun adapterOnSelectionChangedListener(product: Product, selected: Boolean, quantity: Int) {
-        viewModel.updateSelectionData(product, selected, quantity)
-        Log.d(
-            "USUK",
-            "SuggestProductsActivity.".plus("adapterOnSelectionChangedListener() product = ${product.name}, selected = $selected, quantity = $quantity")
-        )
+    private fun adapterOnSelectionChangedListener(sp: SelectableProduct) {
+        viewModel.updateSelectionData(sp)
     }
 
 
@@ -167,7 +163,7 @@ class SuggestProductsActivity : AppCompatActivity() {
         fabAddProduct.setOnClickListener {
             Vibrator.interaction()
             fabAddProduct.isEnabled = false
-            viewModel.saveProducts(rvAdapter.currentList)
+            viewModel.saveProducts()
         }
 
         rvProducts.addOnScrollListener(object : OnScrollListener() {
