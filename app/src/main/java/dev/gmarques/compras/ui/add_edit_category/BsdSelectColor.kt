@@ -15,15 +15,14 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.databinding.BsdSelectColorDialogBinding
 import dev.gmarques.compras.databinding.RvItemCategoryColorBinding
 
-
-class BsdSelectColor(
+class BsdSelectColor private constructor(
     targetActivity: Activity,
-    val onConfirmListener: (Int) -> Unit,
+    private val onConfirmListener: (Int) -> Unit,
+    private val dismissListener: (() -> Unit)?,
+    private val vividColors: List<Int>,
 ) {
 
-    private var dismissListener: (() -> Unit)? = null
-    private var vividColors: List<Int>? = null
-    private var binding = BsdSelectColorDialogBinding.inflate(targetActivity.layoutInflater)
+    private val binding = BsdSelectColorDialogBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
 
     init {
@@ -31,13 +30,11 @@ class BsdSelectColor(
         dialog.setOnDismissListener {
             dismissListener?.invoke()
         }
-        vividColors = targetActivity.resources.getStringArray(R.array.vivid_colors).asList().map { Color.parseColor(it) }
         setupAdapter()
-
     }
 
     private fun setupAdapter() {
-        val adapter = ColorAdapter(vividColors!!) { selectedColor ->
+        val adapter = ColorAdapter(vividColors) { selectedColor ->
             onConfirmListener(selectedColor) // Passa a cor selecionada para o listener
             dialog.dismiss() // Fecha o diálogo após a seleção
         }
@@ -47,11 +44,10 @@ class BsdSelectColor(
             setHasFixedSize(true)
 
             // Configura o gerenciador de layout para ser uma grade com ajuste automático usando Flexbox
-
-
-            val layoutManager = FlexboxLayoutManager(context)
-            layoutManager.flexDirection = FlexDirection.ROW
-            layoutManager.justifyContent = JustifyContent.SPACE_EVENLY
+            val layoutManager = FlexboxLayoutManager(context).apply {
+                flexDirection = FlexDirection.ROW
+                justifyContent = JustifyContent.SPACE_EVENLY
+            }
 
             this.layoutManager = layoutManager
         }
@@ -59,11 +55,32 @@ class BsdSelectColor(
 
     fun show() = dialog.show()
 
-    fun onDismiss(listener: () -> Unit): BsdSelectColor {
-        this.dismissListener = listener
-        return this
-    }
+    class Builder(private val targetActivity: Activity) {
+        private var onConfirmListener: ((Int) -> Unit)? = null
+        private var onDismissListener: (() -> Unit)? = null
+        private var vividColors: List<Int> = targetActivity.resources.getStringArray(R.array.vivid_colors)
+            .asList().map { Color.parseColor(it) }
 
+        fun setOnConfirmListener(listener: (Int) -> Unit) = apply {
+            this.onConfirmListener = listener
+        }
+
+        fun setOnDismissListener(listener: (() -> Unit)?) = apply {
+            this.onDismissListener = listener
+        }
+
+        fun build(): BsdSelectColor {
+            // Verifica se o listener de confirmação foi configurado antes de criar a instância
+            requireNotNull(onConfirmListener) { "onConfirmListener deve ser definido!" }
+
+            return BsdSelectColor(
+                targetActivity,
+                onConfirmListener!!, // Atribui com segurança após a verificação
+                onDismissListener,
+                vividColors
+            )
+        }
+    }
 
     class ColorAdapter(
         private val colors: List<Int>,
@@ -100,6 +117,4 @@ class BsdSelectColor(
 
         override fun getItemCount(): Int = colors.size
     }
-
-
 }

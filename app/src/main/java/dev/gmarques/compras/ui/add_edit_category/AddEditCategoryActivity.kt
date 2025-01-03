@@ -179,14 +179,16 @@ class AddEditCategoryActivity : AppCompatActivity() {
         (binding.edtColor.compoundDrawables[0].mutate() as GradientDrawable).setColor(viewModel.validatedColor)
 
     private fun showColorDialog() {
-        BsdSelectColor(this) { selectedColor ->
-            viewModel.validatedColor = selectedColor
-            Vibrator.success()
-
-        }.onDismiss {
-            binding.edtColor.clearFocus()
-        }.show()
+        BsdSelectColor.Builder(this)
+            .setOnConfirmListener { selectedColor ->
+                viewModel.validatedColor = selectedColor
+                Vibrator.success()
+            }
+            .setOnDismissListener {
+                binding.edtColor.clearFocus()
+            }.build().show()
     }
+
 
     private fun resetFocus(edtTarget: AppCompatEditText, tvTarget: TextView) {
         edtTarget.setBackgroundResource(R.drawable.back_addproduct_edittext)

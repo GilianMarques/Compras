@@ -1,7 +1,10 @@
 package dev.gmarques.compras.ui.products
 
 import android.app.Activity
+import android.view.View.VISIBLE
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import dev.gmarques.compras.BuildConfig
+import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.BsdShoplistMenuDialogBinding
 
@@ -41,6 +44,17 @@ class BsdShopListMenu(
             tvProductSuggestion.setOnClickListener {
                 suggestionListener()
                 dialog.dismiss()
+            }
+
+            if (BuildConfig.DEBUG) {
+                cbProductionDatabase.visibility = VISIBLE
+
+                cbProductionDatabase.isChecked =
+                    PreferencesHelper().getValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, false)
+
+                cbProductionDatabase.setOnCheckedChangeListener { _, checked ->
+                    PreferencesHelper().saveValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, checked)
+                }
             }
 
             tvTitle.text = shopList.name

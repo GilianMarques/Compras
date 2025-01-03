@@ -3,6 +3,7 @@ package dev.gmarques.compras.data.firestore
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import dev.gmarques.compras.BuildConfig
+import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.repository.UserRepository
 
 class Firestore {
@@ -10,7 +11,10 @@ class Firestore {
     // TODO: ajustar regras de acesso no console do firebase ate 10/01/25 ou o app nao vai mais conseguir acessar os dados
     companion object {
 
-        private val userRootPath = if (BuildConfig.DEBUG) "debug_database" else UserRepository.getUser()!!.email!!
+        private val userRootPath = if (BuildConfig.DEBUG) {
+            val useProductionDb = PreferencesHelper().getValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, false)
+            if (useProductionDb) UserRepository.getUser()!!.email!! else "debug_database"
+        } else UserRepository.getUser()!!.email!!
 
         private const val DATABASE = "Database"
         private const val SHOP_LISTS = "ShopLists"
