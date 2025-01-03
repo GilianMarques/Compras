@@ -13,6 +13,7 @@ import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.ShopListRepository
+import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import dev.gmarques.compras.domain.SortCriteria
 import dev.gmarques.compras.domain.model.ProductWithCategory
@@ -184,9 +185,9 @@ class ProductsActivityViewModel : ViewModel() {
     /**
      * Atualiza o produto no banco de dados e sua sugestao de produto relativa, caso exista
      */
-    fun updateProductAsIs(updatedProduct: Product) {
-        ProductRepository.addOrUpdateProduct(updatedProduct)
-        ProductRepository.updateSuggestionProduct(updatedProduct, updatedProduct)
+    fun updateProductAsIs(updatedProduct: Product) = viewModelScope.launch(IO) {
+        ProductRepository.addOrUpdateProduct(ValidatedProduct(updatedProduct))
+        ProductRepository.updateSuggestionProduct(updatedProduct, ValidatedProduct(updatedProduct))
     }
 
     /**
@@ -194,7 +195,7 @@ class ProductsActivityViewModel : ViewModel() {
      */
     fun updateProductBoughtState(product: Product, isBought: Boolean) {
         val newProduct = product.copy(hasBeenBought = isBought)
-        ProductRepository.addOrUpdateProduct(newProduct)
+        ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }
 
     /**
@@ -236,7 +237,7 @@ class ProductsActivityViewModel : ViewModel() {
     }
 
     fun removeProduct(product: Product) {
-        ProductRepository.removeProduct(product)
+        ProductRepository.removeProduct(ValidatedProduct(product))
     }
 
     fun loadSortPreferences() {

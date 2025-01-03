@@ -11,6 +11,7 @@ import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.domain.model.SelectableProduct
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ListenerRegister
@@ -150,9 +151,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
             if (it.isSelected) if (!currentShopListProductsNames.contains(it.product.name)) {
                 val newProduct = it.product.copy(
-                    shopListId = shopListId,
-                    quantity = it.quantity,
-                    hasBeenBought = false
+                    shopListId = shopListId, quantity = it.quantity, hasBeenBought = false
                 ).withNewId()
 
                 saveProduct(it.product, newProduct)
@@ -164,10 +163,10 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
     }
 
-    private fun saveProduct(oldProduct: Product, newProduct: Product) {
+    private suspend fun saveProduct(oldProduct: Product, newProduct: Product) {
 
-        ProductRepository.addOrUpdateProduct(newProduct)
-        ProductRepository.updateSuggestionProduct(oldProduct, newProduct)
+        ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
+        ProductRepository.updateSuggestionProduct(oldProduct, ValidatedProduct(newProduct))
 
     }
 
@@ -184,7 +183,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
     }
 
     fun removeSuggestionProduct(product: Product) {
-        ProductRepository.removeSuggestionProduct(product)
+        ProductRepository.removeSuggestionProduct(ValidatedProduct(product))
     }
 
 }

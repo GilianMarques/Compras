@@ -1,6 +1,5 @@
 package dev.gmarques.compras.ui.add_edit_product
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +12,7 @@ import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.model.ValidatedCategory
+import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -20,29 +20,21 @@ import kotlinx.coroutines.launch
 
 class AddEditProductActivityViewModel : ViewModel() {
 
-    fun tryAndSaveProduct(saveAsSuggestion: Boolean) {
+    fun tryAndSaveProduct(saveAsSuggestion: Boolean) = viewModelScope.launch(IO) {
 
         // se adicionando produto ou se durante a ediçao o usuario trocar o nome do produto, preciso verificar se o novo nome ja nao existe na lista
         val needCheckName = !editingProduct || editingProductLD.value!!.name != validatedName
 
         if (needCheckName) {
-            ProductRepository.getProductByName(validatedName, listId) { result ->
-                if (result.isSuccess) {
-                    if (result.getOrNull() == null) saveProduct(saveAsSuggestion)// o produto nao existe na lista, posso salvar
-                    else {
-                        val msg = String.format(App.getContext().getString(R.string.X_ja_existe_na_lista), validatedName)
-                        _errorEventLD.postValue(msg)
-                    }
-                } else {
-                    val msg = String.format(
-                        App.getContext().getString(R.string.Nao_foi_possivel_verificar_se_x_ja_existe_na_lista), validatedName
-                    )
-                    _errorEventLD.postValue(msg)
-                }
+            val result = ProductRepository.getProductByName(validatedName, listId)
+
+            if (result.getOrNull() == null) saveProduct(saveAsSuggestion)// o produto nao existe na lista, posso salvar
+            else {
+                val msg = String.format(App.getContext().getString(R.string.X_ja_existe_na_lista), validatedName)
+                _errorEventLD.postValue(msg)
             }
 
         } else saveProduct(saveAsSuggestion)
-
 
     }
 
@@ -57,10 +49,10 @@ class AddEditProductActivityViewModel : ViewModel() {
         )
         else Product(listId, validatedCategory!!.id, validatedName, 0, validatedPrice, validatedQuantity, validatedInfo)
 
-        ProductRepository.addOrUpdateProduct(newProduct)
+        ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
 
-        if (editingProduct) ProductRepository.updateSuggestionProduct(editingProductLD.value!!, newProduct)
-        else if (saveAsSuggestion) ProductRepository.updateOrAddProductAsSuggestion(newProduct)
+        if (editingProduct) ProductRepository.updateSuggestionProduct(editingProductLD.value!!, ValidatedProduct(newProduct))
+        else if (saveAsSuggestion) ProductRepository.updateOrAddProductAsSuggestion(ValidatedProduct(newProduct))
 
         _finishEventLD.postValue(true)
 
@@ -68,13 +60,8 @@ class AddEditProductActivityViewModel : ViewModel() {
 
     fun loadEditingProduct() = viewModelScope.launch(IO) {
         productId?.let {
-            ProductRepository.getProduct(productId!!) { result ->
-
-                if (result.isSuccess) _editingProductLD.postValue(result.getOrThrow())
-                else Log.d(
-                    "USUK", "AddProductActivityViewModel.loadProduct: erro obtendo produto do firebase${result.exceptionOrNull()}"
-                )
-            }
+            val result = ProductRepository.getProduct(productId!!)
+            _editingProductLD.postValue(result.getOrThrow())
         }
     }
 

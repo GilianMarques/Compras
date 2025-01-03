@@ -5,24 +5,93 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Product
+import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.tasks.await
 
-// TODO: todas as funçoes de repository  devem ser suspensas com coroutines e usar await. receber um validatedProduct
 object ProductRepository {
 
+    /**
+     * Adiciona ou atualiza um produto na coleção de produtos.
+     * @param validatedProduct Objeto contendo o produto a ser adicionado ou atualizado.
+     */
+    fun addOrUpdateProduct(validatedProduct: ValidatedProduct) {
+        val product = validatedProduct.product
+        Firestore.productCollection.document(product.id).set(product)
+    }
 
     /**
-     * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
-     * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
-     * */
+     * Retorna um produto do banco de dados com base no ID fornecido.
+     * @param idProduct ID do produto a ser recuperado.
+     * @return Um [Result] contendo o produto ou uma exceção se não encontrado.
+     */
+    suspend fun getProduct(idProduct: String): Result<Product> {
+        val querySnapshot = Firestore.productCollection.document(idProduct).get().await()
+        val targetProduct = querySnapshot.toObject<Product>()
+        if (targetProduct != null) return Result.success(targetProduct)
+        else throw Exception("Produto nao encontrado!")
+    }
+
+    /**
+     * Retorna um produto com base no nome e ID da lista fornecidos.
+     * @param name Nome do produto.
+     * @param listId ID da lista de compras.
+     * @return Um [Result] contendo o produto ou null se não encontrado.
+     */
+    suspend fun getProductByName(name: String, listId: String): Result<Product?> {
+        val querySnapShot = Firestore.productCollection
+            .whereEqualTo("name", name).whereEqualTo("shopListId", listId)
+            .limit(1).get().await()
+
+        return if (querySnapShot.isEmpty) Result.success(null)
+        else Result.success(querySnapShot.documents.first().toObject<Product>())
+    }
+
+    /**
+     * Retorna os nomes dos produtos associados a uma lista de compras.
+     * @param shopListId ID da lista de compras.
+     * @return Uma lista de nomes de produtos.
+     */
+    suspend fun getProducts(shopListId: String): List<String> {
+        val querySnapshot: QuerySnapshot = Firestore.productCollection.whereEqualTo("shopListId", shopListId).get().await()
+        return querySnapshot.map { it.toObject<Product>().name }
+    }
+
+    /**
+     * Retorna uma lista de produtos sugeridos do Firestore.
+     * @return Uma lista de produtos sugeridos.
+     */
+    suspend fun getSuggestions(): List<Product> {
+        val querySnapshot = Firestore.suggestionProductCollection.get().await()
+        return querySnapshot.map { it.toObject<Product>() }
+    }
+
+    /**
+     * Verifica se há pelo menos um produto ou sugestão associado ao ID de categoria fornecido.
+     * @param categoryId ID da categoria a ser verificada.
+     * @return Um [Result] indicando se há produtos associados.
+     */
+    suspend fun hasAnyProductWithCategoryId(categoryId: String): Result<Boolean> {
+        val productsSnapshot = Firestore.productCollection.whereEqualTo("categoryId", categoryId).limit(1).get().await()
+        return if (productsSnapshot.isEmpty) {
+            val suggestionProductsSnapshot =
+                Firestore.suggestionProductCollection.whereEqualTo("categoryId", categoryId).limit(1).get().await()
+            Result.success(!suggestionProductsSnapshot.isEmpty)
+        } else Result.success(true)
+    }
+
+    /**
+     * Define um listener no Firestore para notificações de alterações em produtos locais e na nuvem.
+     * @param shopListId ID da lista de compras.
+     * @param onSnapshot Função chamada ao receber atualizações ou erros.
+     * @return Um [ListenerRegister] para gerenciar o listener.
+     */
     fun observeProductUpdates(
         shopListId: String,
         onSnapshot: (List<Product>?, Exception?) -> Any,
     ): ListenerRegister {
         return ListenerRegister(Firestore.productCollection.whereEqualTo("shopListId", shopListId)
             .addSnapshotListener { querySnapshot, fbException ->
-
                 if (fbException != null) onSnapshot(null, fbException)
                 else querySnapshot?.let {
                     val products = arrayListOf<Product>()
@@ -30,24 +99,17 @@ object ProductRepository {
                     onSnapshot(products, null)
                 }
             })
-
-    }
-
-
-    suspend fun getProducts(shopListId: String): List<String> {
-        val querySnapshot: QuerySnapshot = Firestore.productCollection.whereEqualTo("shopListId", shopListId).get().await()
-        return querySnapshot.map { it.toObject<Product>().name }
     }
 
     /**
-     * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
-     * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
-     * */
+     * Define um listener no Firestore para notificações de alterações em produtos sugeridos.
+     * @param onSnapshot Função chamada ao receber atualizações ou erros.
+     * @return Um [ListenerRegister] para gerenciar o listener.
+     */
     fun observeSuggestionProductUpdates(
         onSnapshot: (List<Product>?, Exception?) -> Any,
     ): ListenerRegister {
         return ListenerRegister(Firestore.suggestionProductCollection.addSnapshotListener { querySnapshot, fbException ->
-
             if (fbException != null) onSnapshot(null, fbException)
             else querySnapshot?.let {
                 val products = arrayListOf<Product>()
@@ -55,131 +117,66 @@ object ProductRepository {
                 onSnapshot(products, null)
             }
         })
-
-    }
-
-    fun addOrUpdateProduct(product: Product) {
-        Firestore.productCollection.document(product.id).set(product.selfValidate())
     }
 
     /**
-     * Verifica se a sugestão existe no banco de dados com base em seu nome, e a atualiza.
-     * Caso não exista, a sugestão é adicionada ao banco de dados.
-     * */
-    suspend fun updateOrAddProductAsSuggestion(product: Product) {
+     * Remove todos os produtos associados a uma lista de compras do Firestore.
+     * @param shopListId ID da lista de compras.
+     */
+    suspend fun removeAllProductsFromList(shopListId: String) {
+        val querySnapshot = Firestore.productCollection.whereEqualTo("shopListId", shopListId).get().await()
+        for (document in querySnapshot.documents) {
+            document.reference.delete()
+            Log.d("USUK", "ProductRepository.removeAllProductsFromList: removendo: ${document.get("name")}")
+        }
+    }
 
+    /**
+     * Remove um produto da coleção de produtos do Firestore.
+     * @param validatedProduct Objeto contendo o produto a ser removido.
+     */
+    fun removeProduct(validatedProduct: ValidatedProduct) {
+        val product = validatedProduct.product
+        Firestore.productCollection.document(product.id).delete()
+    }
+
+    /**
+     * Remove um produto da coleção de sugestões do Firestore.
+     * @param validatedProduct Objeto contendo o produto sugerido a ser removido.
+     */
+    fun removeSuggestionProduct(validatedProduct: ValidatedProduct) {
+        val product = validatedProduct.product
+        Firestore.suggestionProductCollection.document(product.id).delete()
+    }
+
+    /**
+     * Atualiza ou adiciona um produto como sugestão no Firestore.
+     * @param validatedProduct Objeto contendo o produto validado.
+     */
+    suspend fun updateOrAddProductAsSuggestion(validatedProduct: ValidatedProduct) {
+        val product = validatedProduct.product
         val querySnapshot = Firestore.suggestionProductCollection.whereEqualTo("name", product.name).limit(1).get().await()
-
-        val suggestionProduct = if (querySnapshot.isEmpty) product.withNewId().selfValidate()
+        val suggestionProduct = if (querySnapshot.isEmpty) product.withNewId()
         else {
             val oldProduct = querySnapshot.documents[0].toObject<Product>()!!
             product.copy(id = oldProduct.id)
         }
-
         Firestore.suggestionProductCollection.document(suggestionProduct.id).set(suggestionProduct)
     }
 
     /**
-     * Atualiza um produto na lista de sugestoes caso ele exista, faz isso considerando o nome do produto.
-     *
-     * Essa função recebe um objeto atualizado e um objeto antigo que tem seu nome usado para encontrar o produto na lista de sugestões.
-     *
-     * Nem sempre um produto que está sendo atualizado estará presente na lista de sugestões e por vezes o usuário pode ter alterado
-     * o nome do produto, por isso o produto antigo é necessário, usando seu nome a função busca na lista de sugestões
-     * por uma de mesmo nome e ao encontrá-la obtém a ID dela e a define no novo produto antes de atualiza-lo no db
+     * Atualiza um produto sugerido no Firestore considerando alterações no nome.
+     * @param oldSuggestion Produto sugerido antigo.
+     * @param newSuggestion Objeto validado contendo o produto atualizado.
      */
-    fun updateSuggestionProduct(oldProduct: Product, newProduct: Product) {
-        val documentRef = Firestore.suggestionProductCollection.whereEqualTo("name", oldProduct.name)
+    suspend fun updateSuggestionProduct(oldSuggestion: Product, newSuggestion: ValidatedProduct) {
+        val documentSnapshot =
+            Firestore.suggestionProductCollection.whereEqualTo("name", oldSuggestion.name).limit(1).get().await()
 
-        documentRef.get().addOnSuccessListener { documentSnapshot ->
-            if (!documentSnapshot.isEmpty) {
-
-                val oldProductOnDb = documentSnapshot.documents[0].toObject<Product>()!!
-                val newProductWithOldId = newProduct.copy(id = oldProductOnDb.id)
-
-                Firestore.suggestionProductCollection.document(newProductWithOldId.id).set(newProductWithOldId.selfValidate())
-
-            } else {
-                // O documento não existe
-                Log.d(
-                    "USUK", "ProductRepository.updateSuggestionProductIfExists: sem sugestao de produto pra atualizar no firebase"
-                )
-            }
-        }.addOnFailureListener { exception ->
-            // Falha ao acessar o banco
-            Log.d(
-                "USUK",
-                "ProductRepository.updateSuggestionProductIfExists: Erro obtendo sugestoes de produto do firebase $exception"
-            )
-        }
-    }
-
-    fun removeProduct(product: Product) {
-        Firestore.productCollection.document(product.id).delete()
-    }
-
-    fun removeSuggestionProduct(product: Product) {
-        Firestore.suggestionProductCollection.document(product.id).delete()
-    }
-
-    fun getProduct(idProduct: String, callback: (result: Result<Product>) -> Unit) {
-
-        Firestore.productCollection.document(idProduct).get().addOnSuccessListener { documentSnapshot ->
-            val targetProduct = documentSnapshot.toObject<Product>()!!
-            callback(Result.success(targetProduct))
-        }.addOnFailureListener { exception: java.lang.Exception ->
-            callback(Result.failure(exception))
-        }
-    }
-
-    /**
-     * Verifica se há ao menos um produto ou sugestão de produto associado ao ID de categoria fornecido.
-     *
-     * A função consulta duas coleções no Firestore (`productCollection` e `suggestionProductCollection`),
-     * retornando `true` na primeira correspondência encontrada. Caso contrário, retorna `false`.
-     *
-     * @param categoryId ID da categoria a ser verificada.
-     */
-    suspend fun hasAnyProductWithCategoryId(categoryId: String): Result<Boolean> {
-
-        val productsSnapshot = Firestore.productCollection.whereEqualTo("categoryId", categoryId).limit(1).get().await()
-
-        return if (productsSnapshot.isEmpty) {
-
-            val suggestionProductsSnapshot = Firestore.suggestionProductCollection
-                .whereEqualTo("categoryId", categoryId).limit(1).get().await()
-            Result.success(!suggestionProductsSnapshot.isEmpty)
-
-        } else Result.success(true)
-    }
-
-    fun getProductByName(name: String, listId: String, callback: (Result<Product?>) -> Unit) {
-        Firestore.productCollection.whereEqualTo("name", name).whereEqualTo("shopListId", listId).limit(1).get()
-            .addOnSuccessListener { snapshot ->
-
-                if (snapshot.isEmpty) callback(Result.success(null))
-                else {
-                    val targetProduct = snapshot.documents[0].toObject<Product>()
-                    callback(Result.success(targetProduct))
-                }
-            }.addOnFailureListener { exception ->
-                callback(Result.failure(exception))
-            }
-
-
-    }
-
-    suspend fun getSuggestions(): List<Product> {
-        val querySnapshot = Firestore.suggestionProductCollection.get().await()
-        return querySnapshot.map { it.toObject<Product>() }
-    }
-
-    suspend fun removeAllProductsFromList(shopListId: String) {
-        val querySnapshot = Firestore.productCollection.whereEqualTo("shopListId", shopListId).get().await()
-
-        for (document in querySnapshot.documents) {
-            document.reference.delete()
-            Log.d("USUK", "ProductRepository.removeAllProductsFromList: removendo: ${document.get("name")}")
+        if (!documentSnapshot.isEmpty) {
+            val targetSuggestion = documentSnapshot.documents.first().toObject<Product>()!!
+            val updatedSuggestionWithOldId = newSuggestion.product.copy(id = targetSuggestion.id)
+            Firestore.suggestionProductCollection.document(updatedSuggestionWithOldId.id).set(updatedSuggestionWithOldId)
         }
     }
 }
