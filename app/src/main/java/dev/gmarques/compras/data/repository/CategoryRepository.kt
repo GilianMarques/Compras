@@ -19,8 +19,10 @@ object CategoryRepository {
     suspend fun tryAndRemoveCategory(validatedCategory: ValidatedCategory): Result<Boolean> {
         val category = validatedCategory.category
 
-        val result = ProductRepository.hasAnyProductWithCategoryId(category.id)
-        val categoryInUse = result.getOrThrow()
+        val productsUsing = ProductRepository.hasAnyProductWithCategoryId(category.id)
+        val suggestionProductsUsing = SuggestionProductRepository.hasAnyProductWithCategoryId(category.id)
+
+        val categoryInUse = productsUsing || suggestionProductsUsing
 
         if (categoryInUse) {
             return Result.failure(

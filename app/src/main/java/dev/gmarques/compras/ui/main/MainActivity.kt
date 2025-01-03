@@ -107,6 +107,8 @@ class MainActivity : AppCompatActivity() {
                 startActivityProducts(shopList, rvAdapter.itemCount > 0)
 
             }.show()
+
+
     }
 
     private fun observeListsUpdates() {

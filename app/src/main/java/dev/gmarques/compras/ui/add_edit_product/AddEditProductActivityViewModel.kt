@@ -11,8 +11,10 @@ import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.data.repository.SuggestionProductRepository
 import dev.gmarques.compras.data.repository.model.ValidatedCategory
 import dev.gmarques.compras.data.repository.model.ValidatedProduct
+import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -52,8 +54,8 @@ class AddEditProductActivityViewModel : ViewModel() {
 
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
 
-        if (editingProduct) ProductRepository.updateSuggestionProduct(editingProductLD.value!!, ValidatedProduct(newProduct))
-        else if (saveAsSuggestion) ProductRepository.updateOrAddProductAsSuggestion(ValidatedProduct(newProduct))
+        if (editingProduct) SuggestionProductRepository.updateSuggestionProduct(editingProductLD.value!!, ValidatedSuggestionProduct(newProduct))
+        else if (saveAsSuggestion) SuggestionProductRepository.updateOrAddProductAsSuggestion(ValidatedSuggestionProduct(newProduct))
 
         _finishEventLD.postValue(true)
 
@@ -62,7 +64,7 @@ class AddEditProductActivityViewModel : ViewModel() {
     fun loadEditingProduct() = viewModelScope.launch(IO) {
         productId?.let {
             val result = ProductRepository.getProduct(productId!!)
-            _editingProductLD.postValue(result.getOrThrow())
+            _editingProductLD.postValue(result)
         }
     }
 

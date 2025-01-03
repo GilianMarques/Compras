@@ -81,7 +81,7 @@ class SuggestionProductAdapter(
 
             quantitySelector.apply {
 
-                val reflectAction = {
+                val updateView = {
                     tvQuantity.text = String.format(App.getContext().getString(R.string.un), sp.quantity)
                     tvProductPrice.text = (sp.product.price * sp.quantity).toCurrency()
                     Vibrator.interaction()
@@ -91,7 +91,7 @@ class SuggestionProductAdapter(
                     if (sp.quantity <= Product.Validator.MAX_QUANTITY) {
                         sp.quantity++
                         onSelectionDataChangedListener(sp)
-                        reflectAction()
+                        updateView()
                     } else Vibrator.error()
                 }
 
@@ -99,7 +99,7 @@ class SuggestionProductAdapter(
                     if (sp.quantity > Product.Validator.MIN_QUANTITY) {
                         sp.quantity--
                         onSelectionDataChangedListener(sp)
-                        reflectAction()
+                        updateView()
                     } else Vibrator.error()
                 }
             }

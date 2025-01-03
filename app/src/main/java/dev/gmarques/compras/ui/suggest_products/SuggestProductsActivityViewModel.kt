@@ -11,7 +11,9 @@ import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.data.repository.SuggestionProductRepository
 import dev.gmarques.compras.data.repository.model.ValidatedProduct
+import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.domain.model.SelectableProduct
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ListenerRegister
@@ -68,7 +70,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
     private fun observeProductsUpdates() {
         if (productsDatabaseListener != null) return
-        productsDatabaseListener = ProductRepository.observeSuggestionProductUpdates { products, error ->
+        productsDatabaseListener = SuggestionProductRepository.observeSuggestionProductUpdates { products, error ->
 
             if (error != null) throw error
 
@@ -161,28 +163,31 @@ class SuggestProductsActivityViewModel : ViewModel() {
         var repeatedProductsCount = 0
         val currentShopListProductsNames = ProductRepository.getProducts(shopListId)
 
-        _productsLD.value!!.map { it.product }.forEach { product ->
+        updatedSelectionData.keys.forEach { key ->
 
-            val (selected, quantity) = updatedSelectionData[product.id] ?: (false to product.quantity)
+            val (selected, quantity) = updatedSelectionData[key] ?: (false to -1)
 
-            if (selected) if (!currentShopListProductsNames.contains(product.name)) {
-                val newProduct = product.copy(
-                    shopListId = shopListId, quantity = quantity, hasBeenBought = false
-                ).withNewId()
+            if (selected) {
+                val product = SuggestionProductRepository.getSuggestionProduct(key)
 
-                saveProduct(product, newProduct)
+                if (!currentShopListProductsNames.contains(product.name)) {
+                    val newProduct = product.copy(
+                        shopListId = shopListId, quantity = quantity, hasBeenBought = false
+                    )
+
+                    saveProduct(product, newProduct)
+                }
             } else repeatedProductsCount++
 
 
         }
         finish(repeatedProductsCount)
+
     }
 
     private suspend fun saveProduct(oldProduct: Product, newProduct: Product) {
-
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
-        ProductRepository.updateSuggestionProduct(oldProduct, ValidatedProduct(newProduct))
-
+        SuggestionProductRepository.updateSuggestionProduct(oldProduct, ValidatedSuggestionProduct(newProduct))
     }
 
     private suspend fun finish(repeatedProductsCount: Int) {
@@ -198,7 +203,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
     }
 
     fun removeSuggestionProduct(product: Product) {
-        ProductRepository.removeSuggestionProduct(ValidatedProduct(product))
+        SuggestionProductRepository.removeSuggestionProduct(ValidatedSuggestionProduct(product))
         reObserveProductsUpdates()
     }
 

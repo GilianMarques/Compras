@@ -13,8 +13,10 @@ import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.ShopListRepository
+import dev.gmarques.compras.data.repository.SuggestionProductRepository
 import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.data.repository.model.ValidatedShopList
+import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.domain.SortCriteria
 import dev.gmarques.compras.domain.model.ProductWithCategory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
@@ -189,7 +191,7 @@ class ProductsActivityViewModel : ViewModel() {
      */
     fun updateProductAsIs(updatedProduct: Product) = viewModelScope.launch(IO) {
         ProductRepository.addOrUpdateProduct(ValidatedProduct(updatedProduct))
-        ProductRepository.updateSuggestionProduct(updatedProduct, ValidatedProduct(updatedProduct))
+        SuggestionProductRepository.updateSuggestionProduct(updatedProduct, ValidatedSuggestionProduct(updatedProduct))
     }
 
     /**
