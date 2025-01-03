@@ -13,6 +13,7 @@ import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.ShopListRepository
+import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import dev.gmarques.compras.domain.SortCriteria
 import dev.gmarques.compras.domain.model.ProductWithCategory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
@@ -211,7 +212,7 @@ class ProductsActivityViewModel : ViewModel() {
     }
 
     fun addOrUpdateShopList(shopList: ShopList) {
-        ShopListRepository.addOrAttShopList(shopList)
+        ShopListRepository.addOrAttShopList(ValidatedShopList(shopList))
     }
 
     suspend fun removeShopList(shopList: ShopList) = withContext(IO) {
@@ -226,7 +227,7 @@ class ProductsActivityViewModel : ViewModel() {
      * Após carregar a lista chama a função para carregar as categorias
      */
     private fun loadList(shoplistId: String) {
-        shopListDatabaseListener = ShopListRepository.observeList(shoplistId) { shopList, error ->
+        shopListDatabaseListener = ShopListRepository.observeShopList(shoplistId) { shopList, error ->
             if (error == null) shopList.let {
                 _shopListLD.postValue(shopList!!)
                 observeCategoriesUpdates()

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.ShopListRepository
+import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import dev.gmarques.compras.domain.utils.ListenerRegister
 
 
@@ -13,7 +14,7 @@ class MainActivityViewModel : ViewModel() {
 
     fun observeUpdates() {
 
-        listenerRegister = ShopListRepository.observeListUpdates { lists, error ->
+        listenerRegister = ShopListRepository.observeShopListsUpdates { lists, error ->
             if (error == null) {
                 val nonNullableList = lists!!
                 _listsLiveData.postValue(nonNullableList)
@@ -23,7 +24,7 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun addOrUpdateShopList(shopList: ShopList) {
-        ShopListRepository.addOrAttShopList(shopList)
+        ShopListRepository.addOrAttShopList(ValidatedShopList(shopList))
     }
 
     override fun onCleared() {

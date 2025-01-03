@@ -26,7 +26,6 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.observeOnce
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
@@ -138,7 +137,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
             val term = text.toString()
 
             rvAdapter.submitList(emptyList())
-            viewModel.searchProduct(term.removeAccents())
+            viewModel.searchProduct(term)
 
             binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
         }

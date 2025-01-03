@@ -28,8 +28,8 @@ data class ShopList(
      */
     fun selfValidate(): ShopList {
 
-        if (Validator.validateName(name).isFailure) throw Exception("Nome da lista é invalio: '${name}'")
-
+        val resultValidateName = Validator.validateName(name)
+        if (resultValidateName.isFailure) throw Exception("Nome da lista é invalido: '${name}' -> ${resultValidateName.exceptionOrNull()!!.message}'")
         return this
     }
 
@@ -66,7 +66,7 @@ data class ShopList(
 
     class Validator {
         companion object {
-            // Constantes privadas
+
             private const val MAX_CHARS = 30
             private const val MIN_CHARS = 3
 
