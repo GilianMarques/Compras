@@ -8,41 +8,39 @@ import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.BsdShoplistMenuDialogBinding
 
-class BsdShopListMenu(
+class BsdShopListMenu private constructor(
     targetActivity: Activity,
     private val shopList: ShopList,
-    private var renameListener: ((ShopList) -> Unit),
-    private var removeListener: ((ShopList) -> Unit),
-    private var orderListener: (() -> Unit),
-    private var suggestionListener: (() -> Unit),
+    private val renameListener: ((ShopList) -> Unit)?,
+    private val removeListener: ((ShopList) -> Unit)?,
+    private val orderListener: (() -> Unit)?,
+    private val suggestionListener: (() -> Unit)?,
 ) {
 
     private var binding = BsdShoplistMenuDialogBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
 
-
     init {
         dialog.setContentView(binding.root)
 
         binding.apply {
-
             tvRemove.setOnClickListener {
-                removeListener(shopList)
+                removeListener?.invoke(shopList)
                 dialog.dismiss()
             }
 
             tvRename.setOnClickListener {
-                renameListener(shopList)
+                renameListener?.invoke(shopList)
                 dialog.dismiss()
             }
 
             tvSortProducts.setOnClickListener {
-                orderListener()
+                orderListener?.invoke()
                 dialog.dismiss()
             }
 
             tvProductSuggestion.setOnClickListener {
-                suggestionListener()
+                suggestionListener?.invoke()
                 dialog.dismiss()
             }
 
@@ -59,13 +57,49 @@ class BsdShopListMenu(
 
             tvTitle.text = shopList.name
         }
-
     }
-
 
     fun show() {
         dialog.show()
     }
 
+    class Builder(private val targetActivity: Activity, private val shopList: ShopList) {
+        private var renameListener: ((ShopList) -> Unit)? = null
+        private var removeListener: ((ShopList) -> Unit)? = null
+        private var orderListener: (() -> Unit)? = null
+        private var suggestionListener: (() -> Unit)? = null
 
+        fun setRenameListener(listener: (ShopList) -> Unit) = apply {
+            this.renameListener = listener
+        }
+
+        fun setRemoveListener(listener: (ShopList) -> Unit) = apply {
+            this.removeListener = listener
+        }
+
+        fun setSortListener(listener: () -> Unit) = apply {
+            this.orderListener = listener
+        }
+
+        fun setSuggestionListener(listener: () -> Unit) = apply {
+            this.suggestionListener = listener
+        }
+
+        fun build(): BsdShopListMenu {
+
+            requireNotNull(renameListener){"renameListener must be set."}
+            requireNotNull(removeListener){"removeListener must be set."}
+            requireNotNull(orderListener){"orderListener must be set."}
+            requireNotNull(suggestionListener){"suggestionListener must be set."}
+
+            return BsdShopListMenu(
+                targetActivity,
+                shopList,
+                renameListener,
+                removeListener,
+                orderListener,
+                suggestionListener
+            )
+        }
+    }
 }

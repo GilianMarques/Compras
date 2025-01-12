@@ -1,6 +1,6 @@
 package dev.gmarques.compras.data.model
 
-import dev.gmarques.compras.App
+import android.content.Context
 import dev.gmarques.compras.R.string.Insira_um_preco_valido
 import dev.gmarques.compras.R.string.Insira_uma_quantidade_valida
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_nimo_x_caracteres
@@ -31,22 +31,23 @@ data class Product(
     /**
      * Garante que nenhum produto entre no banco de dados sem atender às regras de negócio
      */
-    fun selfValidate(): Product {
+    fun selfValidate(context: Context): Product {
 
-        val resultValidateName = Validator.validateName(name)
+        val resultValidateName = Validator.validateName(name, context)
         if (resultValidateName.isFailure) throw Exception("Nome do produto é invalido: '${name}' -> ${resultValidateName.exceptionOrNull()!!.message}'")
 
-        val resultValidatePrice = Validator.validatePrice(price)
+        val resultValidatePrice = Validator.validatePrice(price, context)
         if (resultValidatePrice.isFailure) throw Exception("Preço do produto é invalido '${price}' -> ${resultValidatePrice.exceptionOrNull()!!.message}'")
 
-        val resultValidateQuantity = Validator.validateQuantity(quantity)
+        val resultValidateQuantity = Validator.validateQuantity(quantity, context)
         if (resultValidateQuantity.isFailure) throw Exception("Quantidade do produto é invalida '${quantity}' -> ${resultValidateQuantity.exceptionOrNull()!!.message}'")
 
-        val resultValidateInfo = Validator.validateInfo(info)
+        val resultValidateInfo = Validator.validateInfo(info, context)
         if (resultValidateInfo.isFailure) throw Exception("Info do produto é invalida '${info}' -> ${resultValidateInfo.exceptionOrNull()!!.message}'")
 
         val resultValidateShopListId = Validator.validateShopListId(shopListId)
         if (resultValidateShopListId.isFailure) throw Exception("Id da lista associada ao produto é invalida '${shopListId}' -> ${resultValidateShopListId.exceptionOrNull()!!.message}'")
+
 
         val resultValidateCategoryId = Validator.validateCategoryId(categoryId)
         if (resultValidateCategoryId.isFailure) throw Exception("Id da categoria associada ao produto é invalida '${categoryId}' -> ${resultValidateCategoryId.exceptionOrNull()!!.message}'")
@@ -73,23 +74,23 @@ data class Product(
             private const val MAX_PRICE = 9_999.99
             private const val MIN_PRICE = 0.1
 
-            fun validateName(input: String): Result<String> {
+            fun validateName(input: String, context: Context): Result<String> {
                 return when {
                     input.isEmpty() -> Result.failure(
                         Exception(
-                            App.getContext().getString(O_nome_nao_pode_ficar_vazio)
+                            context.getString(O_nome_nao_pode_ficar_vazio)
                         )
                     )
 
                     input.length < MIN_CHARS_NAME -> Result.failure(
                         Exception(
-                            String.format(App.getContext().getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS_NAME)
+                            String.format(context.getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS_NAME)
                         )
                     )
 
                     input.length > MAX_CHARS_NAME -> Result.failure(
                         Exception(
-                            String.format(App.getContext().getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS_NAME)
+                            String.format(context.getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS_NAME)
                         )
                     )
 
@@ -99,13 +100,13 @@ data class Product(
                 }
             }
 
-            fun validateInfo(input: String): Result<String> {
+            fun validateInfo(input: String, context: Context): Result<String> {
 
                 return when {
 
                     input.length > MAX_CHARS_INFO -> Result.failure(
                         Exception(
-                            String.format(App.getContext().getString(Os_detalhes_devem_ter_ate_x_caracteres), MAX_CHARS_INFO)
+                            String.format(context.getString(Os_detalhes_devem_ter_ate_x_caracteres), MAX_CHARS_INFO)
                         )
                     )
 
@@ -116,13 +117,13 @@ data class Product(
 
             }
 
-            fun validatePrice(input: Double): Result<Double> {
+            fun validatePrice(input: Double, context: Context): Result<Double> {
 
                 return when {
 
                     input !in MIN_PRICE..MAX_PRICE -> Result.failure(
                         Exception(
-                            (App.getContext().getString(Insira_um_preco_valido))
+                            (context.getString(Insira_um_preco_valido))
                         )
                     )
 
@@ -131,13 +132,13 @@ data class Product(
 
             }
 
-            fun validateQuantity(input: Int): Result<Int> {
+            fun validateQuantity(input: Int, context: Context): Result<Int> {
 
                 return when {
 
                     input !in MIN_QUANTITY..MAX_QUANTITY -> Result.failure(
                         Exception(
-                            (App.getContext().getString(Insira_uma_quantidade_valida))
+                            (context.getString(Insira_uma_quantidade_valida))
                         )
                     )
 

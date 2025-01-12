@@ -47,13 +47,13 @@ class SuggestProductsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val shoplistId = intent.getStringExtra(LIST_ID)!!
+        val shopListId = intent.getStringExtra(LIST_ID)!!
 
         binding = ActivitySuggestProductsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this)[SuggestProductsActivityViewModel::class.java]
-        viewModel.init(shoplistId)
+        viewModel.init(shopListId)
 
         initToolbar()
         initRecyclerView()
@@ -61,7 +61,6 @@ class SuggestProductsActivity : AppCompatActivity() {
         initFabIncludeProducts()
         observeProductsUpdates()
         observeViewmodelErrorMessages()
-        observeFinishEvent()
         setupOnBackPressed()
     }
 
@@ -121,12 +120,6 @@ class SuggestProductsActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeFinishEvent() = lifecycleScope.launch {
-        viewModel.finishEventLD.observe(this@SuggestProductsActivity) { event ->
-            finish()
-        }
-    }
-
     private fun initRecyclerView() {
 
         rvAdapter = SuggestionProductAdapter(
@@ -152,11 +145,9 @@ class SuggestProductsActivity : AppCompatActivity() {
         dialog.show()
     }
 
-
     private fun adapterOnSelectionChangedListener(sp: SelectableProduct) {
         viewModel.updateSelectionData(sp)
     }
-
 
     private fun initFabIncludeProducts() = binding.apply {
 
@@ -164,6 +155,7 @@ class SuggestProductsActivity : AppCompatActivity() {
             Vibrator.interaction()
             fabAddProduct.isEnabled = false
             viewModel.saveProducts()
+            finish()
         }
 
         rvProducts.addOnScrollListener(object : OnScrollListener() {

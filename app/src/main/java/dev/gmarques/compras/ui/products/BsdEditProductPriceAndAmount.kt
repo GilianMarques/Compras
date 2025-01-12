@@ -5,6 +5,7 @@ import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.BsdEditProductPriceAndQuantityDialogBinding
@@ -41,10 +42,10 @@ class BsdEditProductPriceOrQuantity private constructor() {
         }
         setupInputPriceFocusListener()
         setupInputQuantityFocusListener()
-        setupAditionalOptions()
+        setupAdditionalOptions()
     }
 
-    private fun setupAditionalOptions() = binding.apply {
+    private fun setupAdditionalOptions() = binding.apply {
 
         tvEditProduct.setOnClickListener { onEditListener(editProduct); dialog.dismiss() }
 
@@ -57,7 +58,7 @@ class BsdEditProductPriceOrQuantity private constructor() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 val term = edtTarget.text.toString().ifBlank { "-1" }.currencyToDouble()
-                val result = Product.Validator.validatePrice(term)
+                val result = Product.Validator.validatePrice(term, App.getContext())
                 if (result.isSuccess) edtTarget.setText(result.getOrThrow().toCurrency())
             }
         }
@@ -68,15 +69,15 @@ class BsdEditProductPriceOrQuantity private constructor() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 val term = edtTarget.text.toString().ifBlank { "0" }.onlyIntegerNumbers()
-                val result = Product.Validator.validateQuantity(term)
+                val result = Product.Validator.validateQuantity(term,targetActivity)
                 if (result.isSuccess) edtTarget.setText(String.format(targetActivity.getString(R.string.un), result.getOrThrow()))
             }
         }
     }
 
     private fun validateUserInput(newQuantity: Int, newPrice: Double) {
-        val resultQuantity = Product.Validator.validateQuantity(newQuantity)
-        val resultPrice = Product.Validator.validatePrice(newPrice)
+        val resultQuantity = Product.Validator.validateQuantity(newQuantity,targetActivity)
+        val resultPrice = Product.Validator.validatePrice(newPrice, App.getContext())
 
         when {
             resultQuantity.isSuccess && resultPrice.isSuccess -> {
@@ -85,16 +86,16 @@ class BsdEditProductPriceOrQuantity private constructor() {
             }
 
             resultQuantity.isFailure -> {
-                showErrorSnackbar(resultQuantity.exceptionOrNull()!!.message)
+                showErrorSnackBar(resultQuantity.exceptionOrNull()!!.message)
             }
 
             resultPrice.isFailure -> {
-                showErrorSnackbar(resultPrice.exceptionOrNull()!!.message)
+                showErrorSnackBar(resultPrice.exceptionOrNull()!!.message)
             }
         }
     }
 
-    private fun showErrorSnackbar(message: String?) {
+    private fun showErrorSnackBar(message: String?) {
         Vibrator.error()
         Snackbar.make(binding.root, message.orEmpty(), Snackbar.LENGTH_LONG).show()
     }

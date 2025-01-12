@@ -12,8 +12,9 @@ import androidx.lifecycle.Observer
 import dev.gmarques.compras.App
 import java.text.Normalizer
 import java.text.NumberFormat
-import java.text.ParseException
 import java.util.Locale
+import kotlin.math.max
+import kotlin.math.min
 
 class ExtFun {
     companion object {
@@ -24,17 +25,25 @@ class ExtFun {
 
         /**
          * Converte a string com valor monetário ou numérico em um double.
-         * Lida com valores em formato de moeda ou diretamente numéricos.
+         * Lida com valores em formato de moeda ou diretamente numéricos corretamente formatados ou com erros de formatação.
          * Retorna 0.0 caso usado em uma string vazia
          */
         fun String.currencyToDouble(): Double {
-            return try {
-                val format = NumberFormat.getCurrencyInstance(Locale.getDefault())
-                val parsedValue = format.parse(this.ifBlank { 0.0.toCurrency() })
-                parsedValue?.toDouble() ?: 0.0
-            } catch (e: ParseException) {
-                // Se falhar ao interpretar como moeda, tenta converter diretamente para número
-                this.toDoubleOrNull() ?: 0.0
+            return if (this.isEmpty()) 0.0
+            else try {
+                NumberFormat.getCurrencyInstance(Locale.getDefault()).parse(this)!!.toDouble()
+            } catch (e: Exception) {
+                val newDecSep = "_"
+                val decimalSeparatorIndex = max(this.indexOfLast { it == '.' }, this.indexOfLast { it == ',' })
+
+                return if (decimalSeparatorIndex == -1) {
+                    this.replace("\\D".toRegex(), "").toDouble()
+                } else (this.substring(0, decimalSeparatorIndex) + newDecSep +
+                        this.substring(min(decimalSeparatorIndex + 1, this.length)))
+                    .replace("[^0-9$newDecSep]".toRegex(), "")
+                    .replace(newDecSep, ".")
+                    .toDouble()
+
             }
         }
 
@@ -64,7 +73,6 @@ class ExtFun {
         }
 
         //-------------------------------------------------------------------
-
 
         /**
          * Formata o valor Double como moeda considerando a localidade do usuário.

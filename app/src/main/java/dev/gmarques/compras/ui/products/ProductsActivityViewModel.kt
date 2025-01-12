@@ -32,6 +32,7 @@ import kotlinx.coroutines.withContext
 class ProductsActivityViewModel : ViewModel() {
 
 
+    var filterCategory: Category? = null
     private var categories: HashMap<String, Category>? = null
     private var searchTerm: String = ""
     private lateinit var productsToBePosted: List<ProductWithCategory>
@@ -47,8 +48,11 @@ class ProductsActivityViewModel : ViewModel() {
     private val _productsLD = MutableLiveData<List<ProductWithCategory>>()
     val productsLD: LiveData<List<ProductWithCategory>> get() = _productsLD
 
-    private val _shopListLD = MutableLiveData<ShopList>()
-    val shopListLD: LiveData<ShopList> get() = _shopListLD
+    private val _listCategoriesLD = MutableLiveData<List<Category>?>()
+    val listCategoriesLD: LiveData<List<Category>?> get() = _listCategoriesLD
+
+    private val _shopListLD = MutableLiveData<ShopList?>()
+    val shopListLD: LiveData<ShopList?> get() = _shopListLD
 
     private val _pricesLD = MutableLiveData<Pair<Double, Double>>()
     val pricesLD: LiveData<Pair<Double, Double>> get() = _pricesLD
@@ -64,8 +68,8 @@ class ProductsActivityViewModel : ViewModel() {
 
         viewModelScope.launch(IO) {
             loadSortPreferences()
+            observeCategoriesUpdates()
             loadList(shoplistId)
-
         }
     }
 
@@ -81,7 +85,10 @@ class ProductsActivityViewModel : ViewModel() {
         categoriesDatabaseListener = CategoryRepository.observeCategoryUpdates { dbCategories, exception ->
 
             if (exception != null) throw exception
-            if (dbCategories != null) categories = dbCategories.associateBy { it.id }.toMap(HashMap())
+            if (dbCategories != null) {
+                categories = dbCategories.associateBy { it.id }.toMap(HashMap())
+
+            }
             observeProductsUpdates()
 
         }
@@ -110,9 +117,17 @@ class ProductsActivityViewModel : ViewModel() {
                 val filteredProductsWithCategories = filterProductsAndLoadCategory(products)
                 val sortedProductsWithPrices = sortProducts(filteredProductsWithCategories)
 
+                updateCategoriesFilter(products)
                 postDataWithThrottling(sortedProductsWithPrices)
             }
         }
+    }
+
+    private fun updateCategoriesFilter(products: List<Product>) {
+        val noRepeatCategories = mutableSetOf<Category>()
+        products.forEach { noRepeatCategories.add(categories?.get(it.categoryId)!!) }
+        val updatedList = noRepeatCategories.toList()
+        if (updatedList != _listCategoriesLD.value) _listCategoriesLD.postValue(noRepeatCategories.toList())
     }
 
     /**
@@ -130,7 +145,13 @@ class ProductsActivityViewModel : ViewModel() {
 
             val product = lists[i]
 
-            if (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true)) {
+            val nameContainsSearchTermOrNoSearchTermDefined =
+                (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true))
+            val categoryMatchesFilterOrNoCategoryFilter =
+                (filterCategory == null || product.categoryId == filterCategory?.id)
+
+            if (nameContainsSearchTermOrNoSearchTermDefined && categoryMatchesFilterOrNoCategoryFilter) {
+
                 fullPrice += product.price * product.quantity
                 if (product.hasBeenBought) boughtPrice += product.price * product.quantity
 
@@ -237,9 +258,8 @@ class ProductsActivityViewModel : ViewModel() {
      */
     private fun loadList(shoplistId: String) {
         shopListDatabaseListener = ShopListRepository.observeShopList(shoplistId) { shopList, error ->
-            if (error == null) shopList.let {
-                _shopListLD.postValue(shopList!!)
-                observeCategoriesUpdates()
+            if (error == null && shopList != null) {
+                _shopListLD.postValue(shopList)
             }
         }
     }
@@ -253,6 +273,17 @@ class ProductsActivityViewModel : ViewModel() {
         sortCriteria = SortCriteria.fromValue(prefs.getValue(PrefsKeys.SORT_CRITERIA, PrefsDefaultValue.SORT_CRITERIA.value))!!
         sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
         boughtProductsAtEnd = prefs.getValue(PrefsKeys.BOUGHT_PRODUCTS_AT_END, PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END)
+    }
+
+    fun filterByCategory(category: Category) {
+
+        if (this.filterCategory == category) filterCategory = null
+        else this.filterCategory = category
+
+        productsDatabaseListener?.remove()
+        productsDatabaseListener = null
+
+        observeProductsUpdates()
     }
 
     data class ProductsWithPrices(

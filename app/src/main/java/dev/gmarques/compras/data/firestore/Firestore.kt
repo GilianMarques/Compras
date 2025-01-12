@@ -8,7 +8,6 @@ import dev.gmarques.compras.data.repository.UserRepository
 
 class Firestore {
 
-    // TODO: ajustar regras de acesso no console do firebase ate 10/01/25 ou o app nao vai mais conseguir acessar os dados
     companion object {
 
         private val userRootPath = if (BuildConfig.DEBUG) {

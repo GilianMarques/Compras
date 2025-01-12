@@ -4,6 +4,7 @@ import android.app.Activity
 import android.graphics.Color
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.BsdAddShoplistDialogBinding
@@ -45,7 +46,7 @@ class BsdAddOrEditShopList(
 
     private fun validateUserInput(name: String) {
 
-        val result = ShopList.Validator.validateName(name)
+        val result = ShopList.Validator.validateName(name, App.getContext())
 
         if (result.isSuccess) {
 

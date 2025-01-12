@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.gmarques.compras.App
-import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
@@ -19,6 +17,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,10 +37,6 @@ class SuggestProductsActivityViewModel : ViewModel() {
     private var productsDatabaseListener: ListenerRegister? = null
 
     private var databaseThrottlingScope: CoroutineScope? = null
-    private var selectionDataThrottlingScope: CoroutineScope? = null
-
-    private val _finishEventLD = MutableLiveData<Boolean>()
-    val finishEventLD: LiveData<Boolean> get() = _finishEventLD
 
     private val _productsLD = MutableLiveData<List<SelectableProduct>>()
     val productsLD: LiveData<List<SelectableProduct>> get() = _productsLD
@@ -159,30 +154,26 @@ class SuggestProductsActivityViewModel : ViewModel() {
         sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
     }
 
-    fun saveProducts() = viewModelScope.launch(IO) {
+    fun saveProducts() = CoroutineScope(Job()).launch(IO) {
         var repeatedProductsCount = 0
         val currentShopListProductsNames = ProductRepository.getProducts(shopListId)
 
         updatedSelectionData.keys.forEach { key ->
-
+            delay(500)
             val (selected, quantity) = updatedSelectionData[key] ?: (false to -1)
 
             if (selected) {
                 val product = SuggestionProductRepository.getSuggestionProduct(key)
 
-                if (!currentShopListProductsNames.contains(product.name)) {
+                if (currentShopListProductsNames.contains(product.name)) repeatedProductsCount++
+                else {
                     val newProduct = product.copy(
                         shopListId = shopListId, quantity = quantity, hasBeenBought = false
                     )
-
                     saveProduct(product, newProduct)
                 }
-            } else repeatedProductsCount++
-
-
+            }
         }
-        finish(repeatedProductsCount)
-
     }
 
     private suspend fun saveProduct(oldProduct: Product, newProduct: Product) {
@@ -190,17 +181,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
         SuggestionProductRepository.updateSuggestionProduct(oldProduct, ValidatedSuggestionProduct(newProduct))
     }
 
-    private suspend fun finish(repeatedProductsCount: Int) {
 
-        if (repeatedProductsCount > 0) {
-            _errorEventLD.postValue(
-                App.getContext().getString(R.string.Produtos_repetidos_x_nao_foram_incluidos_na_lista, repeatedProductsCount)
-            )
-            delay(2500)
-        }
-
-        _finishEventLD.postValue(true)
-    }
 
     fun removeSuggestionProduct(product: Product) {
         SuggestionProductRepository.removeSuggestionProduct(ValidatedSuggestionProduct(product))

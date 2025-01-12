@@ -1,5 +1,6 @@
 package dev.gmarques.compras.data.repository.model
 
+import dev.gmarques.compras.App
 import dev.gmarques.compras.data.model.Category
 
 /**
@@ -10,7 +11,7 @@ import dev.gmarques.compras.data.model.Category
  */
 class ValidatedCategory(val category: Category) {
     init {
-        category.selfValidate()
+        category.selfValidate(App.getContext())
     }
 }
 

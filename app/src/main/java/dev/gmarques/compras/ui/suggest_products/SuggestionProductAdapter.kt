@@ -46,7 +46,6 @@ class SuggestionProductAdapter(
         fun bindData(sp: SelectableProduct) {
 
             clearListener()
-            animate()
 
             binding.apply {
 
@@ -120,12 +119,6 @@ class SuggestionProductAdapter(
                 ivRemove.visibility = VISIBLE
 
             }
-        }
-
-        private fun animate() {
-
-            itemView.alpha = 0f
-            itemView.animate().alpha(1f).setDuration(150).setStartDelay(3L * adapterPosition).start()
         }
     }
 }

@@ -12,6 +12,7 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.RvItemShopListBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.adjustSaturation
+import kotlin.math.min
 
 class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (ShopList) -> Any) :
     ListAdapter<ShopList, ShopListAdapter.ListViewHolder>(ShopListDiffCallback()) {
@@ -54,7 +55,7 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
         private fun animate() {
             itemView.clearAnimation()
             itemView.alpha = 0f
-            itemView.animate().alpha(1f).setDuration(150).setStartDelay(3L * adapterPosition).start()
+            itemView.animate().alpha(1f).setDuration(450).setStartDelay(min(50L * adapterPosition, 500)).start()
         }
 
     }

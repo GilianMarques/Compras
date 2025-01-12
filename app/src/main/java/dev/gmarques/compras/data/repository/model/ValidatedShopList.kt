@@ -1,5 +1,6 @@
 package dev.gmarques.compras.data.repository.model
 
+import dev.gmarques.compras.App
 import dev.gmarques.compras.data.model.ShopList
 
 /**
@@ -10,7 +11,7 @@ import dev.gmarques.compras.data.model.ShopList
  */
 class ValidatedShopList(val shopList: ShopList) {
     init {
-        shopList.selfValidate()
+        shopList.selfValidate(App.getContext())
     }
 }
 

@@ -4,24 +4,32 @@ import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
 import android.text.Spanned
+import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.animation.AnticipateInterpolator
+import android.widget.LinearLayout
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.google.android.material.chip.Chip
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.ActivityProductsBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.observeOnce
@@ -74,23 +82,43 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         observePrices()
         observeShopList()
         setupOnBackPressed()
+        observeCategories()
         if (suggestProducts) startActivitySuggestProduct()
-        /*   runBlocking {
-               repeat(15) {
-                   delay(100)
-                   val x = Product(
-                       shopListId,
-                       "produto #$it",
-                       -1,
-                       Random.nextDouble(499.967),
-                       Random.nextInt(5),
-                       "info referente ao produto #$it",
-                       true
-                   )
-                       ProductRepository.addOrUpdateProduct(x)
-               }
-           }*/
 
+
+    }
+
+    private fun observeCategories() {
+        viewModel.listCategoriesLD.observe(this) { categories ->
+            categories?.let { updateCategoriesOnUi(categories.toList()) }
+        }
+    }
+
+    private fun updateCategoriesOnUi(categories: List<Category>) = binding.apply {
+        cgCategories.removeAllViews()
+        Log.d("USUK", "ProductsActivity.".plus("updateCategoriesOnUi() "))
+        val layoutParams =
+            LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { marginStart = 4.dp(); marginEnd = 4.dp() }
+
+        lifecycleScope.launch {
+            categories.forEachIndexed { index, category ->
+                val chip = Chip(this@ProductsActivity)
+                chip.layoutParams = layoutParams
+                cgCategories.postDelayed({ cgCategories.addView(chip) }, (100 * index).toLong())
+
+                chip.text = category.name
+                chip.chipIcon = AppCompatResources.getDrawable(this@ProductsActivity, R.drawable.vec_category)
+                (chip.chipIcon?.mutate() as? VectorDrawable)?.setTint(category.color)
+                chip.isCheckable = true  // Torna o Chip selecionável
+                chip.isCheckedIconVisible = true  // Exibe o ícone de seleção quando o Chip é selecionado
+                if (viewModel.filterCategory == category) chip.isChecked = true
+                chip.setOnClickListener {
+                    Vibrator.interaction()
+                    viewModel.filterByCategory(category)
+                    hscCategories.smoothScrollTo(chip.x.toInt() - chip.width, 0)
+                }
+            }
+        }
     }
 
     private fun observePrices() = viewModel.pricesLD.observe(this) {
@@ -126,7 +154,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     }
 
     private fun observeShopList() = viewModel.shopListLD.observe(this) {
-        binding.toolbar.tvActivityTitle.text = it.name
+        binding.toolbar.tvActivityTitle.text = it?.name
     }
 
     private fun initSearch() {
@@ -218,7 +246,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         viewModel.shopListLD.observeOnce(this@ProductsActivity) { shopList ->
 
             Vibrator.interaction()
-            val intent = AddEditProductActivity.newIntentAddProduct(this@ProductsActivity, shopList.id)
+            val intent = AddEditProductActivity.newIntentAddProduct(this@ProductsActivity, shopList!!.id)
             startActivity(intent)
         }
     }
@@ -234,7 +262,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         viewModel.shopListLD.observeOnce(this@ProductsActivity) { shopList ->
 
             Vibrator.interaction()
-            val intent = AddEditProductActivity.newIntentEditProduct(this@ProductsActivity, shopList.id, product.id)
+            val intent = AddEditProductActivity.newIntentEditProduct(this@ProductsActivity, shopList!!.id, product.id)
             startActivity(intent)
         }
     }
@@ -243,15 +271,12 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         viewModel.shopListLD.observeOnce(this) {
             Vibrator.interaction()
 
-            BsdShopListMenu(this, it, { renameList ->
-                showRenameDialog(renameList)
-            }, { removeList ->
-                confirmRemove(removeList)
-            }, {
-                showSortProductsDialog()
-            }, {
-                startActivitySuggestProduct()
-            }).show()
+            BsdShopListMenu.Builder(this, it!!)
+                .setRenameListener { renameList -> showRenameDialog(renameList) }
+                .setSortListener { showSortProductsDialog() }
+                .setSuggestionListener { startActivitySuggestProduct() }
+                .setRemoveListener { removeList -> confirmRemove(removeList) }
+                .build().show()
         }
     }
 

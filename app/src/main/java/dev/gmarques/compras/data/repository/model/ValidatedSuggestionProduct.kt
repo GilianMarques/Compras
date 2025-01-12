@@ -1,5 +1,6 @@
 package dev.gmarques.compras.data.repository.model
 
+import dev.gmarques.compras.App
 import dev.gmarques.compras.data.model.Product
 
 /**
@@ -13,7 +14,7 @@ class ValidatedSuggestionProduct(product: Product) {
      val suggestionProduct: Product
 
     init {
-        product.selfValidate()
+        product.selfValidate(App.getContext())
         suggestionProduct = product
             .withNewId()
             .copy(shopListId = "", hasBeenBought = false)

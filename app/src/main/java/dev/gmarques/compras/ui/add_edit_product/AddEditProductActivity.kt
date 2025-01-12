@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
@@ -260,7 +261,7 @@ class AddEditProductActivity : AppCompatActivity() {
                 hideSuggestions()
 
                 val term = edtTarget.text.toString()
-                val result = Product.Validator.validateName(term)
+                val result = Product.Validator.validateName(term, App.getContext())
 
                 if (result.isSuccess) {
                     viewModel.validatedName = result.getOrThrow()
@@ -289,7 +290,7 @@ class AddEditProductActivity : AppCompatActivity() {
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
                 val term = edtTarget.text.toString()
-                val result = Product.Validator.validateInfo(term)
+                val result = Product.Validator.validateInfo(term,this)
 
                 if (result.isSuccess) {
                     viewModel.validatedInfo = result.getOrThrow()
@@ -312,7 +313,7 @@ class AddEditProductActivity : AppCompatActivity() {
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
                 val term = edtTarget.text.toString().ifBlank { "-1" }.currencyToDouble()
-                val result = Product.Validator.validatePrice(term)
+                val result = Product.Validator.validatePrice(term, App.getContext())
 
                 if (result.isSuccess) {
                     viewModel.validatedPrice = result.getOrThrow()
@@ -335,7 +336,7 @@ class AddEditProductActivity : AppCompatActivity() {
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
                 val term = edtTarget.text.toString().ifBlank { "0" }.onlyIntegerNumbers()
-                val result = Product.Validator.validateQuantity(term)
+                val result = Product.Validator.validateQuantity(term,this)
 
                 if (result.isSuccess) {
                     viewModel.validatedQuantity = result.getOrThrow()

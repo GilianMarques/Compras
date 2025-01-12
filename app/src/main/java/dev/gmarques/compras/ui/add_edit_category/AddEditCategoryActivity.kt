@@ -13,6 +13,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.databinding.ActivityAddEditCategoryBinding
@@ -136,7 +137,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
                 val term = edtTarget.text.toString()
-                val result = Category.Validator.validateName(term)
+                val result = Category.Validator.validateName(term,this)
 
                 if (result.isSuccess) {
                     viewModel.validatedName = result.getOrThrow()
@@ -160,7 +161,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
                 resetFocus(edtTarget, tvTarget)
                 showColorDialog()
             } else {
-                val result = Category.Validator.validateColor(viewModel.validatedColor)
+                val result = Category.Validator.validateColor(viewModel.validatedColor, App.getContext())
 
                 if (result.isSuccess) {
                     edtTarget.hint = getString(R.string.Cor_selecionada)

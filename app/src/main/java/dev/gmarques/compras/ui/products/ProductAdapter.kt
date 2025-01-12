@@ -15,6 +15,7 @@ import dev.gmarques.compras.databinding.RvItemProductBinding
 import dev.gmarques.compras.domain.model.ProductWithCategory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.adjustSaturation
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
+import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.products.ProductAdapter.ProductViewHolder
 
 class ProductAdapter(val callback: Callback) :
@@ -39,7 +40,6 @@ class ProductAdapter(val callback: Callback) :
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bindData(productWithCategory: ProductWithCategory) {
-            animate()
             clearListener()
 
             val product = productWithCategory.product
@@ -69,16 +69,10 @@ class ProductAdapter(val callback: Callback) :
             }
 
             cbBought.setOnCheckedChangeListener { _, checked ->
+               Vibrator.interaction()
                 callback.rvProductsOnBoughtItemClick(product, checked)
             }
 
-        }
-
-
-        private fun animate() {
-            itemView.clearAnimation()
-            itemView.alpha = 0f
-            itemView.animate().alpha(1f).setDuration(150).setStartDelay(3L * adapterPosition).start()
         }
     }
 

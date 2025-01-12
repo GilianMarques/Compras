@@ -1,6 +1,6 @@
 package dev.gmarques.compras.data.model
 
-import dev.gmarques.compras.App
+import android.content.Context
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_nimo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_ximo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_nao_pode_ficar_vazio
@@ -26,9 +26,9 @@ data class ShopList(
     /**
      * Garante que nenhuma lista entre no banco de dados sem atender às regras de negócio
      */
-    fun selfValidate(): ShopList {
+    fun selfValidate(context: Context): ShopList {
 
-        val resultValidateName = Validator.validateName(name)
+        val resultValidateName = Validator.validateName(name, context)
         if (resultValidateName.isFailure) throw Exception("Nome da lista é invalido: '${name}' -> ${resultValidateName.exceptionOrNull()!!.message}'")
         return this
     }
@@ -70,23 +70,23 @@ data class ShopList(
             private const val MAX_CHARS = 30
             private const val MIN_CHARS = 3
 
-            fun validateName(input: String): Result<String> {
+            fun validateName(input: String, context: Context): Result<String> {
                 return when {
                     input.isEmpty() -> Result.failure(
                         Exception(
-                            App.getContext().getString(O_nome_nao_pode_ficar_vazio)
+                            context.getString(O_nome_nao_pode_ficar_vazio)
                         )
                     )
 
                     input.length < MIN_CHARS -> Result.failure(
                         Exception(
-                            String.format(App.getContext().getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS)
+                            String.format(context.getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS)
                         )
                     )
 
                     input.length > MAX_CHARS -> Result.failure(
                         Exception(
-                            String.format(App.getContext().getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS)
+                            String.format(context.getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS)
                         )
                     )
 
