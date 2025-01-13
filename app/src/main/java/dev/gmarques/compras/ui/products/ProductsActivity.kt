@@ -19,6 +19,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
@@ -207,8 +208,14 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     }
 
     private fun initRecyclerView() {
-
         rvAdapter = ProductAdapter(this@ProductsActivity)
+
+        val dragDropHelper = DragDropHelperCallback(rvAdapter)
+        val touchHelper = ItemTouchHelper(dragDropHelper)
+        rvAdapter.attachItemTouchHelper(touchHelper)
+
+        touchHelper.attachToRecyclerView(binding.rvProducts)
+
         binding.rvProducts.layoutManager = LinearLayoutManager(this)
         binding.rvProducts.adapter = rvAdapter
     }
@@ -326,6 +333,10 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
         val dialog = dialogBuilder.create()
         dialog.show()
+    }
+
+    override fun rvProductsOnDragAndDrop(toPosition: Int, product: Product) {
+       viewModel.updateProductPosition(product,toPosition)
     }
 
     override fun rvProductsOnEditItemClick(product: Product) {

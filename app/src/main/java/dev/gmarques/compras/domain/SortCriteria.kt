@@ -8,7 +8,8 @@ package dev.gmarques.compras.domain
 enum class SortCriteria(val value: Int) {
     NAME(1),
     CREATION_DATE(2),
-    CATEGORY(3);
+    CATEGORY(3),
+    POSITION(4);
 
     companion object {
 

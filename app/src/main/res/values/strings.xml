@@ -84,4 +84,6 @@
     <string name="Produtos_repetidos_x_nao_foram_incluidos_na_lista">Produtos repetidos (%1$d) não foram incluídos na lista</string>
     <string name="Voce_esta_pensando_em">Você está pensando em:</string>
     <string name="Usar_banco_de_dados_de_producao">Usar banco de dados de produção</string>
+    <string name="Posicao">Posição</string>
+    <string name="Como_ordenar_os_itens">Como ordenar os itens</string>
 </resources>

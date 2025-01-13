@@ -176,7 +176,8 @@ class ProductsActivityViewModel : ViewModel() {
             compareBy({ if (boughtProductsAtEnd) it.product.hasBeenBought else false }, // Produtos comprados no final
                 { if (sortCriteria == SortCriteria.NAME) it.product.name else null },
                 { if (sortCriteria == SortCriteria.CATEGORY) it.category.name else null },
-                { if (sortCriteria == SortCriteria.CREATION_DATE) it.product.creationDate else null })
+                { if (sortCriteria == SortCriteria.CREATION_DATE) it.product.creationDate else null },
+                { if (sortCriteria == SortCriteria.POSITION) it.product.position else null })
         ).let {
             if (!sortAscending) it.reversed() else it
         }
@@ -284,6 +285,11 @@ class ProductsActivityViewModel : ViewModel() {
         productsDatabaseListener = null
 
         observeProductsUpdates()
+    }
+
+    fun updateProductPosition(product: Product, newIndex: Int) {
+        val newProduct = product.copy(position = newIndex)
+        ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }
 
     data class ProductsWithPrices(

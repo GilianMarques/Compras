@@ -43,6 +43,7 @@ class BsdSortProducts(
         rbName.isChecked = sortCriteria == SortCriteria.NAME
         rbCreationDate.isChecked = sortCriteria == SortCriteria.CREATION_DATE
         rbCategory.isChecked = sortCriteria == SortCriteria.CATEGORY
+        rbPosition.isChecked = sortCriteria == SortCriteria.POSITION
 
         swAscendingOrder.isChecked = sortAscending
         swBoughtAtEnd.isChecked = boughtProductsAtEnd
@@ -62,6 +63,10 @@ class BsdSortProducts(
 
         rbCreationDate.setOnCheckedChangeListener { _, checked ->
             if (checked) sortCriteria = SortCriteria.CREATION_DATE
+        }
+
+        rbPosition.setOnCheckedChangeListener { _, checked ->
+            if (checked) sortCriteria = SortCriteria.POSITION
         }
 
         swAscendingOrder.setOnCheckedChangeListener { _, checked ->

@@ -5,7 +5,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:fitsSystemWindows="false"
         android:paddingTop="8dp">
 
@@ -34,147 +34,156 @@
             android:padding="16dp"
             android:textAlignment="center"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@id/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Compras de dezembro" />
 
         <View
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="4dp"
             android:background="?android:attr/listDivider"
-            app:layout_constraintBottom_toTopOf="@id/ll_options" />
+            app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-        <LinearLayout
-            android:id="@+id/ll_options"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="76dp">
 
-
-            <TextView
-                android:id="@+id/tv_sort_products"
+            <LinearLayout
+                android:id="@+id/ll_options"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/back_textview_menu"
-                android:drawablePadding="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/Ordenar_produtos"
-                android:textColor="?attr/colorPrimaryVariant"
-                app:drawableStartCompat="@drawable/vec_sort"
-                app:drawableTint="?attr/colorPrimaryVariant"
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent">
 
 
-            <TextView
-                android:id="@+id/tv_product_suggestion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/back_textview_menu"
-                android:drawablePadding="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/Sugestao_de_produtos"
-                android:textColor="?attr/colorPrimaryVariant"
-                app:drawableStartCompat="@drawable/vec_product"
-                app:drawableTint="?attr/colorPrimaryVariant"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                <TextView
+                    android:id="@+id/tv_sort_products"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/back_textview_menu"
+                    android:drawablePadding="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/Ordenar_produtos"
+                    android:textColor="?attr/colorPrimaryVariant"
+                    app:drawableStartCompat="@drawable/vec_sort"
+                    app:drawableTint="?attr/colorPrimaryVariant"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_rename"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/back_textview_menu"
-                android:drawablePadding="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/Renomear_lista"
-                android:textColor="?attr/colorPrimaryVariant"
-                app:drawableStartCompat="@drawable/vec_rename"
-                app:drawableTint="?attr/colorPrimaryVariant"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/tv_remove"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_remove"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/back_textview_menu"
-                android:drawablePadding="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/Remover_lista"
-                android:textColor="?attr/colorPrimaryVariant"
-                app:drawableStartCompat="@drawable/vec_remove"
-                app:drawableTint="?attr/colorPrimaryVariant"
-                app:layout_constraintBottom_toTopOf="@id/tv_sort_products"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                <TextView
+                    android:id="@+id/tv_product_suggestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/back_textview_menu"
+                    android:drawablePadding="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/Sugestao_de_produtos"
+                    android:textColor="?attr/colorPrimaryVariant"
+                    app:drawableStartCompat="@drawable/vec_product"
+                    app:drawableTint="?attr/colorPrimaryVariant"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/cb_production_database"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/back_textview_menu"
-                android:button="@null"
-                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-                android:drawablePadding="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/Usar_banco_de_dados_de_producao"
-                android:textColor="?attr/colorPrimaryVariant"
-                android:visibility="gone"
-                app:drawableStartCompat="@drawable/vec_check"
-                app:drawableTint="?attr/colorPrimaryVariant"
-                app:layout_constraintBottom_toTopOf="@id/tv_sort_products"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:visibility="visible" />
+                <TextView
+                    android:id="@+id/tv_rename"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/back_textview_menu"
+                    android:drawablePadding="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/Renomear_lista"
+                    android:textColor="?attr/colorPrimaryVariant"
+                    app:drawableStartCompat="@drawable/vec_rename"
+                    app:drawableTint="?attr/colorPrimaryVariant"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/tv_remove"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_remove"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/back_textview_menu"
+                    android:drawablePadding="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/Remover_lista"
+                    android:textColor="?attr/colorPrimaryVariant"
+                    app:drawableStartCompat="@drawable/vec_remove"
+                    app:drawableTint="?attr/colorPrimaryVariant"
+                    app:layout_constraintBottom_toTopOf="@id/tv_sort_products"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cb_production_database"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/back_textview_menu"
+                    android:button="@null"
+                    android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                    android:drawablePadding="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/Usar_banco_de_dados_de_producao"
+                    android:textColor="?attr/colorPrimaryVariant"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/vec_check"
+                    app:drawableTint="?attr/colorPrimaryVariant"
+                    app:layout_constraintBottom_toTopOf="@id/tv_sort_products"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
