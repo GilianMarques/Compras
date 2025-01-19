@@ -1,5 +1,6 @@
 package dev.gmarques.compras.ui.add_edit_product
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,8 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
@@ -34,6 +37,8 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
+import dev.gmarques.compras.ui.categories.CategoriesActivity
+import dev.gmarques.compras.ui.categories.CategoriesActivity.Companion.SELECTED_CATEGORY
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,7 +50,8 @@ import kotlinx.coroutines.withContext
  */
 class AddEditProductActivity : AppCompatActivity() {
 
-    private var categoryDialog: BsdSelectCategory? = null
+    private lateinit var categoryResultLauncher: ActivityResultLauncher<Intent>
+
     private lateinit var binding: ActivityAddEditProductBinding
     private lateinit var viewModel: AddEditProductActivityViewModel
 
@@ -90,6 +96,7 @@ class AddEditProductActivity : AppCompatActivity() {
         observeNameSuggestions()
         observeViewmodelErrorMessages()
         observeViewmodelFinishEvent()
+        setupActivityResultLauncher()
 
         lifecycleScope.launch {
             withContext(IO) {
@@ -102,11 +109,21 @@ class AddEditProductActivity : AppCompatActivity() {
 
     }
 
+    private fun setupActivityResultLauncher() {
+
+        categoryResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val selectedCategory = result.data!!.getSerializableExtra(SELECTED_CATEGORY) as Category
+                viewModel.validatedCategory = selectedCategory
+                binding.edtCategory.clearFocus()
+            }
+        }
+    }
+
     private fun observeViewmodelErrorMessages() {
         viewModel.errorEventLD.observe(this@AddEditProductActivity) { event ->
             Snackbar.make(binding.root, event, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
-            categoryDialog?.dismissBottomSheetDialog()
         }
     }
 
@@ -290,7 +307,7 @@ class AddEditProductActivity : AppCompatActivity() {
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
                 val term = edtTarget.text.toString()
-                val result = Product.Validator.validateInfo(term,this)
+                val result = Product.Validator.validateInfo(term, this)
 
                 if (result.isSuccess) {
                     viewModel.validatedInfo = result.getOrThrow()
@@ -336,7 +353,7 @@ class AddEditProductActivity : AppCompatActivity() {
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
                 val term = edtTarget.text.toString().ifBlank { "0" }.onlyIntegerNumbers()
-                val result = Product.Validator.validateQuantity(term,this)
+                val result = Product.Validator.validateQuantity(term, this)
 
                 if (result.isSuccess) {
                     viewModel.validatedQuantity = result.getOrThrow()
@@ -358,7 +375,8 @@ class AddEditProductActivity : AppCompatActivity() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 resetFocus(edtTarget, tvTarget)
-                showCategoryDialog()
+                categoryResultLauncher.launch(CategoriesActivity.newIntent(this@AddEditProductActivity, true))
+
             } else {
 
                 if (viewModel.validatedCategory != null) {
@@ -370,23 +388,6 @@ class AddEditProductActivity : AppCompatActivity() {
             }
         }
 
-    }
-
-    private fun showCategoryDialog() {
-        categoryDialog = BsdSelectCategory.Builder(this).setOnConfirmListener { category ->
-            viewModel.validatedCategory = category
-            binding.edtCategory.clearFocus()
-        }.setOnEditListener { category ->
-            startActivityEditCategory(category)
-        }.setOnRemoveListener { category ->
-            confirmRemove(category)
-        }.setOnAddListener {
-            startActivityAddCategory()
-        }.setOnDismissListener {
-            categoryDialog = null
-            binding.edtCategory.clearFocus()
-        }.build()
-        categoryDialog!!.show()
     }
 
     private fun resetFocus(edtTarget: AppCompatEditText, tvTarget: TextView) {

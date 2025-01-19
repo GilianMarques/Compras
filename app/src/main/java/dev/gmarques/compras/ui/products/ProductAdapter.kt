@@ -1,7 +1,6 @@
 package dev.gmarques.compras.ui.products
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.VectorDrawable
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View.GONE
@@ -17,7 +16,6 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.RvItemProductBinding
 import dev.gmarques.compras.domain.model.ProductWithCategory
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.adjustSaturation
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import java.util.Collections
@@ -105,7 +103,7 @@ class ProductAdapter(val callback: Callback) :
                 tvProductPrice.text = (product.price * product.quantity).toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
                 cbBought.isChecked = product.hasBeenBought
-                (ivHandle.drawable as VectorDrawable).mutate().setTint(productWithCategory.category.color.adjustSaturation(2f))
+             //   (ivHandle.drawable as VectorDrawable).mutate().setTint(productWithCategory.category.color.adjustSaturation(2f))
                 ivHandle.visibility = if (dragnDropEnabled) VISIBLE else GONE
             }
 

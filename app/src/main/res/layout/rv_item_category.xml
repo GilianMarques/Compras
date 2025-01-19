@@ -23,22 +23,37 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="UseCompoundDrawables">
 
+
+                <ImageView
+                    android:id="@+id/iv_handle"
+                    android:layout_width="36dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="end"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:contentDescription="@string/Alca_para_mudar_a_posicao_do_produto_na_lista"
+                    android:padding="2dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:srcCompat="@drawable/vec_drag_indicator"
+                    />
+
                 <ImageView
                     android:id="@+id/iv_list_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="16dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/back_list_icon"
                     android:importantForAccessibility="no"
                     android:padding="10dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/iv_handle"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/vec_category"
                     app:tint="?colorPrimarySurface" />
 
                 <TextView
@@ -57,7 +72,7 @@
                     app:layout_constraintEnd_toStartOf="@id/iv_edit"
                     app:layout_constraintStart_toEndOf="@id/iv_list_icon"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Macarrão" />
+                    tools:text="Massas e temperos" />
 
                 <ImageView
                     android:id="@+id/iv_edit"

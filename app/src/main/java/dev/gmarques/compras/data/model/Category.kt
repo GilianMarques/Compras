@@ -14,6 +14,7 @@ import java.util.UUID
 data class Category(
     val name: String,
     val color: Int,
+    val position: Int = 0,
     val id: String = getNewId(),
     val creationDate: Long = System.currentTimeMillis(),
 ) : Serializable {
@@ -30,7 +31,7 @@ data class Category(
      */
     fun selfValidate(context: Context) {
 
-        if (Validator.validateName(name,context).isFailure) throw Exception("Nome da categoria é invalido: '${name}'")
+        if (Validator.validateName(name, context).isFailure) throw Exception("Nome da categoria é invalido: '${name}'")
         if (Validator.validateColor(color, context).isFailure) throw Exception("Cor da categoria é invalida: '${color}'")
     }
 

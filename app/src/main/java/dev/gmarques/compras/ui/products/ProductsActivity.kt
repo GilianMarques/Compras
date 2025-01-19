@@ -37,6 +37,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.observeOnce
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
+import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.main.BsdAddOrEditShopList
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.Main
@@ -210,7 +211,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     private fun initRecyclerView() {
         rvAdapter = ProductAdapter(this@ProductsActivity)
 
-        val dragDropHelper = DragDropHelperCallback(rvAdapter)
+        val dragDropHelper = ProductDragDropHelperCallback(rvAdapter)
         val touchHelper = ItemTouchHelper(dragDropHelper)
         rvAdapter.attachItemTouchHelper(touchHelper)
 
@@ -222,12 +223,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     private fun initFabAddProduct() = binding.apply {
 
-
         fabAddProduct.setOnClickListener {
             startActivityAddProduct()
         }
-
-
         rvProducts.addOnScrollListener(object : OnScrollListener() {
 
 
@@ -283,8 +281,16 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
                 .setSortListener { showSortProductsDialog() }
                 .setSuggestionListener { startActivitySuggestProduct() }
                 .setRemoveListener { removeList -> confirmRemove(removeList) }
+                .setManageCategoriesListener { startCategoriesActivity() }
                 .build().show()
         }
+    }
+
+    private fun startCategoriesActivity() {
+
+        Vibrator.interaction()
+        val intent = CategoriesActivity.newIntent(this@ProductsActivity)
+        startActivity(intent)
     }
 
     private fun showSortProductsDialog() {

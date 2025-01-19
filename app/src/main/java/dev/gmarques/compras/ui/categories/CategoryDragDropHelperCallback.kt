@@ -1,9 +1,9 @@
-package dev.gmarques.compras.ui.products
+package dev.gmarques.compras.ui.categories
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class DragDropHelperCallback(private val adapter: ProductAdapter) : ItemTouchHelper.Callback() {
+class CategoryDragDropHelperCallback(private val adapter: CategoryAdapter) : ItemTouchHelper.Callback() {
     override fun isLongPressDragEnabled(): Boolean = false
 
     override fun getMovementFlags(
@@ -21,7 +21,7 @@ class DragDropHelperCallback(private val adapter: ProductAdapter) : ItemTouchHel
         target: RecyclerView.ViewHolder,
     ): Boolean {
 
-        adapter.moveProduct(viewHolder.adapterPosition, target.adapterPosition)
+        adapter.moveCategory(viewHolder.adapterPosition, target.adapterPosition)
         return true
     }
 
@@ -31,7 +31,7 @@ class DragDropHelperCallback(private val adapter: ProductAdapter) : ItemTouchHel
      */
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
 
-        adapter.updateDraggedProducts()
+        adapter.updateDraggedCategories()
 
         super.clearView(recyclerView, viewHolder)
     }

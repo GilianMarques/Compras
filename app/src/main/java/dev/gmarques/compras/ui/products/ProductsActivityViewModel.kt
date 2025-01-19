@@ -127,7 +127,10 @@ class ProductsActivityViewModel : ViewModel() {
         val noRepeatCategories = mutableSetOf<Category>()
         products.forEach { noRepeatCategories.add(categories?.get(it.categoryId)!!) }
         val updatedList = noRepeatCategories.toList()
-        if (updatedList != _listCategoriesLD.value) _listCategoriesLD.postValue(noRepeatCategories.toList())
+
+        val sorted = updatedList.sortedWith(compareBy { it.name }).sortedWith(compareBy { it.position })
+
+        if (sorted != _listCategoriesLD.value) _listCategoriesLD.postValue(sorted)
     }
 
     /**
@@ -147,8 +150,7 @@ class ProductsActivityViewModel : ViewModel() {
 
             val nameContainsSearchTermOrNoSearchTermDefined =
                 (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true))
-            val categoryMatchesFilterOrNoCategoryFilter =
-                (filterCategory == null || product.categoryId == filterCategory?.id)
+            val categoryMatchesFilterOrNoCategoryFilter = (filterCategory == null || product.categoryId == filterCategory?.id)
 
             if (nameContainsSearchTermOrNoSearchTermDefined && categoryMatchesFilterOrNoCategoryFilter) {
 
@@ -170,18 +172,32 @@ class ProductsActivityViewModel : ViewModel() {
      * Ordena os produtos da lista conforme configurado pelo usuario
      */
     private fun sortProducts(filteredProductsWithPrices: ProductsWithPrices): ProductsWithPrices {
-        val newData = filteredProductsWithPrices.productsWithCategory
 
-        var sorted = newData.sortedWith(
-            compareBy({ if (boughtProductsAtEnd) it.product.hasBeenBought else false }, // Produtos comprados no final
-                { if (sortCriteria == SortCriteria.NAME) it.product.name else null },
-                { if (sortCriteria == SortCriteria.CATEGORY) it.category.name else null },
-                { if (sortCriteria == SortCriteria.CREATION_DATE) it.product.creationDate else null },
-                { if (sortCriteria == SortCriteria.POSITION) it.product.position else null })
-        ).let {
-            if (!sortAscending) it.reversed() else it
+        val newData = filteredProductsWithPrices.productsWithCategory
+        var sorted = listOf<ProductWithCategory>()
+
+        when (sortCriteria) {
+            SortCriteria.NAME -> {
+                sorted = newData.sortedWith(compareBy { it.category.name })
+
+            }
+
+            SortCriteria.CATEGORY -> {
+                sorted = newData.sortedWith(compareBy { it.product.name }).sortedWith(compareBy { it.category.name })
+            }
+
+            SortCriteria.CREATION_DATE -> {
+                sorted = newData.sortedWith(compareBy { it.product.creationDate })
+            }
+
+            SortCriteria.POSITION -> {
+                sorted = newData.sortedWith(compareBy { it.category.name }).sortedWith(compareBy { it.product.position })
+            }
         }
+
+        sorted = if (!sortAscending) sorted.reversed() else sorted
         sorted = sorted.sortedWith(compareBy { if (boughtProductsAtEnd) it.product.hasBeenBought else false })
+
 
         return filteredProductsWithPrices.copy(productsWithCategory = sorted)
     }

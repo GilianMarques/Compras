@@ -15,6 +15,7 @@ class BsdShopListMenu private constructor(
     private val removeListener: ((ShopList) -> Unit)?,
     private val orderListener: (() -> Unit)?,
     private val suggestionListener: (() -> Unit)?,
+    private val manageCategoriesListener: (() -> Unit)?,
 ) {
 
     private var binding = BsdShoplistMenuDialogBinding.inflate(targetActivity.layoutInflater)
@@ -44,6 +45,11 @@ class BsdShopListMenu private constructor(
                 dialog.dismiss()
             }
 
+            tvManageCategories.setOnClickListener {
+                manageCategoriesListener?.invoke()
+                dialog.dismiss()
+            }
+
             if (BuildConfig.DEBUG) {
                 cbProductionDatabase.visibility = VISIBLE
 
@@ -68,6 +74,7 @@ class BsdShopListMenu private constructor(
         private var removeListener: ((ShopList) -> Unit)? = null
         private var orderListener: (() -> Unit)? = null
         private var suggestionListener: (() -> Unit)? = null
+        private var manageCategoriesListener: (() -> Unit)? = null
 
         fun setRenameListener(listener: (ShopList) -> Unit) = apply {
             this.renameListener = listener
@@ -85,12 +92,17 @@ class BsdShopListMenu private constructor(
             this.suggestionListener = listener
         }
 
+        fun setManageCategoriesListener(listener: () -> Unit) = apply {
+            this.manageCategoriesListener = listener
+        }
+
         fun build(): BsdShopListMenu {
 
             requireNotNull(renameListener){"renameListener must be set."}
             requireNotNull(removeListener){"removeListener must be set."}
             requireNotNull(orderListener){"orderListener must be set."}
             requireNotNull(suggestionListener){"suggestionListener must be set."}
+            requireNotNull(manageCategoriesListener){"manageCategoriesListener must be set."}
 
             return BsdShopListMenu(
                 targetActivity,
@@ -98,7 +110,8 @@ class BsdShopListMenu private constructor(
                 renameListener,
                 removeListener,
                 orderListener,
-                suggestionListener
+                suggestionListener,
+                manageCategoriesListener
             )
         }
     }

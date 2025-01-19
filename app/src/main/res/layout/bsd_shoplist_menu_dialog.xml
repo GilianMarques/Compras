@@ -108,6 +108,29 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
+
+                <TextView
+                    android:id="@+id/tv_manage_categories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/back_textview_menu"
+                    android:drawablePadding="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/Gerenciar_categorias"
+                    android:textColor="?attr/colorPrimaryVariant"
+                    app:drawableStartCompat="@drawable/vec_category"
+                    app:drawableTint="?attr/colorPrimaryVariant"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
                 <TextView
                     android:id="@+id/tv_rename"
                     android:layout_width="match_parent"
