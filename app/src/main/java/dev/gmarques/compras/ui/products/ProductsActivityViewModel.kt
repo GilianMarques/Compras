@@ -48,8 +48,8 @@ class ProductsActivityViewModel : ViewModel() {
     private val _productsLD = MutableLiveData<List<ProductWithCategory>>()
     val productsLD: LiveData<List<ProductWithCategory>> get() = _productsLD
 
-    private val _listCategoriesLD = MutableLiveData<List<Category>?>()
-    val listCategoriesLD: LiveData<List<Category>?> get() = _listCategoriesLD
+    private val _listCategoriesLD = MutableLiveData<List<Triple<Category, Int, Int>>?>()
+    val listCategoriesLD: LiveData<List<Triple<Category, Int, Int>>?> get() = _listCategoriesLD
 
     private val _shopListLD = MutableLiveData<ShopList?>()
     val shopListLD: LiveData<ShopList?> get() = _shopListLD
@@ -117,21 +117,11 @@ class ProductsActivityViewModel : ViewModel() {
                 val filteredProductsWithCategories = filterProductsAndLoadCategory(products)
                 val sortedProductsWithPrices = sortProducts(filteredProductsWithCategories)
 
-                updateCategoriesFilter(products)
                 postDataWithThrottling(sortedProductsWithPrices)
             }
         }
     }
 
-    private fun updateCategoriesFilter(products: List<Product>) {
-        val noRepeatCategories = mutableSetOf<Category>()
-        products.forEach { noRepeatCategories.add(categories?.get(it.categoryId)!!) }
-        val updatedList = noRepeatCategories.toList()
-
-        val sorted = updatedList.sortedWith(compareBy { it.name }).sortedWith(compareBy { it.position })
-
-        if (sorted != _listCategoriesLD.value) _listCategoriesLD.postValue(sorted)
-    }
 
     /**
      * Aplica os termos de busca do ususario, caso hajam, aproveita o loop para carregar as categorias
@@ -144,13 +134,17 @@ class ProductsActivityViewModel : ViewModel() {
         var fullPrice = 0.0
         var boughtPrice = 0.0
 
+        val noRepeatCategories = HashMap<String, Triple<Category, Int, Int>>()
+
+
         for (i in lists!!.indices) {
 
             val product = lists[i]
 
             val nameContainsSearchTermOrNoSearchTermDefined =
                 (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true))
-            val categoryMatchesFilterOrNoCategoryFilter = (filterCategory == null || product.categoryId == filterCategory?.id)
+            val categoryMatchesFilterOrNoCategoryFilter =
+                if (searchTerm.isNotEmpty()) true else (filterCategory == null || product.categoryId == filterCategory?.id)
 
             if (nameContainsSearchTermOrNoSearchTermDefined && categoryMatchesFilterOrNoCategoryFilter) {
 
@@ -163,8 +157,26 @@ class ProductsActivityViewModel : ViewModel() {
                         ?: throw Exception("Carregue as categorias antes de carregar os produtos.\nProduto: $product\ncatgorias: $categories")
                 )
                 filteredProducts.add(prodWithCat)
+
             }
+
+
+            val totalProductsWithMatchingCategory = (noRepeatCategories[product.categoryId]?.second ?: 0) + 1
+            val totalBoughtProductsFromCategory =
+                (noRepeatCategories[product.categoryId]?.third ?: 0) + if (product.hasBeenBought) 1 else 0
+
+            noRepeatCategories[product.categoryId] = Triple(
+                categories!![product.categoryId]!!,
+                totalProductsWithMatchingCategory,
+                totalBoughtProductsFromCategory
+            )
+
         }
+
+        val updatedList = noRepeatCategories.map { it.value }.toList<Triple<Category, Int, Int>>()
+        val sorted = updatedList.sortedWith(compareBy { it.first.name }).sortedWith(compareBy { it.first.position })
+        if (sorted != _listCategoriesLD.value) _listCategoriesLD.postValue(sorted)
+
         return ProductsWithPrices(filteredProducts, fullPrice, boughtPrice)
     }
 
@@ -273,8 +285,8 @@ class ProductsActivityViewModel : ViewModel() {
      * Carrega a lista de compras, apenas a lista e seus atributos, nao inclui os produtos
      * Após carregar a lista chama a função para carregar as categorias
      */
-    private fun loadList(shoplistId: String) {
-        shopListDatabaseListener = ShopListRepository.observeShopList(shoplistId) { shopList, error ->
+    private fun loadList(shopListId: String) {
+        shopListDatabaseListener = ShopListRepository.observeShopList(shopListId) { shopList, error ->
             if (error == null && shopList != null) {
                 _shopListLD.postValue(shopList)
             }

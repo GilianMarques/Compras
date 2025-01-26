@@ -73,8 +73,8 @@
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scrollIndicators="none"
                     android:fillViewport="false"
+                    android:scrollIndicators="none"
                     android:scrollbarSize="0dp">
 
                     <LinearLayout
@@ -152,6 +152,7 @@
                     android:importantForAutofill="no"
                     android:inputType="numberDecimal"
                     android:maxLength="12"
+                    android:selectAllOnFocus="true"
                     tools:text="algum  texto  algum  texto  algum  texto  " />
 
                 <TextView
@@ -176,6 +177,7 @@
                     android:background="@drawable/back_addproduct_edittext"
                     android:drawableStart="@drawable/vec_quantity"
                     android:hint="@string/Quantidade_necessaria"
+                    android:imeOptions="actionDone"
                     android:importantForAutofill="no"
                     android:inputType="number"
                     android:maxLength="6"

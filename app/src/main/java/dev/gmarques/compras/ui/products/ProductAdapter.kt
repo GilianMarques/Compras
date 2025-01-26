@@ -125,6 +125,7 @@ class ProductAdapter(val callback: Callback) :
                 Vibrator.interaction()
                 callback.rvProductsOnBoughtItemClick(product, checked)
             }
+
             ivHandle.setOnTouchListener { it, motionEvent ->
 
                 when (motionEvent.action) {

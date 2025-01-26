@@ -4,10 +4,11 @@ import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.VectorDrawable
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Spanned
 import android.util.Log
+import android.util.TypedValue
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -15,7 +16,6 @@ import android.view.animation.AnticipateInterpolator
 import android.widget.LinearLayout
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -96,24 +96,43 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         }
     }
 
-    private fun updateCategoriesOnUi(categories: List<Category>) = binding.apply {
+    private fun updateCategoriesOnUi(categories: List<Triple<Category, Int, Int>>) = binding.apply {
         cgCategories.removeAllViews()
         Log.d("USUK", "ProductsActivity.".plus("updateCategoriesOnUi() "))
         val layoutParams =
             LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { marginStart = 4.dp(); marginEnd = 4.dp() }
 
         lifecycleScope.launch {
-            categories.forEachIndexed { index, category ->
+
+            val theme = this@ProductsActivity.theme
+
+            val bgTypedValue = TypedValue()
+            theme.resolveAttribute(android.R.attr.colorPrimary, bgTypedValue, true)
+
+            val textTypedValue = TypedValue()
+            theme.resolveAttribute(android.R.attr.windowBackground, textTypedValue, true)
+
+            val bgColor = ColorStateList.valueOf(bgTypedValue.data)
+            val textColor = ColorStateList.valueOf(textTypedValue.data)
+
+            categories.forEachIndexed { index, triple ->
+                val category = triple.first
+                val totalItems = triple.second
+                val totalBoughtItems = triple.third
+
                 val chip = Chip(this@ProductsActivity)
                 chip.layoutParams = layoutParams
-                cgCategories.postDelayed({ cgCategories.addView(chip) }, (100 * index).toLong())
+                cgCategories.postDelayed({ cgCategories.addView(chip) }, (250 * index).toLong())
 
                 chip.text = category.name
-                chip.chipIcon = AppCompatResources.getDrawable(this@ProductsActivity, R.drawable.vec_category)
-                (chip.chipIcon?.mutate() as? VectorDrawable)?.setTint(category.color)
                 chip.isCheckable = true  // Torna o Chip selecionável
                 chip.isCheckedIconVisible = true  // Exibe o ícone de seleção quando o Chip é selecionado
                 if (viewModel.filterCategory == category) chip.isChecked = true
+
+                if (totalItems == totalBoughtItems) {
+                    chip.chipBackgroundColor = bgColor
+                    chip.setTextColor(textColor)
+                }
                 chip.setOnClickListener {
                     Vibrator.interaction()
                     viewModel.filterByCategory(category)
@@ -122,6 +141,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
             }
         }
     }
+// TODO: colocar indicador de categoria nos itens, marcar categorias compradas, a pesquisa deve ignorar filtros de categoria 
 
     private fun observePrices() = viewModel.pricesLD.observe(this) {
         binding.apply {
@@ -166,6 +186,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
             val term = text.toString()
             viewModel.searchProduct(term)
             binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
+            binding.hscCategories.visibility = if (term.isEmpty()) VISIBLE else GONE
+
         }
 
         binding.ivClearSearch.setOnClickListener {
@@ -342,7 +364,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
     }
 
     override fun rvProductsOnDragAndDrop(toPosition: Int, product: Product) {
-       viewModel.updateProductPosition(product,toPosition)
+        viewModel.updateProductPosition(product, toPosition)
     }
 
     override fun rvProductsOnEditItemClick(product: Product) {
