@@ -18,6 +18,7 @@ import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.domain.SortCriteria
+import dev.gmarques.compras.domain.model.CategoryWithProductsStats
 import dev.gmarques.compras.domain.model.ProductWithCategory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ListenerRegister
@@ -32,11 +33,14 @@ import kotlinx.coroutines.withContext
 class ProductsActivityViewModel : ViewModel() {
 
 
-    var filterCategory: Category? = null
-    private var categories: HashMap<String, Category>? = null
-    private var searchTerm: String = ""
-    private lateinit var productsToBePosted: List<ProductWithCategory>
+    private var filterCategory: Category? = null
 
+    // mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo
+    private var categories: HashMap<String, Category>? = null
+
+    private var searchTerm: String = ""
+
+    private lateinit var productsToBePosted: List<ProductWithCategory>
     private lateinit var pricesToBePosted: Pair<Double, Double>
 
     private var productsDatabaseListener: ListenerRegister? = null
@@ -48,8 +52,8 @@ class ProductsActivityViewModel : ViewModel() {
     private val _productsLD = MutableLiveData<List<ProductWithCategory>>()
     val productsLD: LiveData<List<ProductWithCategory>> get() = _productsLD
 
-    private val _listCategoriesLD = MutableLiveData<List<Triple<Category, Int, Int>>?>()
-    val listCategoriesLD: LiveData<List<Triple<Category, Int, Int>>?> get() = _listCategoriesLD
+    private val _listCategoriesLD = MutableLiveData<List<CategoryWithProductsStats>?>()
+    val listCategoriesLD: LiveData<List<CategoryWithProductsStats>?> get() = _listCategoriesLD
 
     private val _shopListLD = MutableLiveData<ShopList?>()
     val shopListLD: LiveData<ShopList?> get() = _shopListLD
@@ -61,17 +65,27 @@ class ProductsActivityViewModel : ViewModel() {
     private var sortAscending = PrefsDefaultValue.SORT_ASCENDING
     private var boughtProductsAtEnd = PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END
 
-    fun init(shoplistId: String) {
+    fun init(shopListId: String) {
 
         // lista temporaria pra permitir o carregamento imediato dos produtos, esta sera substituida apos o carrregamento do banco de dados
-        _shopListLD.value = ShopList(shoplistId)
+        _shopListLD.value = ShopList(shopListId)
 
         viewModelScope.launch(IO) {
             loadSortPreferences()
             observeCategoriesUpdates()
-            loadList(shoplistId)
+            loadList(shopListId)
         }
     }
+
+    override fun onCleared() {
+        productsDatabaseListener?.remove()
+        shopListDatabaseListener?.remove()
+        categoriesDatabaseListener?.remove()
+        throttlingScope?.cancel()
+
+        super.onCleared()
+    }
+
 
     /**
      * Mantem na memoria (hashmap) uma copia sempre atualizada de todas as categorias do banco de dados afim
@@ -87,20 +101,45 @@ class ProductsActivityViewModel : ViewModel() {
             if (exception != null) throw exception
             if (dbCategories != null) {
                 categories = dbCategories.associateBy { it.id }.toMap(HashMap())
-
+                _productsLD.value?.let { filterCategoriesWithProductsDataAndDispatchToUi(_productsLD.value!!.map { it.product }) }
             }
             observeProductsUpdates()
 
         }
     }
 
-    override fun onCleared() {
-        productsDatabaseListener?.remove()
-        shopListDatabaseListener?.remove()
-        categoriesDatabaseListener?.remove()
-        throttlingScope?.cancel()
+    private fun filterCategoriesWithProductsDataAndDispatchToUi(products: List<Product>) {
 
-        super.onCleared()
+
+        requireNotNull(categories) { "Carregue as categorias antes de tentar filtrar os dados." }
+
+        val noRepeatCategories = HashMap<String, CategoryWithProductsStats>()
+
+
+        for (i in products.indices) {
+
+            val product = products[i]
+
+            val categoryOnMap = noRepeatCategories[product.categoryId]
+            val totalProductsWithMatchingCategory = (categoryOnMap?.totalProducts ?: 0) + 1
+            val totalBoughtProductsFromCategory = (categoryOnMap?.boughtProducts ?: 0) + if (product.hasBeenBought) 1 else 0
+
+            noRepeatCategories[product.categoryId] = CategoryWithProductsStats(
+                categories!![product.categoryId]!!,
+                totalProductsWithMatchingCategory,
+                totalBoughtProductsFromCategory,
+                product.categoryId == filterCategory?.id
+            )
+
+        }
+
+        val updatedList = noRepeatCategories.map { it.value }.toList()
+        val sorted = updatedList.sortedWith(compareBy { it.category.name })
+            .sortedWith(compareBy { it.category.position })
+            .sortedWith(compareBy { it.boughtProducts == it.totalProducts })
+
+        if (sorted != _listCategoriesLD.value) _listCategoriesLD.postValue(sorted)
+
     }
 
     /**
@@ -114,42 +153,43 @@ class ProductsActivityViewModel : ViewModel() {
             if (error != null) throw error
             if (products != null) viewModelScope.launch(IO) {
 
-                val filteredProductsWithCategories = filterProductsAndLoadCategory(products)
+                val filteredProductsWithCategories = filterProducts(products)
                 val sortedProductsWithPrices = sortProducts(filteredProductsWithCategories)
 
                 postDataWithThrottling(sortedProductsWithPrices)
+
+                viewModelScope.launch(IO) { filterCategoriesWithProductsDataAndDispatchToUi(products) }
+
             }
         }
     }
 
-
     /**
-     * Aplica os termos de busca do ususario, caso hajam, aproveita o loop para carregar as categorias
+     * Aplica os termos de busca do ususario, caso hajam
      */
-    private fun filterProductsAndLoadCategory(lists: List<Product>?): ProductsWithPrices {
+    private fun filterProducts(products: List<Product>?): ProductsWithPrices {
 
-        requireNotNull(categories) { "Carregue as categorias antes de carregar os produtos." }
+        requireNotNull(categories) { "Carregue as categorias antes de filtrar os produtos." }
 
         val filteredProducts = mutableListOf<ProductWithCategory>()
         var fullPrice = 0.0
         var boughtPrice = 0.0
 
-        val noRepeatCategories = HashMap<String, Triple<Category, Int, Int>>()
 
+        for (i in products!!.indices) {
 
-        for (i in lists!!.indices) {
-
-            val product = lists[i]
+            val product = products[i]
 
             val nameContainsSearchTermOrNoSearchTermDefined =
                 (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true))
-            val categoryMatchesFilterOrNoCategoryFilter =
-                if (searchTerm.isNotEmpty()) true else (filterCategory == null || product.categoryId == filterCategory?.id)
+
+            val categoryMatchesFilterOrNoCategoryFilter = if (searchTerm.isNotEmpty()) true
+            else (filterCategory == null || product.categoryId == filterCategory?.id)
+
+            fullPrice += product.price * product.quantity
+            if (product.hasBeenBought) boughtPrice += product.price * product.quantity
 
             if (nameContainsSearchTermOrNoSearchTermDefined && categoryMatchesFilterOrNoCategoryFilter) {
-
-                fullPrice += product.price * product.quantity
-                if (product.hasBeenBought) boughtPrice += product.price * product.quantity
 
                 val prodWithCat = ProductWithCategory(
                     product,
@@ -160,22 +200,7 @@ class ProductsActivityViewModel : ViewModel() {
 
             }
 
-
-            val totalProductsWithMatchingCategory = (noRepeatCategories[product.categoryId]?.second ?: 0) + 1
-            val totalBoughtProductsFromCategory =
-                (noRepeatCategories[product.categoryId]?.third ?: 0) + if (product.hasBeenBought) 1 else 0
-
-            noRepeatCategories[product.categoryId] = Triple(
-                categories!![product.categoryId]!!,
-                totalProductsWithMatchingCategory,
-                totalBoughtProductsFromCategory
-            )
-
         }
-
-        val updatedList = noRepeatCategories.map { it.value }.toList<Triple<Category, Int, Int>>()
-        val sorted = updatedList.sortedWith(compareBy { it.first.name }).sortedWith(compareBy { it.first.position })
-        if (sorted != _listCategoriesLD.value) _listCategoriesLD.postValue(sorted)
 
         return ProductsWithPrices(filteredProducts, fullPrice, boughtPrice)
     }

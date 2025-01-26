@@ -36,18 +36,17 @@
                 android:padding="2dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/vec_drag_indicator"
-                 />
+                app:srcCompat="@drawable/vec_drag_indicator" />
 
             <CheckBox
                 android:id="@+id/cb_bought"
-                android:layout_width="48dp"
-                android:layout_height="wrap_content"
+                android:layout_width="56dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center_vertical"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_product_name" />
 
             <TextView
                 android:id="@+id/tv_product_name"
@@ -59,29 +58,49 @@
                 android:fontFamily="@font/lexend_deca_bold"
                 android:gravity="center_vertical"
                 android:maxLines="1"
-                android:paddingStart="8dp"
-                android:paddingEnd="16dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="8dp"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@id/tv_product_price"
+                app:layout_constraintEnd_toStartOf="@id/tv_product_quantity"
                 app:layout_constraintStart_toEndOf="@id/iv_handle"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Linguiça calabresa" />
 
             <TextView
+                android:id="@+id/tv_category_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/back_round"
+                android:gravity="center"
+                android:paddingStart="8dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="2dp"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/cb_bought"
+                app:layout_constraintStart_toStartOf="@id/tv_product_name"
+                app:layout_constraintTop_toTopOf="@id/cb_bought"
+                tools:text="Massas" />
+
+            <TextView
                 android:id="@+id/tv_product_info"
-                android:layout_width="0dp"
-                android:layout_height="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="48dp"
+                android:background="@drawable/back_round"
                 android:ellipsize="marquee"
-                android:fontFamily="@font/lexend_deca"
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:paddingStart="8dp"
-                android:paddingEnd="16dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="2dp"
                 android:textSize="12sp"
-                app:layout_constraintEnd_toStartOf="@id/tv_product_quantity"
-                app:layout_constraintStart_toStartOf="@id/tv_product_name"
-                app:layout_constraintTop_toBottomOf="@id/tv_product_name"
+                app:layout_constraintBottom_toBottomOf="@id/cb_bought"
+                app:layout_constraintStart_toEndOf="@id/tv_category_name"
+                app:layout_constraintTop_toTopOf="@id/cb_bought"
                 tools:text="Espageti apollo, 500gr" />
 
             <TextView
@@ -89,6 +108,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_gravity="center_vertical"
+                android:layout_marginEnd="16dp"
                 android:fontFamily="@font/lexend_deca_bold"
                 android:gravity="center_vertical"
                 android:maxLines="1"
@@ -97,23 +117,25 @@
                 android:textColor="?colorPrimary"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@id/tv_product_name"
-                app:layout_constraintEnd_toStartOf="@id/cb_bought"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tv_product_name"
                 tools:text="R$24,89" />
 
             <TextView
                 android:id="@+id/tv_product_quantity"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:fontFamily="@font/lexend_deca_bold"
+                android:gravity="center"
                 android:maxLines="1"
                 android:paddingStart="2dp"
-                android:paddingEnd="2dp"
+                android:paddingEnd="8dp"
                 android:textAlignment="center"
                 android:textColor="?colorSecondary"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@id/tv_product_info"
-                app:layout_constraintEnd_toStartOf="@id/cb_bought"
-                app:layout_constraintTop_toTopOf="@id/tv_product_info"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_product_name"
+                app:layout_constraintEnd_toStartOf="@id/tv_product_price"
+                app:layout_constraintTop_toTopOf="@id/tv_product_name"
                 tools:text="3 UN" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,16 +4,12 @@ import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Spanned
-import android.util.Log
-import android.util.TypedValue
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.animation.AnticipateInterpolator
-import android.widget.LinearLayout
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
@@ -23,14 +19,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.google.android.material.chip.Chip
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.ActivityProductsBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.observeOnce
@@ -39,18 +34,22 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.main.BsdAddOrEditShopList
+import dev.gmarques.compras.ui.products.cat.CategoryAdapter
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.max
+import kotlin.math.min
 
-class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
+class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
 
     private lateinit var viewModel: ProductsActivityViewModel
     private lateinit var binding: ActivityProductsBinding
-    private lateinit var rvAdapter: ProductAdapter
+    private lateinit var rvAdapterProducts: ProductAdapter
+    private lateinit var rvAdapterCategories: CategoryAdapter
     private var fabHidden: Boolean = false
-
+    private var lastAdapterPosition = 0 // ajuda a escrolar o rv de categorias pra categoria selecionada
 
     companion object {
         private const val LIST_ID = "list_id"
@@ -77,7 +76,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         viewModel.init(shopListId)
 
         initToolbar()
-        initRecyclerView()
+        initRecyclerViewProducts()
+        initRecyclerViewCategories()
         initSearch()
         initFabAddProduct()
         observeProductsUpdates()
@@ -92,53 +92,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     private fun observeCategories() {
         viewModel.listCategoriesLD.observe(this) { categories ->
-            categories?.let { updateCategoriesOnUi(categories.toList()) }
-        }
-    }
-
-    private fun updateCategoriesOnUi(categories: List<Triple<Category, Int, Int>>) = binding.apply {
-        cgCategories.removeAllViews()
-        Log.d("USUK", "ProductsActivity.".plus("updateCategoriesOnUi() "))
-        val layoutParams =
-            LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { marginStart = 4.dp(); marginEnd = 4.dp() }
-
-        lifecycleScope.launch {
-
-            val theme = this@ProductsActivity.theme
-
-            val bgTypedValue = TypedValue()
-            theme.resolveAttribute(android.R.attr.colorPrimary, bgTypedValue, true)
-
-            val textTypedValue = TypedValue()
-            theme.resolveAttribute(android.R.attr.windowBackground, textTypedValue, true)
-
-            val bgColor = ColorStateList.valueOf(bgTypedValue.data)
-            val textColor = ColorStateList.valueOf(textTypedValue.data)
-
-            categories.forEachIndexed { index, triple ->
-                val category = triple.first
-                val totalItems = triple.second
-                val totalBoughtItems = triple.third
-
-                val chip = Chip(this@ProductsActivity)
-                chip.layoutParams = layoutParams
-                cgCategories.postDelayed({ cgCategories.addView(chip) }, (250 * index).toLong())
-
-                chip.text = category.name
-                chip.isCheckable = true  // Torna o Chip selecionável
-                chip.isCheckedIconVisible = true  // Exibe o ícone de seleção quando o Chip é selecionado
-                if (viewModel.filterCategory == category) chip.isChecked = true
-
-                if (totalItems == totalBoughtItems) {
-                    chip.chipBackgroundColor = bgColor
-                    chip.setTextColor(textColor)
-                }
-                chip.setOnClickListener {
-                    Vibrator.interaction()
-                    viewModel.filterByCategory(category)
-                    hscCategories.smoothScrollTo(chip.x.toInt() - chip.width, 0)
-                }
-            }
+            categories?.let { rvAdapterCategories.submitList(categories) }
         }
     }
 // TODO: colocar indicador de categoria nos itens, marcar categorias compradas, a pesquisa deve ignorar filtros de categoria 
@@ -186,7 +140,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
             val term = text.toString()
             viewModel.searchProduct(term)
             binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
-            binding.hscCategories.visibility = if (term.isEmpty()) VISIBLE else GONE
+            binding.rvCategories.visibility = if (term.isEmpty()) VISIBLE else GONE
 
         }
 
@@ -219,7 +173,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     private fun observeProductsUpdates() {
         viewModel.productsLD.observe(this) { newData ->
-            rvAdapter.submitList(newData)
+            rvAdapterProducts.submitList(newData)
 
             if (binding.edtSearch.text.toString().isNotEmpty()) {
                 when (newData.isEmpty()) {
@@ -230,17 +184,23 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         }
     }
 
-    private fun initRecyclerView() {
-        rvAdapter = ProductAdapter(this@ProductsActivity)
+    private fun initRecyclerViewProducts() {
+        rvAdapterProducts = ProductAdapter(isDarkThemeEnabled(), this@ProductsActivity)
 
-        val dragDropHelper = ProductDragDropHelperCallback(rvAdapter)
+        val dragDropHelper = ProductDragDropHelperCallback(rvAdapterProducts)
         val touchHelper = ItemTouchHelper(dragDropHelper)
-        rvAdapter.attachItemTouchHelper(touchHelper)
+        rvAdapterProducts.attachItemTouchHelper(touchHelper)
 
         touchHelper.attachToRecyclerView(binding.rvProducts)
 
         binding.rvProducts.layoutManager = LinearLayoutManager(this)
-        binding.rvProducts.adapter = rvAdapter
+        binding.rvProducts.adapter = rvAdapterProducts
+    }
+
+    private fun initRecyclerViewCategories() {
+        rvAdapterCategories = CategoryAdapter(this@ProductsActivity, this@ProductsActivity)
+        binding.rvCategories.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvCategories.adapter = rvAdapterCategories
     }
 
     private fun initFabAddProduct() = binding.apply {
@@ -363,6 +323,11 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
         dialog.show()
     }
 
+    private fun isDarkThemeEnabled(): Boolean {
+        val nightModeFlags = App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
+    }
+
     override fun rvProductsOnDragAndDrop(toPosition: Int, product: Product) {
         viewModel.updateProductPosition(product, toPosition)
     }
@@ -389,5 +354,18 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback {
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {
         viewModel.updateProductBoughtState(product, isBought)
+    }
+
+    override fun rvCategoriesOnSelect(category: Category, adapterPosition: Int) {
+        Vibrator.interaction()
+        viewModel.filterByCategory(category)
+
+        (binding.rvCategories.layoutManager as LinearLayoutManager).smoothScrollToPosition(
+            binding.rvCategories,
+            null,
+            if (lastAdapterPosition < adapterPosition) min(rvAdapterCategories.itemCount - 1, adapterPosition + 1)
+            else max(0, adapterPosition - 1)
+        )
+        lastAdapterPosition = adapterPosition
     }
 }

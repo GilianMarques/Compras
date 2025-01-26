@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -20,7 +21,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import java.util.Collections
 
-class ProductAdapter(val callback: Callback) :
+class ProductAdapter(val darkModeEnabled: Boolean, val callback: Callback) :
     ListAdapter<ProductWithCategory, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
 
     private var itemTouchHelper: ItemTouchHelper? = null
@@ -37,7 +38,7 @@ class ProductAdapter(val callback: Callback) :
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bindData(getItem(position))
+        holder.bindData(darkModeEnabled, getItem(position))
     }
 
     fun moveProduct(fromPosition: Int, toPosition: Int) {
@@ -92,7 +93,7 @@ class ProductAdapter(val callback: Callback) :
         private val itemTouchHelper: ItemTouchHelper,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bindData(productWithCategory: ProductWithCategory) {
+        fun bindData(darkModeEnabled: Boolean, productWithCategory: ProductWithCategory) {
             clearListener()
 
             val product = productWithCategory.product
@@ -100,11 +101,16 @@ class ProductAdapter(val callback: Callback) :
 
                 tvProductName.text = product.name
                 tvProductInfo.text = product.info
-                tvProductPrice.text = (product.price * product.quantity).toCurrency()
+                tvProductPrice.text = product.price.toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
                 cbBought.isChecked = product.hasBeenBought
-             //   (ivHandle.drawable as VectorDrawable).mutate().setTint(productWithCategory.category.color.adjustSaturation(2f))
+               /* if (!darkModeEnabled) (tvCategoryName.background.mutate() as GradientDrawable).setStroke(
+                    (1.dp() * 1.5).toInt(),
+                    productWithCategory.category.color
+                )*/
+                tvCategoryName.text = productWithCategory.category.name
                 ivHandle.visibility = if (dragnDropEnabled) VISIBLE else GONE
+                tvProductInfo.visibility = if (product.info.isNotEmpty()) VISIBLE else INVISIBLE
             }
 
             setListeners(binding, product)

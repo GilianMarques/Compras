@@ -8,11 +8,12 @@ package dev.gmarques.compras.domain.utils
  */
 class RefactorKlass {
     init {
+        //--------------------
 
 
 
-
-
+    //--------------------
 
     }
+
 }

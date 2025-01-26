@@ -88,4 +88,6 @@
     <string name="Como_ordenar_os_itens">Como ordenar os itens</string>
     <string name="Gerenciar_categorias">Gerenciar categorias</string>
     <string name="Botao_para_adicionar_uma_nova_categoria">Botão para adicionar uma nova categoria</string>
+    <string name="Todos_os_produtos_desta_categoria_foram_comprados">Todos os produtos desta categoria foram comprados</string>
+    <string name="Compras_de_x">Compras de %1$s</string>
 </resources>

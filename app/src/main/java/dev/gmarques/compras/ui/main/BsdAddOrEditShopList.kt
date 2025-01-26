@@ -40,6 +40,10 @@ class BsdAddOrEditShopList(
             } else {
                 pastelColors =
                     targetActivity.resources.getStringArray(R.array.pastel_colors).asList().map { Color.parseColor(it) }
+
+                val currentMonthName = java.text.DateFormatSymbols().months[java.util.Calendar.getInstance().get(java.util.Calendar.MONTH)]
+                edtInput.setText(targetActivity.getString(R.string.Compras_de_x, currentMonthName))
+
             }
         }
     }
