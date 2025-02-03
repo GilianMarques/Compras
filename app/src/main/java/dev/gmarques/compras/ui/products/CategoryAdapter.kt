@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.products.cat
+package dev.gmarques.compras.ui.products
 
 import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
@@ -18,7 +18,9 @@ import dev.gmarques.compras.domain.model.CategoryWithProductsStats
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
 
 class CategoryAdapter(activity: AppCompatActivity, val callback: Callback) :
-    ListAdapter<CategoryWithProductsStats, CategoryAdapter.CategoryWithProductStatsViewHolder>(CategoryDiffCallback()) {
+    ListAdapter<CategoryWithProductsStats, CategoryAdapter.CategoryWithProductStatsViewHolder>(
+        CategoryDiffCallback()
+    ) {
 
 
     private var allBoughtColor = -1

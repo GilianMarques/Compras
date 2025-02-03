@@ -34,7 +34,6 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.main.BsdAddOrEditShopList
-import dev.gmarques.compras.ui.products.cat.CategoryAdapter
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch

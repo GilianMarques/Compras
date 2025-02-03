@@ -8,7 +8,6 @@ import dev.gmarques.compras.data.repository.UserRepository
 
 class Firestore {
 
-// TODO: definir o firebase pra carregar dados localmente apenas, pra ver se consome banda
 
     companion object {
 
