@@ -8,6 +8,10 @@
         <item name="android:fontFamily">@font/lexend_deca_medium</item>
     </style>
 
+    <style name="Profile.Theme.Compras" parent="Base.Theme.Compras">
+        <item name="android:statusBarColor">?attr/colorPrimaryContainer</item>
+    </style>
+
     <style name="Theme.EditText" parent="Base.Theme.Compras">
         <item name="android:editTextBackground">@drawable/back_edit_text</item>
         <item name="android:backgroundTint">@color/edittext_background</item>

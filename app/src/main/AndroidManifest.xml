@@ -18,6 +18,10 @@
         android:theme="@style/Theme.Compras"
         tools:targetApi="31">
         <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:theme="@style/Profile.Theme.Compras"
+            android:exported="false" />
+        <activity
             android:name=".ui.categories.CategoriesActivity"
             android:exported="false" />
         <activity

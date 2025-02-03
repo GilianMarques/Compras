@@ -90,4 +90,11 @@
     <string name="Botao_para_adicionar_uma_nova_categoria">Botão para adicionar uma nova categoria</string>
     <string name="Todos_os_produtos_desta_categoria_foram_comprados">Todos os produtos desta categoria foram comprados</string>
     <string name="Compras_de_x">Compras de %1$s</string>
+    <string name="Convide_usuarios_para_sua_conta">Convide usuários para sua conta</string>
+    <string name="Sincronismo_de_dados">Sincronismo de dados</string>
+    <string name="Seja_convidado_de_outro_usuario">Seja convidado de outro usuário</string>
+    <string name="Sua_conta">Sua conta</string>
+    <string name="sair">Sair</string>
+    <string name="Apagar_conta">Apagar conta</string>
+    <string name="Gerencie_sua_conta">Gerencie sua conta</string>
 </resources>
