@@ -66,42 +66,49 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Linguiça calabresa" />
 
-            <TextView
-                android:id="@+id/tv_category_name"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/back_round"
-                android:gravity="center"
-                android:paddingStart="8dp"
-                android:paddingTop="2dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="2dp"
-                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@id/cb_bought"
+                app:layout_constraintEnd_toStartOf="@id/cb_bought"
                 app:layout_constraintStart_toStartOf="@id/tv_product_name"
-                app:layout_constraintTop_toTopOf="@id/cb_bought"
-                tools:text="Massas" />
+                app:layout_constraintTop_toTopOf="@id/cb_bought">
 
-            <TextView
-                android:id="@+id/tv_product_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="48dp"
-                android:background="@drawable/back_round"
-                android:ellipsize="marquee"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:paddingStart="8dp"
-                android:paddingTop="2dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="2dp"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@id/cb_bought"
-                app:layout_constraintStart_toEndOf="@id/tv_category_name"
-                app:layout_constraintTop_toTopOf="@id/cb_bought"
-                tools:text="Espageti apollo, 500gr" />
+                <TextView
+                    android:id="@+id/tv_category_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/back_round"
+                    android:ellipsize="marquee"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="12sp"
+                    tools:text="Massas" />
+
+                <TextView
+                    android:id="@+id/tv_product_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/back_round"
+                    android:ellipsize="marquee"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="12sp"
+                    tools:text="Espageti apollo, 500gr" />
+
+            </LinearLayout>
+
 
             <TextView
                 android:id="@+id/tv_product_price"

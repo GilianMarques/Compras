@@ -411,32 +411,5 @@ class AddEditProductActivity : AppCompatActivity() {
         ivMenu.visibility = GONE
     }
 
-    private fun startActivityAddCategory() {
 
-        Vibrator.interaction()
-        val intent = AddEditCategoryActivity.newIntentAddCategory(this@AddEditProductActivity)
-        startActivity(intent)
-    }
-
-    private fun startActivityEditCategory(category: Category) {
-
-        Vibrator.interaction()
-        val intent = AddEditCategoryActivity.newIntentEditCategory(this@AddEditProductActivity, category.id)
-        startActivity(intent)
-    }
-
-    private fun confirmRemove(category: Category) {
-        val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x), category.name).formatHtml()
-
-        val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
-            .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
-                viewModel.removeCategory(category)
-                dialog.dismiss()
-            }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
-                dialog.dismiss()
-            }
-
-        val dialog = dialogBuilder.create()
-        dialog.show()
-    }
 }

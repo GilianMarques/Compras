@@ -8,7 +8,6 @@ import dev.gmarques.compras.data.repository.UserRepository
 
 class Firestore {
 
-
     companion object {
 
         private val userRootPath = if (BuildConfig.DEBUG) {
@@ -36,6 +35,6 @@ class Firestore {
 
         val suggestionProductCollection by lazy {
             Firebase.firestore.collection(userRootPath).document(DATABASE).collection(SUGGESTION_PRODUCT)
-        }
+        } 
     }
 }

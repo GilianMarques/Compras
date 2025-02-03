@@ -94,7 +94,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             categories?.let { rvAdapterCategories.submitList(categories) }
         }
     }
-// TODO: colocar indicador de categoria nos itens, marcar categorias compradas, a pesquisa deve ignorar filtros de categoria 
 
     private fun observePrices() = viewModel.pricesLD.observe(this) {
         binding.apply {

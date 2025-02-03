@@ -215,7 +215,7 @@ class ProductsActivityViewModel : ViewModel() {
 
         when (sortCriteria) {
             SortCriteria.NAME -> {
-                sorted = newData.sortedWith(compareBy { it.category.name })
+                sorted = newData.sortedWith(compareBy { it.product.name })
 
             }
 
