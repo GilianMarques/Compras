@@ -22,7 +22,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/colorPrimaryContainer"
+                android:background="?attr/profileActivityAppBarColor"
                 android:paddingBottom="48dp">
 
                 <include
@@ -89,12 +89,12 @@
                 android:layout_marginStart="16dp"
                 android:fontFamily="@font/lexend_deca_bold"
                 android:padding="4dp"
-                android:text="@string/Sincronismo_de_dados"
+                android:text="@string/Colaboracao"
                 android:textAlignment="viewStart"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/tv_invite_users"
+                android:id="@+id/tv_request_permission"
                 style="@style/Margins_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/Convide_usuarios_para_sua_conta"
+                android:text="@string/Colaborar_com_outro_usu_rio"
                 android:textColor="?attr/colorPrimaryVariant"
                 app:drawableStartCompat="@drawable/vec_invite_user"
                 app:drawableTint="?attr/colorPrimaryVariant"
@@ -113,7 +113,7 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/tv_accept_invite"
+                android:id="@+id/tv_interrupt_sync"
                 style="@style/Margins_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

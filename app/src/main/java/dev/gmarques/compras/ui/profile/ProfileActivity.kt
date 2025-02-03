@@ -40,6 +40,14 @@ class ProfileActivity : AppCompatActivity() {
 
         setupToolbar()
         loadUserData()
+        setupRequestPermission()
+    }
+
+    private fun setupRequestPermission() {
+        binding.tvRequestPermission.setOnClickListener{
+            BsdSendSyncRequest(this).show()
+        }
+
     }
 
     /**

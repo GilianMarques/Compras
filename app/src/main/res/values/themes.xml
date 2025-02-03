@@ -10,6 +10,7 @@
 
     <style name="Profile.Theme.Compras" parent="Base.Theme.Compras">
         <item name="android:statusBarColor">?attr/colorPrimaryContainer</item>
+        <item name="profileActivityAppBarColor">?attr/colorPrimaryContainer</item>
     </style>
 
     <style name="Theme.EditText" parent="Base.Theme.Compras">

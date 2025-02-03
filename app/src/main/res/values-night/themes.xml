@@ -4,4 +4,11 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
+
+    <style name="Profile.Theme.Compras" parent="Base.Theme.Compras">
+        <item name="android:statusBarColor">?android:attr/windowBackground</item>
+        <item name="profileActivityAppBarColor">?android:attr/windowBackground</item>
+    </style>
+
+
 </resources>

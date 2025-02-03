@@ -8,33 +8,43 @@ import dev.gmarques.compras.data.repository.UserRepository
 
 class Firestore {
 
+
     companion object {
 
-        private val userRootPath = if (BuildConfig.DEBUG) {
-            val useProductionDb = PreferencesHelper().getValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, false)
-            if (useProductionDb) UserRepository.getUser()!!.email!! else "debug_database"
-        } else UserRepository.getUser()!!.email!!
+        private val useProductionDb = PreferencesHelper()
+            .getValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, false)
 
-        private const val DATABASE = "Database"
+        private val environment = if (BuildConfig.DEBUG && !useProductionDb) "debug" else "production"
+        private const val USERS = "users"
+        private const val DATABASE = "Data"
         private const val SHOP_LISTS = "ShopLists"
         private const val PRODUCTS = "Products"
         private const val CATEGORIES = "Categories"
         private const val SUGGESTION_PRODUCT = "Suggestion_products"
+        private val userEmail = UserRepository.getUser()!!.email!!
 
         val shopListCollection by lazy {
-            Firebase.firestore.collection(userRootPath).document(DATABASE).collection(SHOP_LISTS)
+            Firebase.firestore.collection(environment).document(USERS).collection(userEmail)
+                .document(DATABASE)
+                .collection(SHOP_LISTS)
         }
 
         val categoryCollection by lazy {
-            Firebase.firestore.collection(userRootPath).document(DATABASE).collection(CATEGORIES)
+            Firebase.firestore.collection(environment).document(USERS).collection(userEmail)
+                .document(DATABASE)
+                .collection(CATEGORIES)
         }
 
         val productCollection by lazy {
-            Firebase.firestore.collection(userRootPath).document(DATABASE).collection(PRODUCTS)
+            Firebase.firestore.collection(environment).document(USERS).collection(userEmail)
+                .document(DATABASE)
+                .collection(PRODUCTS)
         }
 
         val suggestionProductCollection by lazy {
-            Firebase.firestore.collection(userRootPath).document(DATABASE).collection(SUGGESTION_PRODUCT)
-        } 
+            Firebase.firestore.collection(environment).document(USERS).collection(userEmail)
+                .document(DATABASE)
+                .collection(SUGGESTION_PRODUCT)
+        }
     }
 }
