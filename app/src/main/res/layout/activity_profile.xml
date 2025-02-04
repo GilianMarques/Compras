@@ -2,8 +2,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
-
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -64,7 +62,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/iv_profile_picture"
 
-                    tools:text="\@usename" />
+                    tools:text="\@username" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -89,7 +87,7 @@
                 android:layout_marginStart="16dp"
                 android:fontFamily="@font/lexend_deca_bold"
                 android:padding="4dp"
-                android:text="@string/Colaboracao"
+                android:text="@string/Colaborar_com_outr_usuario"
                 android:textAlignment="viewStart"
                 android:textSize="14sp" />
 
@@ -104,7 +102,7 @@
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/Colaborar_com_outro_usu_rio"
+                android:text="@string/Sincronize_com_outro_usu_rio"
                 android:textColor="?attr/colorPrimaryVariant"
                 app:drawableStartCompat="@drawable/vec_invite_user"
                 app:drawableTint="?attr/colorPrimaryVariant"
@@ -123,9 +121,9 @@
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/Seja_convidado_de_outro_usuario"
+                android:text="@string/Gerenciar_contas"
                 android:textColor="?attr/colorPrimaryVariant"
-                app:drawableStartCompat="@drawable/vec_check"
+                app:drawableStartCompat="@drawable/vec_interrupt_sinc_with_other_account"
                 app:drawableTint="?attr/colorPrimaryVariant"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -161,7 +159,7 @@
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/sair"
+                android:text="@string/Sair"
                 android:textColor="?attr/colorPrimaryVariant"
                 app:drawableStartCompat="@drawable/vec_logoff"
                 app:drawableTint="?attr/colorPrimaryVariant"

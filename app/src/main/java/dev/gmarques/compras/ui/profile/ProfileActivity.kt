@@ -1,28 +1,22 @@
 package dev.gmarques.compras.ui.profile
 
-import android.content.Intent
-import android.content.res.Configuration
-import android.os.Build
+import android.app.AlertDialog
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.View
 import android.view.View.GONE
-import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseUser
-import dev.gmarques.compras.App
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.UserRepository
-import dev.gmarques.compras.databinding.ActivityMainBinding
 import dev.gmarques.compras.databinding.ActivityProfileBinding
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.login.LoginActivity
-import dev.gmarques.compras.ui.products.ProductsActivity
-import java.util.Calendar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -41,11 +35,55 @@ class ProfileActivity : AppCompatActivity() {
         setupToolbar()
         loadUserData()
         setupRequestPermission()
+        setupLogOff()
+    }
+
+    private fun setupLogOff() {
+
+        binding.tvLogOff.setOnClickListener {
+            showDialog(
+                getString(R.string.Por_favor_confirme),
+                getString(R.string.Voce_sera_desconectado_a_e_todos_os_dados_locais_ser_o_removidos_deseja_mesmo_continuar),
+                getString(R.string.Sair)
+            ) {
+
+                UserRepository.logOff(this@ProfileActivity) { error ->
+                    if (error == null) {
+                        Firebase.firestore.clearPersistence()
+                        Vibrator.success()
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            delay(1000)
+                            finishAffinity()
+
+                        }
+                    } else {
+                        Vibrator.error()
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.Erro_fazendo_logoff_tente_novamente_mais_tarde),
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showDialog(title: String, msg: String, confirm: String, callback: () -> Any) {
+        AlertDialog.Builder(this@ProfileActivity)
+            .setTitle(title)
+            .setMessage(msg)
+            .setPositiveButton(confirm) { dialog, _ ->
+                dialog.dismiss()
+                callback()
+            }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
+                dialog.dismiss()
+            }.show()
     }
 
     private fun setupRequestPermission() {
-        binding.tvRequestPermission.setOnClickListener{
-            BsdSendSyncRequest(this).show()
+        binding.tvRequestPermission.setOnClickListener {
+            BsdSendSyncRequest(this, lifecycleScope).show()
         }
 
     }
@@ -55,7 +93,7 @@ class ProfileActivity : AppCompatActivity() {
      */
     private fun setupToolbar() = binding.toolbar.apply {
 
-        tvActivityTitle.text = getString(R.string.Gerencie_sua_conta)
+        tvActivityTitle.text = getString(R.string.Perfil)
         ivGoBack.setOnClickListener { finish() }
         ivMenu.visibility = GONE
 

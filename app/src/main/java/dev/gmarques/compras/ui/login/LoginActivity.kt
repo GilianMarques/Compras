@@ -15,9 +15,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityLoginBinding
 import dev.gmarques.compras.domain.utils.InternetConnectionChecker
 import dev.gmarques.compras.ui.main.MainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.MessageFormat
 
 // TODO: usa api credentials 
@@ -100,13 +104,16 @@ class LoginActivity : AppCompatActivity() {
                 GoogleSignInStatusCodes.SIGN_IN_CANCELLED -> {
                     this.binding.tvInfo.setText(R.string.Voce_cancelou_o_login)
                 }
+
                 GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS -> {
                     this.binding.tvInfo.setText(R.string.Hamaisdeumprocessodeloginemandamentoquantas)
                 }
+
                 GoogleSignInStatusCodes.SIGN_IN_FAILED -> {
                     this.binding.tvInfo.text =
                         MessageFormat.format(getString(R.string.Ologinfalhou), e.statusCode)
                 }
+
                 else -> {
                     this.binding.tvInfo.text = MessageFormat.format(
                         getString(R.string.Houveumerroaocontactaraapidogoole), e.statusCode
@@ -128,6 +135,10 @@ class LoginActivity : AppCompatActivity() {
                 this.binding.tvInfo.text = MessageFormat.format(getString(R.string.BemvindoX),
                     nome!!.split(" ".toRegex()).dropLastWhile { it.isEmpty() }
                         .toTypedArray()[0])
+
+                //deve rodar mesmo setivity fechar
+                CoroutineScope(Dispatchers.IO).launch { UserRepository.initUserDatabase() }
+
                 Handler().postDelayed({
                     startActivity(
                         Intent(applicationContext, MainActivity::class.java).addFlags(

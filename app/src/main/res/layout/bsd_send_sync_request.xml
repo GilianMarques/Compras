@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -58,32 +59,64 @@
             android:inputType="textEmailAddress"
             android:selectAllOnFocus="true"
             android:theme="@style/Theme.EditText.Dialog"
-            app:layout_constraintBottom_toTopOf="@id/tv_info"
+            app:layout_constraintBottom_toTopOf="@id/tv_error_msg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/pb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="-4dp"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintEnd_toEndOf="@id/edt_input"
+            app:layout_constraintStart_toStartOf="@+id/edt_input"
+            app:layout_constraintTop_toBottomOf="@id/edt_input" />
+
+        <TextView
+            android:id="@+id/tv_error_msg"
+            style="@style/Margins_edittext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:text="@string/Endereco_de_email_invalido"
+            android:textAlignment="viewStart"
+            android:textColor="@color/error"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/vec_error"
+            app:drawableTint="@color/error"
+            app:layout_constraintBottom_toTopOf="@id/tv_info"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_info"
             style="@style/Margins_edittext"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="48dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
             android:text="@string/Quando_a_sua_solicita_o_for_aceita_os_dados_de_ambos_ser_o_mesclados"
+            android:textAlignment="viewStart"
             app:layout_constraintBottom_toTopOf="@id/fab_confirm"
             app:layout_constraintEnd_toEndOf="parent"
-            android:textAlignment="viewStart"
             app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fab_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="24dp"
             android:backgroundTint="?attr/colorPrimary"
             android:text="@string/Solicitar_permissao"
             android:textColor="?colorOnPrimary"
