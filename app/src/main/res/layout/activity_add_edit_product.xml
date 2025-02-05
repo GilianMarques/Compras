@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.add_edit_category.AddEditCategoryActivity">
+    tools:context=".ui.add_edit_shop_list.AddEditShopListActivity">
 
     <LinearLayout
         android:id="@+id/main"
@@ -27,8 +27,7 @@
             android:layout_height="1dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintBottom_toTopOf="@id/edt_input" />
+            android:background="?android:attr/listDivider" />
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll"

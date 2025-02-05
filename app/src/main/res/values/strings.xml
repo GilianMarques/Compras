@@ -90,4 +90,6 @@
     <string name="Botao_para_adicionar_uma_nova_categoria">Botão para adicionar uma nova categoria</string>
     <string name="Todos_os_produtos_desta_categoria_foram_comprados">Todos os produtos desta categoria foram comprados</string>
     <string name="Compras_de_x">Compras de %1$s</string>
+    <string name="Editar_lista">Editar lista</string>
+    <string name="Salvar_lista">Salvar lista</string>
 </resources>

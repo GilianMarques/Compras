@@ -37,6 +37,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
+import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity.Companion.SELECTED_CATEGORY
 import kotlinx.coroutines.Dispatchers.IO

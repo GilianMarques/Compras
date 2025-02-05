@@ -1,6 +1,7 @@
 package dev.gmarques.compras.data.model
 
 import android.content.Context
+import dev.gmarques.compras.R.string.A_cor_nao_pode_ficar_vazia
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_nimo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_ximo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_nao_pode_ficar_vazio
@@ -69,6 +70,8 @@ data class ShopList(
 
             private const val MAX_CHARS = 30
             private const val MIN_CHARS = 3
+            private const val EMPTY_COLOR = -1
+            private const val COLOR_LENGTH_THRESHOLD = 2
 
             fun validateName(input: String, context: Context): Result<String> {
                 return when {
@@ -92,6 +95,21 @@ data class ShopList(
 
                     else -> {
                         Result.success(input.removeSpaces().replaceFirstChar { it.titlecase(Locale.getDefault()) })
+                    }
+                }
+            }
+
+
+            fun validateColor(input: Int, context: Context): Result<Int> {
+                return when {
+                    input == EMPTY_COLOR || input.toString().length <= COLOR_LENGTH_THRESHOLD -> Result.failure(
+                        Exception(
+                            context.getString(A_cor_nao_pode_ficar_vazia)
+                        )
+                    )
+
+                    else -> {
+                        Result.success(input)
                     }
                 }
             }
