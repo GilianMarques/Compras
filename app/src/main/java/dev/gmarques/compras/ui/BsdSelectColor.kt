@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.add_edit_category
+package dev.gmarques.compras.ui
 
 import android.app.Activity
 import android.graphics.Color
@@ -55,11 +55,13 @@ class BsdSelectColor private constructor(
 
     fun show() = dialog.show()
 
-    class Builder(private val targetActivity: Activity) {
+    class Builder(private val targetActivity: Activity, private val colorForShopList: Boolean) {
+
         private var onConfirmListener: ((Int) -> Unit)? = null
         private var onDismissListener: (() -> Unit)? = null
-        private var vividColors: List<Int> = targetActivity.resources.getStringArray(R.array.vivid_colors)
-            .asList().map { Color.parseColor(it) }
+        private var colors: List<Int> =
+            targetActivity.resources.getStringArray(if (colorForShopList) R.array.pastel_colors else R.array.vivid_colors)
+                .asList().map { Color.parseColor(it) }
 
         fun setOnConfirmListener(listener: (Int) -> Unit) = apply {
             this.onConfirmListener = listener
@@ -77,7 +79,7 @@ class BsdSelectColor private constructor(
                 targetActivity,
                 onConfirmListener!!, // Atribui com segurança após a verificação
                 onDismissListener,
-                vividColors
+                colors
             )
         }
     }
@@ -87,7 +89,8 @@ class BsdSelectColor private constructor(
         private val onColorSelected: (Int) -> Unit,
     ) : RecyclerView.Adapter<ColorAdapter.ColorViewHolder>() {
 
-        inner class ColorViewHolder(private val binding: RvItemCategoryColorBinding) : RecyclerView.ViewHolder(binding.root) {
+        inner class ColorViewHolder(private val binding: RvItemCategoryColorBinding) :
+            RecyclerView.ViewHolder(binding.root) {
 
             fun bind(color: Int) {
                 (binding.ivColor.background as GradientDrawable).setColor(color)
@@ -118,3 +121,4 @@ class BsdSelectColor private constructor(
         override fun getItemCount(): Int = colors.size
     }
 }
+

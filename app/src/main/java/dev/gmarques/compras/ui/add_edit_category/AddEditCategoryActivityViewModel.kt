@@ -22,9 +22,9 @@ class AddEditCategoryActivityViewModel : ViewModel() {
         if (needCheckName) {
             val result = CategoryRepository.getCategoryByName(validatedName)
 
-            val categoryDontExit = result.getOrNull() == null
+            val categoryDontExist = result.getOrNull() == null
 
-            if (categoryDontExit) saveCategory()
+            if (categoryDontExist) saveCategory()
             else {
                 val msg = String.format(App.getContext().getString(R.string.X_ja_existe), validatedName)
                 _errorEventLD.postValue(msg)

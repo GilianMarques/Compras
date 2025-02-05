@@ -20,6 +20,7 @@ import dev.gmarques.compras.databinding.ActivityCategoriesBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
+import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 
 class CategoriesActivity : AppCompatActivity(), CategoryAdapter.Callback {
 

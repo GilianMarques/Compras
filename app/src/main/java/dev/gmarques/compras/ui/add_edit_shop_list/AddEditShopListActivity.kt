@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.add_edit_category
+package dev.gmarques.compras.ui.add_edit_shop_list
 
 import android.content.Context
 import android.content.Intent
@@ -14,35 +14,33 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.databinding.ActivityAddEditCategoryBinding
+import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.databinding.ActivityAddEditShopListBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.ui.BsdSelectColor
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
-import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivityViewModel
 import kotlinx.coroutines.launch
 
 /**
- * Activity para adicionar ou editar categorias em uma lista.
+ * Activity para adicionar ou editar listas de compra.
  * Implementada seguindo o padrão MVVM e princípios de Clean Code e SOLID.
  */
-class AddEditCategoryActivity : AppCompatActivity() {
+class AddEditShopListActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAddEditCategoryBinding
-    private lateinit var viewModel: AddEditCategoryActivityViewModel
+    private lateinit var binding: ActivityAddEditShopListBinding
+    private lateinit var viewModel: AddEditShopListActivityViewModel
 
     companion object {
-        private const val CATEGORY_ID = "category_id"
+        private const val SHOPLIST_ID = "shopList_id"
 
-        fun newIntentAddCategory(context: Context): Intent {
+        fun newIntentAddShopList(context: Context): Intent {
             return Intent(context, AddEditShopListActivity::class.java).apply {
             }
         }
 
-        fun newIntentEditCategory(context: Context, categoryId: String): Intent {
+        fun newIntentEditShopList(context: Context, shopListId: String): Intent {
             return Intent(context, AddEditShopListActivity::class.java).apply {
-                putExtra(CATEGORY_ID, categoryId)
+                putExtra(SHOPLIST_ID, shopListId)
             }
         }
     }
@@ -50,61 +48,63 @@ class AddEditCategoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityAddEditCategoryBinding.inflate(layoutInflater)
+        binding = ActivityAddEditShopListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[AddEditCategoryActivityViewModel::class.java]
-        viewModel.categoryId = intent.getStringExtra(CATEGORY_ID)
+        viewModel = ViewModelProvider(this)[AddEditShopListActivityViewModel::class.java]
+        viewModel.shopListId = intent.getStringExtra(SHOPLIST_ID)
 
 
         setupToolbar()
-        initFabAddCategory()
+        initFabAddShopList()
         setupInputName()
         setupInputColor()
-        observeCategory()
+        observeShopList()
         observeViewmodelErrorMessages()
         observeViewmodelFinishEvent()
+
 
         binding.edtName.showKeyboard()
 
     }
 
     private fun observeViewmodelErrorMessages() = lifecycleScope.launch {
-        viewModel.errorEventLD.observe(this@AddEditCategoryActivity) { event ->
+        viewModel.errorEventLD.observe(this@AddEditShopListActivity) { event ->
             Snackbar.make(binding.root, event, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
         }
     }
 
     private fun observeViewmodelFinishEvent() = lifecycleScope.launch {
-        viewModel.finishEventLD.observe(this@AddEditCategoryActivity) {
+        viewModel.finishEventLD.observe(this@AddEditShopListActivity) {
             finish()
         }
     }
 
-    private fun observeCategory() = lifecycleScope.launch {
-        viewModel.loadCategory()
-        viewModel.editingCategoryLD.observe(this@AddEditCategoryActivity) {
+    private fun observeShopList() = lifecycleScope.launch {
+        viewModel.loadShopList()
+        viewModel.editingShopListLD.observe(this@AddEditShopListActivity) {
 
             it?.let {
-                viewModel.editingCategory = true
-                updateViewModelAndUiWithEditableCategory(it)
+                viewModel.editingShopList = true
+                updateViewModelAndUiWithEditableShopList(it)
             }
         }
     }
 
-    private fun updateViewModelAndUiWithEditableCategory(category: Category) = binding.apply {
+    private fun updateViewModelAndUiWithEditableShopList(shopList: ShopList) = binding.apply {
         viewModel.apply {
 
-            edtName.setText(category.name)
-            validatedName = category.name
+            edtName.setText(shopList.name)
+            validatedName = shopList.name
 
             edtColor.hint = getString(R.string.Clique_aqui_para_alterar_a_cor)
-            validatedColor = category.color
+            validatedColor = shopList.color
             changeEditDrawableTextColor()
 
-            toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), category.name)
-            fabSave.text = getString(R.string.Salvar_categoria)
+            toolbar.tvActivityTitle.text =
+                String.format(getString(R.string.Editar_x), shopList.name)
+            fabSave.text = getString(R.string.Salvar_lista)
 
         }
     }
@@ -112,7 +112,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
     /**
      * Configura o botão de salvar categoria (FAB).
      */
-    private fun initFabAddCategory() = binding.apply {
+    private fun initFabAddShopList() = binding.apply {
         fabSave.setOnClickListener {
             root.clearFocus()
 
@@ -123,7 +123,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
                     edtColor.requestFocus()
                 } else {
                     root.clearFocus()
-                    lifecycleScope.launch { tryAndSaveCategory() }
+                    lifecycleScope.launch { tryAndSaveShopList() }
                 }
 
             }
@@ -139,7 +139,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
                 val term = edtTarget.text.toString()
-                val result = Category.Validator.validateName(term,this)
+                val result = ShopList.Validator.validateName(term, this)
 
                 if (result.isSuccess) {
                     viewModel.validatedName = result.getOrThrow()
@@ -149,6 +149,11 @@ class AddEditCategoryActivity : AppCompatActivity() {
                     showError(edtTarget, tvTarget, result.exceptionOrNull()!!.message!!)
                 }
             }
+        }
+
+        if (!viewModel.editingShopList) {
+            val currentMonthName = java.text.DateFormatSymbols().months[java.util.Calendar.getInstance().get(java.util.Calendar.MONTH)]
+            edtTarget.setText(getString(R.string.Compras_de_x, currentMonthName))
         }
 
     }
@@ -163,7 +168,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
                 resetFocus(edtTarget, tvTarget)
                 showColorDialog()
             } else {
-                val result = Category.Validator.validateColor(viewModel.validatedColor, this)
+                val result = ShopList.Validator.validateColor(viewModel.validatedColor, this)
 
                 if (result.isSuccess) {
                     edtTarget.hint = getString(R.string.Cor_selecionada)
@@ -182,16 +187,18 @@ class AddEditCategoryActivity : AppCompatActivity() {
         (binding.edtColor.compoundDrawables[0].mutate() as GradientDrawable).setColor(viewModel.validatedColor)
 
     private fun showColorDialog() {
-        BsdSelectColor.Builder(this, false)
+
+        BsdSelectColor.Builder(this, true)
             .setOnConfirmListener { selectedColor ->
                 viewModel.validatedColor = selectedColor
                 Vibrator.success()
             }
             .setOnDismissListener {
                 binding.edtColor.clearFocus()
-            }.build().show()
+            }
+            .build()
+            .show()
     }
-
 
     private fun resetFocus(edtTarget: AppCompatEditText, tvTarget: TextView) {
         edtTarget.setBackgroundResource(R.drawable.back_addproduct_edittext)
@@ -209,7 +216,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
      * Configura a toolbar da activity.
      */
     private fun setupToolbar() = binding.toolbar.apply {
-        tvActivityTitle.text = getString(R.string.Adicionar_categoria)
+        tvActivityTitle.text = getString(R.string.Adicionar_lista)
         ivGoBack.setOnClickListener { finish() }
         ivMenu.visibility = GONE
     }

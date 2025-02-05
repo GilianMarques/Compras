@@ -24,7 +24,7 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun addOrUpdateShopList(shopList: ShopList) {
-        ShopListRepository.addOrAttShopList(ValidatedShopList(shopList))
+        ShopListRepository.addOrUpdateShopList(ValidatedShopList(shopList))
     }
 
     override fun onCleared() {
