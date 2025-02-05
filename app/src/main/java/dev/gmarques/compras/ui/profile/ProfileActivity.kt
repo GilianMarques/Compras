@@ -2,6 +2,7 @@ package dev.gmarques.compras.ui.profile
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
@@ -18,9 +19,9 @@ import dev.gmarques.compras.databinding.ActivityProfileBinding
 import dev.gmarques.compras.databinding.ItemSyncRequestBinding
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import dev.gmarques.compras.ui.profile.ProfileActivityViewModel.ProfileActivityState
+import kotlin.system.exitProcess
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -41,12 +42,13 @@ class ProfileActivity : AppCompatActivity() {
         setupRequestPermission()
         setupLogOff()
         observeStateUpdates()
+
     }
 
     private fun observeStateUpdates() {
         viewModel.uiStateLd.observe(this) { newState ->
             updateRequests(newState.requests)
-
+            Log.d("USUK", "ProfileActivity.observeStateUpdates: requests ${currentState.requests}")
             currentState = newState
         }
     }
@@ -65,10 +67,11 @@ class ProfileActivity : AppCompatActivity() {
             Glide.with(root.context)
                 .load(req.photoUrl)
                 .circleCrop()
+                .placeholder(R.drawable.vec_invite_user)
                 .into(item.ivProfilePicture)
 
-            item.ivOpen.setOnClickListener {
-                showViewSyncRequestDialog()
+            item.root.setOnClickListener {
+                showViewSyncRequestDialog(req)
             }
             llSyncRequests.addView(item.root)
 
@@ -76,7 +79,9 @@ class ProfileActivity : AppCompatActivity() {
 
     }
 
-    private fun showViewSyncRequestDialog() {
+    private fun showViewSyncRequestDialog(req: SyncRequest) {
+        BsdManageSyncRequest(req, this, lifecycleScope).show()
+
     }
 
     private fun setupLogOff() {
@@ -92,11 +97,8 @@ class ProfileActivity : AppCompatActivity() {
                     if (error == null) {
                         Firebase.firestore.clearPersistence()
                         Vibrator.success()
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            delay(1000)
-                            finishAffinity()
+                        closeApp()
 
-                        }
                     } else {
                         Vibrator.error()
                         Snackbar.make(
@@ -108,6 +110,12 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun closeApp() = lifecycleScope.launch(Dispatchers.IO) {
+
+        finishAffinity()
+        exitProcess(0)
     }
 
     private fun showDialog(title: String, msg: String, confirm: String, callback: () -> Any) {
@@ -139,7 +147,6 @@ class ProfileActivity : AppCompatActivity() {
         ivMenu.visibility = GONE
 
     }
-
 
     private fun loadUserData() {
         val user = UserRepository.getUser()!!

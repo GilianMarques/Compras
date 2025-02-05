@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun attUiWithUserData(user: FirebaseUser) {
+    private fun attUiWithUserData(user: FirebaseUser) = binding.apply {
         binding.tvUserName.text = user.displayName
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)

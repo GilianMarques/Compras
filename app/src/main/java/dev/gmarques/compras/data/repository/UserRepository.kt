@@ -83,7 +83,6 @@ object UserRepository {
                 querySnapshot?.documents?.forEach { snap ->
                     requests.add(snap.toObject<SyncRequest>()!!)
                 }
-
                 callback(requests)
             }
 

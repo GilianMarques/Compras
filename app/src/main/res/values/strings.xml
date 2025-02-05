@@ -125,5 +125,9 @@
 
     <string name="Editar_lista">Editar lista</string>
     <string name="Salvar_lista">Salvar lista</string>
+    <string name="Gerenciar_solicitacao">Gerenciar solicitação</string>
+    <string name="Recusar">Recusar</string>
+    <string name="Aceitar">Aceitar</string>
+    <string name="X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar_a_solicita_o_os_dados_de_ambas_as_contas_ser_o_mesclados_e_as_altera_es_feitas_por_um_usu_rio_ser_o_refletidas_na_conta_do_outro_n_nn_o_aceite_solicita_es_de_pessoas_desconhecidas">%1$s te enviou uma solicitação de sincronismo.\n\nAo aceitar a solicitação, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.\n\nNão aceite solicitações de pessoas desconhecidas.</string>
 
 </resources>

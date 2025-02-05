@@ -29,9 +29,9 @@ class ProfileActivityViewModel : ViewModel() {
 
     private fun observeSyncRequests() {
         listenerRegister = UserRepository.observeSyncRequests { requests ->
-            requests.toList().also { uiState.requests = it }
+            requests.toList().also { uiState.requests = requests.toList() }
+            _uiStateLd.postValue(uiState)
         }
-        _uiStateLd.postValue(uiState)
     }
 
 

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/tv_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/lexend_deca_bold"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@id/tv_email"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="\@username" />
+
+            <TextView
+                android:id="@+id/tv_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                android:fontFamily="@font/lexend_deca_light"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@id/tv_error_msg"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="\@username" />
+
+            <ImageView
+                android:id="@+id/iv_profile_picture"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/back_profile_picture"
+                android:contentDescription="@string/Foto_de_perfil_do_usuario"
+                android:padding="2dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/tv_user_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:src="@drawable/vec_try_again" />
+
+            <ImageView
+                android:id="@+id/iv_list_icon"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/back_list_icon"
+                android:importantForAccessibility="no"
+                android:padding="10dp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_title"
+                app:layout_constraintEnd_toStartOf="@id/tv_title"
+                app:layout_constraintTop_toTopOf="@id/tv_title"
+                app:srcCompat="@drawable/vec_invite_user"
+                app:tint="?colorPrimary" />
+
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="42dp"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/lexend_deca_bold"
+                android:padding="16dp"
+                android:text="@string/Gerenciar_solicitacao"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@id/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="24dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintBottom_toTopOf="@id/iv_profile_picture" />
+
+            <TextView
+                android:id="@+id/tv_info"
+                style="@style/Margins_edittext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="48dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:text="@string/X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar_a_solicita_o_os_dados_de_ambas_as_contas_ser_o_mesclados_e_as_altera_es_feitas_por_um_usu_rio_ser_o_refletidas_na_conta_do_outro_n_nn_o_aceite_solicita_es_de_pessoas_desconhecidas"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toTopOf="@id/fab_accept"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_error_msg"
+                style="@style/Margins_edittext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:text="@string/Endereco_de_email_invalido"
+                android:textAlignment="viewStart"
+                android:textColor="@color/error"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/vec_error"
+                app:drawableTint="@color/error"
+                app:layout_constraintBottom_toTopOf="@id/tv_info"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:visibility="visible" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fab_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="?attr/colorSecondary"
+                android:text="@string/Aceitar"
+                android:textColor="?colorOnPrimary"
+                app:icon="@drawable/vec_sync_request_accept"
+                app:iconTint="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/fab_decline"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fab_decline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:text="@string/Recusar"
+                android:textColor="?colorOnPrimary"
+                app:icon="@drawable/vec_sync_request_cancel"
+                app:iconTint="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/fab_accept" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+
+</layout>
