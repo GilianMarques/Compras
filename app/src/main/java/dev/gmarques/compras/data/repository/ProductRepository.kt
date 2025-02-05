@@ -32,7 +32,6 @@ object ProductRepository {
         else throw Exception("Produto nao encontrado!")
     }
 
-
     /**
      * Retorna um produto com base no nome e ID da lista fornecidos.
      * @param name Nome do produto.

@@ -90,6 +90,40 @@
     <string name="Botao_para_adicionar_uma_nova_categoria">Botão para adicionar uma nova categoria</string>
     <string name="Todos_os_produtos_desta_categoria_foram_comprados">Todos os produtos desta categoria foram comprados</string>
     <string name="Compras_de_x">Compras de %1$s</string>
+
+    <string name="Convide_usuarios_para_sua_conta">Convide usuários para sua conta</string>
+    <string name="Sincronismo_de_dados">Sincronismo de dados</string>
+    <string name="Seja_convidado_de_outro_usuario">Seja convidado de outro usuário</string>
+    <string name="Sua_conta">Sua conta</string>
+    <string name="Sair">Sair</string>
+    <string name="Apagar_conta">Apagar conta</string>
+    <string name="Gerencie_sua_conta">Gerencie sua conta</string>
+    <string name="Sincronizar_dados_com_outra_conta">Sincronizar dados com outra conta</string>
+    <string name="Colaboracao">Colaboração</string>
+    <string name="Enviar_solicitacao">Enviar solicitação</string>
+    <string name="Digite_o_email_do_usuario">Digite o email do usuário</string>
+    <string name="Solicitar_permissao">Solicitar permissão</string>
+    <string name="Quando_a_sua_solicita_o_for_aceita_os_dados_de_ambos_ser_o_mesclados">Quando a sua solicitação for aceita, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.</string>
+    <string name="Colaborar_com_outro_usu_rio">Colaborar com outro usuário</string>
+    <string name="Perfil">Perfil</string>
+    <string name="Gerenciar_contas">Interromper sincronismo</string>
+    <string name="Sincronize_com_outro_usu_rio">Sincronize dados com outro usuário</string>
+    <string name="Colaborar_com_outr_usuario">Colaborar com outro usuário</string>
+    <string name="Endereco_de_email_invalido">Endereço de email inválido</string>
+    <string name="O_email_n_o_pode_ficar_em_branco">O email não pode ficar em branco</string>
+    <string name="Insira_um_endere_o_v_lido">Insira um endereço válido</string>
+    <string name="Solicita_o_enviada">Solicitação enviada</string>
+    <string name="Entendi">Entendi</string>
+    <string name="Reinicie_o_app_ap_s_a_solicita_o_ser_aceita">Reinicie o App após a solicitação ser aceita.</string>
+    <string name="Voce_nao_pode_convidar_a_s_mesmo">Você não pode convidar a sí mesmo</string>
+    <string name="Usu_rio_n_o_existe">Usuário não existe</string>
+    <string name="Voce_sera_desconectado_a_e_todos_os_dados_locais_ser_o_removidos_deseja_mesmo_continuar">Você será desconectado(a) e todos os dados locais serão removidos, deseja mesmo continuar?</string>
+    <string name="Erro_fazendo_logoff_tente_novamente_mais_tarde">Erro fazendo logoff, tente novamente mais tarde</string>
+    <string name="Houve_um_erro_ao_enviar_a_solicitacao">Houve um erro ao enviar a solicitação, tente novamente mais tarde</string>
+    <string name="Erro_ao_enviar_solicitacao">Erro ao enviar solicitação</string>
+    <string name="Solicitacoes_recebidas">Solicitações recebidas</string>
+
     <string name="Editar_lista">Editar lista</string>
     <string name="Salvar_lista">Salvar lista</string>
+
 </resources>

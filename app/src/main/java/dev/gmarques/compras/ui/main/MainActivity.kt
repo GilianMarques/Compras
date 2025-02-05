@@ -18,6 +18,7 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
+import dev.gmarques.compras.ui.profile.ProfileActivity
 import java.util.Calendar
 
 
@@ -66,26 +67,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private fun attUiWithUserData(user: FirebaseUser) {
         binding.tvUserName.text = user.displayName
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        binding.tvGreetings.text = when (currentHour) {
+        tvGreetings.text = when (currentHour) {
             in 0..11 -> getString(R.string.Bom_dia)
             in 12..17 -> getString(R.string.Boa_tarde)
             else -> getString(R.string.Boa_noite)
         }
 
         user.photoUrl?.let { photoUrl ->
-            Glide.with(binding.root.context)
+            Glide.with(root.context)
                 .load(photoUrl)
                 .circleCrop()
-                .into(binding.ivProfilePicture)
+                .into(ivProfilePicture)
         } ?: run {
             // Esconde a imagem se não houver foto
-            binding.ivProfilePicture.visibility = View.GONE
-            binding.tvUserName.visibility = View.GONE
-            binding.tvGreetings.visibility = View.GONE
+            ivProfilePicture.visibility = View.GONE
+            tvUserName.visibility = View.GONE
+            tvGreetings.visibility = View.GONE
+        }
+
+        ivMenu.setOnClickListener {
+            startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
         }
     }
 

@@ -27,7 +27,7 @@ class MigrationDatabase {
         val suggestions = Firestore.suggestionProductCollection.get().await()
         suggestions.documents.forEach { doc: DocumentSnapshot ->
             val suggestion = doc.toObject<Product>()
-            FirestoreV2.suggestionProductCollection.document(suggestion!!.id).set(suggestion)
+            Firestore.suggestionProductCollection.document(suggestion!!.id).set(suggestion)
             Log.d("USUK", "MigrationDatabase.migrateSuggestions: $suggestion")
         }
     }
@@ -37,7 +37,7 @@ class MigrationDatabase {
         val suggestions = Firestore.categoryCollection.get().await()
         suggestions.documents.forEach { doc: DocumentSnapshot ->
             val suggestion = doc.toObject<Category>()
-            FirestoreV2.categoryCollection.document(suggestion!!.id).set(suggestion)
+            Firestore.categoryCollection.document(suggestion!!.id).set(suggestion)
             Log.d("USUK", "MigrationDatabase.migrateSuggestions: $suggestion")
         }
     }
@@ -47,7 +47,7 @@ class MigrationDatabase {
         val suggestions = Firestore.productCollection.get().await()
         suggestions.documents.forEach { doc: DocumentSnapshot ->
             val suggestion = doc.toObject<Product>()
-            FirestoreV2.productCollection.document(suggestion!!.id).set(suggestion)
+            Firestore.productCollection.document(suggestion!!.id).set(suggestion)
             Log.d("USUK", "MigrationDatabase.migrateSuggestions: $suggestion")
         }
     }
@@ -57,7 +57,7 @@ class MigrationDatabase {
         val suggestions = Firestore.shopListCollection.get().await()
         suggestions.documents.forEach { doc: DocumentSnapshot ->
             val suggestion = doc.toObject<ShopList>()
-            FirestoreV2.shopListCollection.document(suggestion!!.id).set(suggestion)
+            Firestore.shopListCollection.document(suggestion!!.id).set(suggestion)
             Log.d("USUK", "MigrationDatabase.migrateSuggestions: $suggestion")
         }
     }

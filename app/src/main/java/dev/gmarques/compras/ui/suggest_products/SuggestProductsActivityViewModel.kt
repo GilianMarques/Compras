@@ -159,7 +159,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
         val currentShopListProductsNames = ProductRepository.getProducts(shopListId)
 
         updatedSelectionData.keys.forEach { key ->
-            delay(500)
+            delay(250)
             val (selected, quantity) = updatedSelectionData[key] ?: (false to -1)
 
             if (selected) {
@@ -169,7 +169,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
                 else {
                     val newProduct = product.copy(
                         shopListId = shopListId, quantity = quantity, hasBeenBought = false
-                    )
+                    ).withNewId()
                     saveProduct(product, newProduct)
                 }
             }
@@ -180,8 +180,6 @@ class SuggestProductsActivityViewModel : ViewModel() {
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
         SuggestionProductRepository.updateSuggestionProduct(oldProduct, ValidatedSuggestionProduct(newProduct))
     }
-
-
 
     fun removeSuggestionProduct(product: Product) {
         SuggestionProductRepository.removeSuggestionProduct(ValidatedSuggestionProduct(product))
