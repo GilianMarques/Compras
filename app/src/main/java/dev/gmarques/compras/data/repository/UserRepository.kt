@@ -5,9 +5,13 @@ import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.SyncRequest
+import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -68,6 +72,22 @@ object UserRepository {
     fun initUserDatabase() {
         Firestore.rootCollection.document("metadata").set(Metadata())
 
+    }
+
+    fun observeSyncRequests(callback: (MutableList<SyncRequest>) -> Any): ListenerRegister {
+        val listenerRegistration = Firestore.syncRequestsCollection
+            .addSnapshotListener { querySnapshot: QuerySnapshot?, _: FirebaseFirestoreException? ->
+
+                val requests = mutableListOf<SyncRequest>()
+
+                querySnapshot?.documents?.forEach { snap ->
+                    requests.add(snap.toObject<SyncRequest>()!!)
+                }
+
+                callback(requests)
+            }
+
+        return ListenerRegister(listenerRegistration)
     }
 
     data class Metadata(val creationDate: Long = System.currentTimeMillis())

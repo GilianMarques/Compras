@@ -118,4 +118,7 @@
     <string name="Usu_rio_n_o_existe">Usuário não existe</string>
     <string name="Voce_sera_desconectado_a_e_todos_os_dados_locais_ser_o_removidos_deseja_mesmo_continuar">Você será desconectado(a) e todos os dados locais serão removidos, deseja mesmo continuar?</string>
     <string name="Erro_fazendo_logoff_tente_novamente_mais_tarde">Erro fazendo logoff, tente novamente mais tarde</string>
+    <string name="Houve_um_erro_ao_enviar_a_solicitacao">Houve um erro ao enviar a solicitação, tente novamente mais tarde</string>
+    <string name="Erro_ao_enviar_solicitacao">Erro ao enviar solicitação</string>
+    <string name="Solicitacoes_recebidas">Solicitações recebidas</string>
 </resources>

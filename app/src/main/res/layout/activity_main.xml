@@ -16,8 +16,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/back_profile_picture"
-            android:contentDescription="@string/Foto_de_perfil_do_usuario"
-            android:padding="2dp"
+               android:padding="2dp"
+               android:contentDescription="@string/Foto_de_perfil_do_usuario"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/vec_try_again" />

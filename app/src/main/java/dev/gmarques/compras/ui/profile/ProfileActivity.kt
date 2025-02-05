@@ -3,6 +3,7 @@ package dev.gmarques.compras.ui.profile
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -11,16 +12,19 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.model.SyncRequest
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityProfileBinding
+import dev.gmarques.compras.databinding.ItemSyncRequestBinding
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import dev.gmarques.compras.ui.profile.ProfileActivityViewModel.ProfileActivityState
 
 class ProfileActivity : AppCompatActivity() {
 
+    private var currentState: ProfileActivityState = ProfileActivityState()
     private lateinit var binding: ActivityProfileBinding
     private lateinit var viewModel: ProfileActivityViewModel
 
@@ -36,6 +40,43 @@ class ProfileActivity : AppCompatActivity() {
         loadUserData()
         setupRequestPermission()
         setupLogOff()
+        observeStateUpdates()
+    }
+
+    private fun observeStateUpdates() {
+        viewModel.uiStateLd.observe(this) { newState ->
+            updateRequests(newState.requests)
+
+            currentState = newState
+        }
+    }
+
+    private fun updateRequests(requests: List<SyncRequest>?) = binding.apply {
+
+        llSyncRequests.removeAllViews()
+        llParentSyncRequest.visibility = if (requests.isNullOrEmpty()) GONE else VISIBLE
+
+        requests?.forEach { req ->
+            val item = ItemSyncRequestBinding.inflate(layoutInflater)
+
+            item.tvName.text = req.name
+            item.tvEmail.text = req.email
+
+            Glide.with(root.context)
+                .load(req.photoUrl)
+                .circleCrop()
+                .into(item.ivProfilePicture)
+
+            item.ivOpen.setOnClickListener {
+                showViewSyncRequestDialog()
+            }
+            llSyncRequests.addView(item.root)
+
+        }
+
+    }
+
+    private fun showViewSyncRequestDialog() {
     }
 
     private fun setupLogOff() {
@@ -112,6 +153,7 @@ class ProfileActivity : AppCompatActivity() {
                 .into(binding.ivProfilePicture)
         }
     }
+
 
 }
 

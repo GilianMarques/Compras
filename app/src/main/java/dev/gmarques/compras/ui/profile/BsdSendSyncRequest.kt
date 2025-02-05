@@ -10,9 +10,10 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.firestore.Firestore
+import dev.gmarques.compras.data.model.SyncRequest
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdSendSyncRequestBinding
+import dev.gmarques.compras.domain.utils.ListenerRegister
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -27,6 +28,8 @@ class BsdSendSyncRequest(
     private var binding = BsdSendSyncRequestBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
 
+
+
     init {
         dialog.setContentView(binding.root)
 
@@ -35,7 +38,10 @@ class BsdSendSyncRequest(
                 validateInput(edtInput.text.toString())
             }
         }
+
     }
+
+
 
     private fun validateInput(email: String) = lifecycleScope.launch(Dispatchers.IO) {
 
@@ -63,16 +69,31 @@ class BsdSendSyncRequest(
     }
 
     private fun sendRequest(email: String) = lifecycleScope.launch {
-        UserRepository.sendSyncRequest(email)
+
+        val success = UserRepository.sendSyncRequest(email)
+
+        val title =
+            targetActivity.getString(
+                if (success) R.string.Solicita_o_enviada
+                else R.string.Erro_ao_enviar_solicitacao
+            )
+        val msg =
+            targetActivity.getString(
+                if (success) R.string.Reinicie_o_app_ap_s_a_solicita_o_ser_aceita
+                else R.string.Houve_um_erro_ao_enviar_a_solicitacao
+            )
 
         AlertDialog.Builder(targetActivity)
-            .setTitle(targetActivity.getString(R.string.Solicita_o_enviada))
-            .setMessage(targetActivity.getString(R.string.Reinicie_o_app_ap_s_a_solicita_o_ser_aceita))
+            .setTitle(title)
+            .setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
-                this@BsdSendSyncRequest.dialog.dismiss()
+                binding.root.postDelayed({
+                    this@BsdSendSyncRequest.dialog.dismiss()
+                }, 500) // 500ms delay
             }
             .show()
+
     }
 
     private suspend fun showErrorMsg(msg: String) = withContext(Dispatchers.Main) {

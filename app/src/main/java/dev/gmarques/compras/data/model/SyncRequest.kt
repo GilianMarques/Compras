@@ -4,4 +4,7 @@ data class SyncRequest(
     val name: String,
     val email: String,
     val photoUrl: String,
-)
+) {
+    constructor():this("","","")
+}
+
