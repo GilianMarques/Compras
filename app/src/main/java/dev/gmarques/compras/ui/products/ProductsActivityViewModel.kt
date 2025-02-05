@@ -296,7 +296,7 @@ class ProductsActivityViewModel : ViewModel() {
     }
 
     fun addOrUpdateShopList(shopList: ShopList) {
-        ShopListRepository.addOrAttShopList(ValidatedShopList(shopList))
+        ShopListRepository.addOrUpdateShopList(ValidatedShopList(shopList))
     }
 
     suspend fun removeShopList(shopList: ShopList) = withContext(IO) {

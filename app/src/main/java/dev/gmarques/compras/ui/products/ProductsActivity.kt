@@ -32,8 +32,8 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.observeOnce
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
+import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
-import dev.gmarques.compras.ui.main.BsdAddOrEditShopList
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -258,7 +258,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             Vibrator.interaction()
 
             BsdShopListMenu.Builder(this, it!!)
-                .setRenameListener { renameList -> showRenameDialog(renameList) }
+                .setRenameListener { showRenameDialog() }
                 .setSortListener { showSortProductsDialog() }
                 .setSuggestionListener { startActivitySuggestProduct() }
                 .setRemoveListener { removeList -> confirmRemove(removeList) }
@@ -283,10 +283,13 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         }.show()
     }
 
-    private fun showRenameDialog(renameList: ShopList) {
-        BsdAddOrEditShopList(this, renameList).setOnConfirmListener { shopList ->
-            viewModel.addOrUpdateShopList(shopList)
-        }.show()
+    private fun showRenameDialog() {
+      startActivity(
+            AddEditShopListActivity.newIntentEditShopList(
+                this,
+                viewModel.shopListLD.value!!.id
+            )
+        )
     }
 
     private fun confirmRemove(shopList: ShopList) {

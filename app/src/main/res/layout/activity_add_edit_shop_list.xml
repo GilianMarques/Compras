@@ -65,7 +65,7 @@
                     android:visibility="gone"
                     app:drawableStartCompat="@drawable/vec_error"
                     app:drawableTint="@color/error"
-                    tools:text="@string/Nome_do_produto_ex_macarrao_parafuso"
+                    tools:text="@string/Nome"
                     tools:visibility="visible" />
 
                 <androidx.appcompat.widget.AppCompatEditText
@@ -111,7 +111,7 @@
         android:elevation="2dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:text="@string/Adicionar_categoria"
+        android:text="@string/Adicionar_lista"
         android:textColor="?colorPrimary"
         app:icon="@drawable/vec_check"
         app:layout_constraintBottom_toBottomOf="@id/parent"

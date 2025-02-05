@@ -2,14 +2,16 @@ package dev.gmarques.compras.data.repository
 
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
+import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import dev.gmarques.compras.domain.utils.ListenerRegister
+import kotlinx.coroutines.tasks.await
 
 
 object ShopListRepository {
 
-    fun addOrAttShopList(validatedShopList: ValidatedShopList) {
+    fun addOrUpdateShopList(validatedShopList: ValidatedShopList) {
         val shopList = validatedShopList.shopList
         Firestore.shopListCollection.document(shopList.id)
             .set(shopList)
@@ -40,7 +42,10 @@ object ShopListRepository {
      * Define um listener no firebase que notifica de altaraçoes locais e na nuvem
      * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
      * */
-    fun observeShopList(shopListId: String, onSnapshot: (ShopList?, Exception?) -> Any): ListenerRegister {
+    fun observeShopList(
+        shopListId: String,
+        onSnapshot: (ShopList?, Exception?) -> Any,
+    ): ListenerRegister {
         return ListenerRegister(
             Firestore.shopListCollection.whereEqualTo("id", shopListId)
                 .addSnapshotListener { querySnapshot, fbException ->
@@ -54,4 +59,22 @@ object ShopListRepository {
 
     }
 
+
+    suspend fun getShopListByName(name: String): Result<Category?> {
+        val querySnapshot =
+            Firestore.shopListCollection.whereEqualTo("name", name).limit(1).get().await()
+
+        return if (!querySnapshot.isEmpty) {
+            val targetCategory = querySnapshot.documents[0].toObject<Category>()
+            Result.success(targetCategory)
+        } else Result.success(null)
+    }
+
+
+    suspend fun getShopList(id: String): Result<ShopList> {
+        val querySnapshot = Firestore.shopListCollection.document(id).get().await()
+
+        val targetShopList = querySnapshot.toObject<ShopList>()!!
+        return Result.success(targetShopList)
+    }
 }

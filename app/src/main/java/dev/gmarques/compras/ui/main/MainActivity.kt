@@ -15,6 +15,7 @@ import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityMainBinding
 import dev.gmarques.compras.ui.Vibrator
+import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import java.util.Calendar
@@ -42,7 +43,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isDarkThemeEnabled(): Boolean {
-        val nightModeFlags = App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val nightModeFlags =
+            App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
 
@@ -65,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun attUiWithUserData(user: FirebaseUser) {
-        binding.tvUserName.text = user.displayName//?.split(" ")?.get(0) ?: ""
+        binding.tvUserName.text = user.displayName
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         binding.tvGreetings.text = when (currentHour) {
@@ -94,22 +96,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initFabAddList() = binding.fabAddList.setOnClickListener {
-        showDialogAddShopList()
+
+        startActivity(AddEditShopListActivity.newIntentAddShopList(this))
     }
 
-    private fun showDialogAddShopList() {
-        BsdAddOrEditShopList(this, rvAdapter.itemCount)
-            .setOnConfirmListener { shopList ->
-                viewModel.addOrUpdateShopList(shopList)
 
-                /*Se houver alguma lista ja criada é mais provavel que hajam produtos para serem sugeridos, caso contrario
-                 nao faz sentido abrir a tela de sugestão*/
-                startActivityProducts(shopList, rvAdapter.itemCount > 0)
-
-            }.show()
-
-
-    }
 
     private fun observeListsUpdates() {
 
