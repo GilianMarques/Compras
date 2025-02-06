@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.ShopListRepository
-import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import dev.gmarques.compras.domain.utils.ListenerRegister
 
 
@@ -23,17 +22,9 @@ class MainActivityViewModel : ViewModel() {
 
     }
 
-    fun addOrUpdateShopList(shopList: ShopList) {
-        ShopListRepository.addOrUpdateShopList(ValidatedShopList(shopList))
-    }
-
     override fun onCleared() {
         listenerRegister?.remove()
         super.onCleared()
-    }
-
-    fun removeShopList(shopList: ShopList) {
-        ShopListRepository.removeShopList(shopList)
     }
 
     private var listenerRegister: ListenerRegister? = null

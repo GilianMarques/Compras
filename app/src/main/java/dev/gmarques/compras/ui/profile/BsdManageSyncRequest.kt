@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import androidx.core.text.htmlEncode
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -14,7 +13,6 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.SyncRequest
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdManageSyncRequestBinding
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class BsdManageSyncRequest(
-    val request: SyncRequest,
+    private val request: SyncRequest,
     private val targetActivity: Activity,
     private val lifecycleScope: LifecycleCoroutineScope,
 ) {
@@ -37,15 +35,21 @@ class BsdManageSyncRequest(
         binding.apply {
 
             fabAccept.setOnClickListener {
+                Vibrator.interaction()
+                acceptRequest()
+                fabAccept.isEnabled = false
             }
 
             fabDecline.setOnClickListener {
+                Vibrator.interaction()
+                declineRequest()
+                fabDecline.isEnabled = false
             }
 
             tvUserName.text = request.name
             tvEmail.text = request.email
             tvInfo.text = targetActivity.getString(
-                R.string.X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar_a_solicita_o_os_dados_de_ambas_as_contas_ser_o_mesclados_e_as_altera_es_feitas_por_um_usu_rio_ser_o_refletidas_na_conta_do_outro_n_nn_o_aceite_solicita_es_de_pessoas_desconhecidas,
+                R.string.X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar,
                 request.name
             )
 
@@ -59,20 +63,43 @@ class BsdManageSyncRequest(
 
     }
 
+    private fun declineRequest() {
 
-    private fun sendRequest(email: String) = lifecycleScope.launch {
-
-        val success = UserRepository.sendSyncRequest(email)
+        val success = UserRepository.declineRequest(request)
+        if (success) Vibrator.success() else Vibrator.error()
 
         val title =
             targetActivity.getString(
-                if (success) R.string.Solicita_o_enviada
-                else R.string.Erro_ao_enviar_solicitacao
+                if (success) R.string.solicita_recusada
+                else R.string.Erro_ao_recusar_solicita_o
+            )
+
+        AlertDialog.Builder(targetActivity)
+            .setTitle(title)
+            .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
+                dialog.dismiss()
+                binding.root.postDelayed({
+                    this@BsdManageSyncRequest.dialog.dismiss()
+                }, 500) // 500ms delay
+            }
+            .show()
+    }
+
+
+    private fun acceptRequest() = lifecycleScope.launch {
+
+        val success = UserRepository.acceptRequest(request)
+        if (success) Vibrator.success() else Vibrator.error()
+
+        val title =
+            targetActivity.getString(
+                if (success) R.string.solicita_o_aceita
+                else R.string.Erro_ao_aceitar_solicita_o
             )
         val msg =
             targetActivity.getString(
-                if (success) R.string.Reinicie_o_app_ap_s_a_solicita_o_ser_aceita
-                else R.string.Houve_um_erro_ao_enviar_a_solicitacao
+                if (success) R.string.Solicita_o_aceita_com_sucesso_o_solicitante_deve_reiniciar_o_aplicativo
+                else R.string.Nao_foi_poss_vel_aceitar_a_solicita_o_tente_novamente_mais_tarde
             )
 
         AlertDialog.Builder(targetActivity)

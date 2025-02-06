@@ -100,7 +100,7 @@
                 android:layout_marginBottom="48dp"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
-                android:text="@string/X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar_a_solicita_o_os_dados_de_ambas_as_contas_ser_o_mesclados_e_as_altera_es_feitas_por_um_usu_rio_ser_o_refletidas_na_conta_do_outro_n_nn_o_aceite_solicita_es_de_pessoas_desconhecidas"
+                android:text="@string/X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar"
                 android:textAlignment="center"
                 app:layout_constraintBottom_toTopOf="@id/fab_accept"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -13,14 +13,15 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.model.SyncRequest
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityProfileBinding
 import dev.gmarques.compras.databinding.ItemSyncRequestBinding
 import dev.gmarques.compras.ui.Vibrator
+import dev.gmarques.compras.ui.profile.ProfileActivityViewModel.ProfileActivityState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import dev.gmarques.compras.ui.profile.ProfileActivityViewModel.ProfileActivityState
 import kotlin.system.exitProcess
 
 class ProfileActivity : AppCompatActivity() {
@@ -96,6 +97,7 @@ class ProfileActivity : AppCompatActivity() {
                 UserRepository.logOff(this@ProfileActivity) { error ->
                     if (error == null) {
                         Firebase.firestore.clearPersistence()
+                        PreferencesHelper().removeValue(PreferencesHelper.PrefsKeys.HOST)
                         Vibrator.success()
                         closeApp()
 

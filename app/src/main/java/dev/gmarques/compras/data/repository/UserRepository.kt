@@ -46,7 +46,7 @@ object UserRepository {
 
         try {
             val myUser = getUser()!!
-            Firestore.syncRequestsCollection(email).document(myUser.email!!)
+            Firestore.findSyncRequestsCollection(email).document(myUser.email!!)
                 .set(SyncRequest(myUser.displayName!!, myUser.email!!, myUser.photoUrl.toString()))
                 .await()
             return true
@@ -62,7 +62,7 @@ object UserRepository {
      * @return true se o usuario existe no banco de dados, senao, false
      */
     suspend fun checkIfUserExists(targetEmail: String): Boolean {
-        return !Firestore.targetAccountCollection(targetEmail).limit(1).get().await().isEmpty
+        return !Firestore.findTargetAccountCollection(targetEmail).limit(1).get().await().isEmpty
     }
 
     /**
@@ -89,5 +89,37 @@ object UserRepository {
         return ListenerRegister(listenerRegistration)
     }
 
-    data class Metadata(val creationDate: Long = System.currentTimeMillis())
+    fun acceptRequest(request: SyncRequest): Boolean {
+
+        return try {
+            // salvo os dados do convidado na lista de convidados do usuario local
+            Firestore.guestsCollection.document(request.email).set(request)
+
+            // salvo os dados do usuario local na seção de anfitrao do solicitante
+            val myUser = getUser()!!
+            Firestore.findTargetAccountHostdocument(request.email)
+                .set(SyncRequest(myUser.displayName!!, myUser.email!!, myUser.photoUrl.toString()))
+
+            // por fim, removo a solicitação de sincronismo do convidado
+            Firestore.syncRequestsCollection.document(request.email).delete()
+            true
+        } catch (e: Exception) {
+            Log.d("USUK", "UserRepository.acceptRequest:Erro aceitando solicitação de sincronismo: $e")
+            false
+        }
+    }
+
+    fun declineRequest(request: SyncRequest): Boolean {
+        return try {
+
+            // por fim, removo a solicitação de sincronismo do convidado
+            Firestore.syncRequestsCollection.document(request.email).delete()
+            true
+        } catch (e: Exception) {
+            Log.d("USUK", "UserRepository.declineRequest:Erro recusando solicitação de sincronismo: $e")
+            false
+        }
+    }
+
+    data class Metadata(val lastLogin: Long = System.currentTimeMillis())
 }

@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityMainBinding
@@ -19,6 +21,9 @@ import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.ui.profile.ProfileActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 
@@ -49,12 +54,14 @@ class MainActivity : AppCompatActivity() {
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
 
-    private fun checkUserAuthenticated() {
+    private fun checkUserAuthenticated() = lifecycleScope.launch {
+
+
         val user = UserRepository.getUser()
 
         if (user != null) {
             attUiWithUserData(user)
-            viewModel.observeUpdates()
+            setupDataBase()
 
         } else {
             startActivity(
@@ -65,6 +72,12 @@ class MainActivity : AppCompatActivity() {
 
             this@MainActivity.finishAffinity()
         }
+    }
+
+    private suspend fun setupDataBase() = withContext(Dispatchers.IO) {
+
+        Firestore.setupDatabase()
+        viewModel.observeUpdates()
     }
 
 
@@ -105,8 +118,6 @@ class MainActivity : AppCompatActivity() {
 
         startActivity(AddEditShopListActivity.newIntentAddShopList(this))
     }
-
-
 
     private fun observeListsUpdates() {
 

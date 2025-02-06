@@ -10,10 +10,8 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.model.SyncRequest
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdSendSyncRequestBinding
-import dev.gmarques.compras.domain.utils.ListenerRegister
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -71,6 +69,7 @@ class BsdSendSyncRequest(
     private fun sendRequest(email: String) = lifecycleScope.launch {
 
         val success = UserRepository.sendSyncRequest(email)
+        if (success) Vibrator.success() else Vibrator.error()
 
         val title =
             targetActivity.getString(
