@@ -1,10 +1,14 @@
 package dev.gmarques.compras.ui.profile
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.AlertDialog
+import android.os.CountDownTimer
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.ProgressBar
+import androidx.core.animation.doOnEnd
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -25,6 +29,7 @@ class BsdManageSyncRequest(
     private val lifecycleScope: LifecycleCoroutineScope,
 ) {
 
+    private var canAccept: Boolean = false
     private var binding = BsdManageSyncRequestBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
 
@@ -35,6 +40,7 @@ class BsdManageSyncRequest(
         binding.apply {
 
             fabAccept.setOnClickListener {
+                if (!canAccept) return@setOnClickListener // melhor que desativar o botao (n gosto da aparencia do botao desativado)
                 Vibrator.interaction()
                 acceptRequest()
                 fabAccept.isEnabled = false
@@ -59,9 +65,38 @@ class BsdManageSyncRequest(
                 .placeholder(R.drawable.vec_invite_user)
                 .into(ivProfilePicture)
 
+
+            startProgressAnimation(pbAccept) {
+                canAccept = true
+                fabAccept.visibility = VISIBLE
+                pbAccept.visibility = GONE
+            }
+
         }
 
     }
+
+    private fun startProgressAnimation(
+        pbAccept: ProgressBar,
+        duration: Long = 3000L,
+        onComplete: () -> Unit,
+    ) {
+        ValueAnimator.ofInt(0, 100).apply {
+            this.duration = duration
+            interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+
+            addUpdateListener { animation ->
+                pbAccept.progress = animation.animatedValue as Int
+            }
+
+            doOnEnd {
+                onComplete()
+            }
+
+            start()
+        }
+    }
+
 
     private fun declineRequest() {
 
