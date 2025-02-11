@@ -15,7 +15,6 @@ import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.ShopListRepository
 import dev.gmarques.compras.data.repository.SuggestionProductRepository
 import dev.gmarques.compras.data.repository.model.ValidatedProduct
-import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.domain.SortCriteria
 import dev.gmarques.compras.domain.model.CategoryWithProductsStats
@@ -32,7 +31,7 @@ import kotlinx.coroutines.withContext
 
 class ProductsActivityViewModel : ViewModel() {
 
-
+    // categoria usada como filtro pelo usuario
     private var filterCategory: Category? = null
 
     // mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo
@@ -42,34 +41,24 @@ class ProductsActivityViewModel : ViewModel() {
 
     private lateinit var productsToBePosted: List<ProductWithCategory>
     private lateinit var pricesToBePosted: Pair<Double, Double>
+    private lateinit var uiState: UiState
 
     private var productsDatabaseListener: ListenerRegister? = null
     private var shopListDatabaseListener: ListenerRegister? = null
     private var categoriesDatabaseListener: ListenerRegister? = null
 
-    private var throttlingScope: CoroutineScope? = null
+    private var throttlingScope: CoroutineScope? = null // todo pq?
 
-    private val _productsLD = MutableLiveData<List<ProductWithCategory>>()
-    val productsLD: LiveData<List<ProductWithCategory>> get() = _productsLD
-
-    private val _listCategoriesLD = MutableLiveData<List<CategoryWithProductsStats>?>()
-    val listCategoriesLD: LiveData<List<CategoryWithProductsStats>?> get() = _listCategoriesLD
-
-    private val _shopListLD = MutableLiveData<ShopList?>()
-    val shopListLD: LiveData<ShopList?> get() = _shopListLD
-
-    private val _pricesLD = MutableLiveData<Pair<Double, Double>>()
-    val pricesLD: LiveData<Pair<Double, Double>> get() = _pricesLD
-
-    private var sortCriteria: SortCriteria = PrefsDefaultValue.SORT_CRITERIA
-    private var sortAscending = PrefsDefaultValue.SORT_ASCENDING
-    private var boughtProductsAtEnd = PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END
+    private val _uiStateLD = MutableLiveData<UiState>()
+    val uiStateLD: LiveData<UiState> get() = _uiStateLD
 
     fun init(shopListId: String) {
+        uiState = UiState()
+
 
         // lista temporaria pra permitir o carregamento imediato dos produtos, esta sera substituida apos o carrregamento do banco de dados
-        _shopListLD.value = ShopList(shopListId)
-
+        uiState.shopList = ShopList(shopListId)
+        _uiStateLD.postValue(uiState)
         viewModelScope.launch(IO) {
             loadSortPreferences()
             observeCategoriesUpdates()
@@ -101,7 +90,7 @@ class ProductsActivityViewModel : ViewModel() {
             if (exception != null) throw exception
             if (dbCategories != null) {
                 categories = dbCategories.associateBy { it.id }.toMap(HashMap())
-                _productsLD.value?.let { filterCategoriesWithProductsDataAndDispatchToUi(_productsLD.value!!.map { it.product }) }
+                filterCategoriesWithProductsDataAndDispatchToUi(uiState.products.map { it.product })
             }
             observeProductsUpdates()
 
@@ -113,18 +102,18 @@ class ProductsActivityViewModel : ViewModel() {
 
         requireNotNull(categories) { "Carregue as categorias antes de tentar filtrar os dados." }
 
-        val noRepeatCategories = HashMap<String, CategoryWithProductsStats>()
+        val noRepeatedCategories = HashMap<String, CategoryWithProductsStats>()
 
 
         for (i in products.indices) {
 
             val product = products[i]
 
-            val categoryOnMap = noRepeatCategories[product.categoryId]
+            val categoryOnMap = noRepeatedCategories[product.categoryId]
             val totalProductsWithMatchingCategory = (categoryOnMap?.totalProducts ?: 0) + 1
             val totalBoughtProductsFromCategory = (categoryOnMap?.boughtProducts ?: 0) + if (product.hasBeenBought) 1 else 0
 
-            noRepeatCategories[product.categoryId] = CategoryWithProductsStats(
+            noRepeatedCategories[product.categoryId] = CategoryWithProductsStats(
                 categories!![product.categoryId]!!,
                 totalProductsWithMatchingCategory,
                 totalBoughtProductsFromCategory,
@@ -133,12 +122,14 @@ class ProductsActivityViewModel : ViewModel() {
 
         }
 
-        val updatedList = noRepeatCategories.map { it.value }.toList()
-        val sorted = updatedList.sortedWith(compareBy { it.category.name })
-            .sortedWith(compareBy { it.category.position })
+        val updatedList = noRepeatedCategories.map { it.value }.toList()
+        val sorted = updatedList.sortedWith(compareBy { it.category.name }).sortedWith(compareBy { it.category.position })
             .sortedWith(compareBy { it.boughtProducts == it.totalProducts })
 
-        if (sorted != _listCategoriesLD.value) _listCategoriesLD.postValue(sorted)
+        if (sorted != uiState.listCategories) {
+            uiState.listCategories = sorted
+            _uiStateLD.postValue(uiState)
+        }
 
     }
 
@@ -148,7 +139,7 @@ class ProductsActivityViewModel : ViewModel() {
      */
     private fun observeProductsUpdates() {
         if (productsDatabaseListener != null) return
-        productsDatabaseListener = ProductRepository.observeProductUpdates(_shopListLD.value!!.id) { products, error ->
+        productsDatabaseListener = ProductRepository.observeProductUpdates(uiState.shopList.id) { products, error ->
 
             if (error != null) throw error
             if (products != null) viewModelScope.launch(IO) {
@@ -213,7 +204,7 @@ class ProductsActivityViewModel : ViewModel() {
         val newData = filteredProductsWithPrices.productsWithCategory
         var sorted = listOf<ProductWithCategory>()
 
-        when (sortCriteria) {
+        when (uiState.sortCriteria) {
             SortCriteria.NAME -> {
                 sorted = newData.sortedWith(compareBy { it.product.name })
 
@@ -232,8 +223,8 @@ class ProductsActivityViewModel : ViewModel() {
             }
         }
 
-        sorted = if (!sortAscending) sorted.reversed() else sorted
-        sorted = sorted.sortedWith(compareBy { if (boughtProductsAtEnd) it.product.hasBeenBought else false })
+        sorted = if (!uiState.sortAscending) sorted.reversed() else sorted
+        sorted = sorted.sortedWith(compareBy { if (uiState.boughtProductsAtEnd) it.product.hasBeenBought else false })
 
 
         return filteredProductsWithPrices.copy(productsWithCategory = sorted)
@@ -249,12 +240,21 @@ class ProductsActivityViewModel : ViewModel() {
 
 
         var delayMillis = 0L
+
         throttlingScope?.apply { delayMillis = 250; cancel() }
         throttlingScope = CoroutineScope(IO)
         throttlingScope!!.launch {
+
             delay(delayMillis)
-            _productsLD.postValue(productsToBePosted)
-            _pricesLD.postValue(pricesToBePosted)
+
+            uiState.apply {
+                priceBought = pricesToBePosted.second
+                priceFull = pricesToBePosted.first
+                products = productsToBePosted
+            }
+
+            _uiStateLD.postValue(uiState)
+
             productsToBePosted = emptyList()
             pricesToBePosted = Pair(0.0, 0.0)
         }
@@ -295,10 +295,6 @@ class ProductsActivityViewModel : ViewModel() {
         observeProductsUpdates()
     }
 
-    fun addOrUpdateShopList(shopList: ShopList) {
-        ShopListRepository.addOrUpdateShopList(ValidatedShopList(shopList))
-    }
-
     suspend fun removeShopList(shopList: ShopList) = withContext(IO) {
         shopListDatabaseListener?.remove()
 
@@ -313,7 +309,8 @@ class ProductsActivityViewModel : ViewModel() {
     private fun loadList(shopListId: String) {
         shopListDatabaseListener = ShopListRepository.observeShopList(shopListId) { shopList, error ->
             if (error == null && shopList != null) {
-                _shopListLD.postValue(shopList)
+                uiState.shopList = shopList
+                _uiStateLD.postValue(uiState)
             }
         }
     }
@@ -324,9 +321,10 @@ class ProductsActivityViewModel : ViewModel() {
 
     fun loadSortPreferences() {
         val prefs = PreferencesHelper()
-        sortCriteria = SortCriteria.fromValue(prefs.getValue(PrefsKeys.SORT_CRITERIA, PrefsDefaultValue.SORT_CRITERIA.value))!!
-        sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
-        boughtProductsAtEnd = prefs.getValue(PrefsKeys.BOUGHT_PRODUCTS_AT_END, PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END)
+        uiState.sortCriteria =
+            SortCriteria.fromValue(prefs.getValue(PrefsKeys.SORT_CRITERIA, PrefsDefaultValue.SORT_CRITERIA.value))!!
+        uiState.sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
+        uiState.boughtProductsAtEnd = prefs.getValue(PrefsKeys.BOUGHT_PRODUCTS_AT_END, PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END)
     }
 
     fun filterByCategory(category: Category) {
@@ -350,5 +348,18 @@ class ProductsActivityViewModel : ViewModel() {
         val fullPrice: Double,
         val boughtPrice: Double,
     )
+
+    class UiState {
+
+        var sortCriteria: SortCriteria = PrefsDefaultValue.SORT_CRITERIA
+        var sortAscending = PrefsDefaultValue.SORT_ASCENDING
+        var boughtProductsAtEnd = PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END
+
+        var products = listOf<ProductWithCategory>()
+        var listCategories = listOf<CategoryWithProductsStats>()
+        lateinit var shopList: ShopList
+        var priceFull: Double = 0.0
+        var priceBought: Double = 0.0
+    }
 
 }

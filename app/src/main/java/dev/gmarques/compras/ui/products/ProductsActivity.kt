@@ -43,6 +43,7 @@ import kotlin.math.min
 
 class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
 
+    private lateinit var state: ProductsActivityViewModel.UiState
     private lateinit var viewModel: ProductsActivityViewModel
     private lateinit var binding: ActivityProductsBinding
     private lateinit var rvAdapterProducts: ProductAdapter
@@ -79,57 +80,66 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         initRecyclerViewCategories()
         initSearch()
         initFabAddProduct()
-        observeProductsUpdates()
-        observePrices()
-        observeShopList()
+        observeStateChanges()
         setupOnBackPressed()
-        observeCategories()
         if (suggestProducts) startActivitySuggestProduct()
 
 
     }
 
-    private fun observeCategories() {
-        viewModel.listCategoriesLD.observe(this) { categories ->
-            categories?.let { rvAdapterCategories.submitList(categories) }
+    private fun observeStateChanges() {
+        viewModel.uiStateLD.observe(this) { newState ->
+
+            binding.toolbar.tvActivityTitle.text = newState.shopList.name
+
+            rvAdapterCategories.submitList(newState.listCategories)
+
+            binding.apply {
+
+                ValueAnimator.ofFloat(tvPriceList.text.toString().currencyToDouble().toFloat(), newState.priceFull.toFloat())
+                    .apply {
+                        interpolator = AnticipateInterpolator()
+                        duration = 500
+                        addUpdateListener {
+                            lifecycleScope.launch {
+                                withContext(Main) {
+                                    tvPriceList.text = it.animatedValue.toString().toDouble().toCurrency()
+                                }
+                            }
+                        }
+                    }.start()
+
+                ValueAnimator.ofFloat(tvPriceCart.text.toString().currencyToDouble().toFloat(), newState.priceBought.toFloat())
+                    .apply {
+                        interpolator = AnticipateInterpolator()
+                        duration = 500
+                        addUpdateListener {
+                            lifecycleScope.launch {
+                                withContext(Main) {
+                                    tvPriceCart.text = it.animatedValue.toString().toDouble().toCurrency()
+                                }
+                            }
+                        }
+                    }.start()
+
+            }
+
+            with(newState.products) {
+
+                rvAdapterProducts.submitList(this)
+
+                if (binding.edtSearch.text.toString().isNotEmpty()) {
+                    when (this.isEmpty()) {
+                        true -> Vibrator.error()
+                        false -> Vibrator.success()
+                    }
+                }
+            }
+
+            this.state = newState
         }
     }
 
-    private fun observePrices() = viewModel.pricesLD.observe(this) {
-        binding.apply {
-
-
-            ValueAnimator.ofFloat(tvPriceList.text.toString().currencyToDouble().toFloat(), it.first.toFloat()).apply {
-                interpolator = AnticipateInterpolator()
-                duration = 500
-                addUpdateListener {
-                    lifecycleScope.launch {
-                        withContext(Main) {
-                            tvPriceList.text = it.animatedValue.toString().toDouble().toCurrency()
-                        }
-                    }
-                }
-            }.start()
-
-
-            ValueAnimator.ofFloat(tvPriceCart.text.toString().currencyToDouble().toFloat(), it.second.toFloat()).apply {
-                interpolator = AnticipateInterpolator()
-                duration = 500
-                addUpdateListener {
-                    lifecycleScope.launch {
-                        withContext(Main) {
-                            tvPriceCart.text = it.animatedValue.toString().toDouble().toCurrency()
-                        }
-                    }
-                }
-            }.start()
-
-        }
-    }
-
-    private fun observeShopList() = viewModel.shopListLD.observe(this) {
-        binding.toolbar.tvActivityTitle.text = it?.name
-    }
 
     private fun initSearch() {
 
@@ -167,19 +177,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             showMenuDialog()
         }
 
-    }
-
-    private fun observeProductsUpdates() {
-        viewModel.productsLD.observe(this) { newData ->
-            rvAdapterProducts.submitList(newData)
-
-            if (binding.edtSearch.text.toString().isNotEmpty()) {
-                when (newData.isEmpty()) {
-                    true -> Vibrator.error()
-                    false -> Vibrator.success()
-                }
-            }
-        }
     }
 
     private fun initRecyclerViewProducts() {
@@ -228,42 +225,37 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     }
 
     private fun startActivityAddProduct() {
-        viewModel.shopListLD.observeOnce(this@ProductsActivity) { shopList ->
 
-            Vibrator.interaction()
-            val intent = AddEditProductActivity.newIntentAddProduct(this@ProductsActivity, shopList!!.id)
-            startActivity(intent)
-        }
+        Vibrator.interaction()
+        val intent = AddEditProductActivity.newIntentAddProduct(this@ProductsActivity, state.shopList.id)
+        startActivity(intent)
+
     }
 
     private fun startActivitySuggestProduct() {
         Vibrator.interaction()
-        val intent = SuggestProductsActivity.newIntent(this@ProductsActivity, viewModel.shopListLD.value!!.id)
+        val intent = SuggestProductsActivity.newIntent(this@ProductsActivity, state.shopList.id)
         startActivity(intent)
 
     }
 
     private fun startActivityEditProduct(product: Product) {
-        viewModel.shopListLD.observeOnce(this@ProductsActivity) { shopList ->
 
-            Vibrator.interaction()
-            val intent = AddEditProductActivity.newIntentEditProduct(this@ProductsActivity, shopList!!.id, product.id)
-            startActivity(intent)
-        }
+        Vibrator.interaction()
+        val intent = AddEditProductActivity.newIntentEditProduct(this@ProductsActivity, state.shopList.id, product.id)
+        startActivity(intent)
     }
 
     private fun showMenuDialog() {
-        viewModel.shopListLD.observeOnce(this) {
-            Vibrator.interaction()
+        Vibrator.interaction()
 
-            BsdShopListMenu.Builder(this, it!!)
-                .setRenameListener { showRenameDialog() }
-                .setSortListener { showSortProductsDialog() }
-                .setSuggestionListener { startActivitySuggestProduct() }
-                .setRemoveListener { removeList -> confirmRemove(removeList) }
-                .setManageCategoriesListener { startCategoriesActivity() }
-                .build().show()
-        }
+        BsdShopListMenu.Builder(this, state.shopList)
+            .setRenameListener { showRenameDialog() }
+            .setSortListener { showSortProductsDialog() }
+            .setSuggestionListener { startActivitySuggestProduct() }
+            .setRemoveListener { removeList -> confirmRemove(removeList) }
+            .setManageCategoriesListener { startCategoriesActivity() }
+            .build().show()
     }
 
     private fun startCategoriesActivity() {
@@ -283,10 +275,10 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     }
 
     private fun showRenameDialog() {
-      startActivity(
+        startActivity(
             AddEditShopListActivity.newIntentEditShopList(
                 this,
-                viewModel.shopListLD.value!!.id
+                state.shopList.id
             )
         )
     }
