@@ -81,7 +81,7 @@
 
 
             <LinearLayout
-                android:id="@+id/ll_parent_sync_request"
+                android:id="@+id/ll_parent_sync_invites"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -101,7 +101,7 @@
                     android:textSize="14sp" />
 
                 <LinearLayout
-                    android:id="@+id/ll_sync_requests"
+                    android:id="@+id/ll_sync_invites"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -115,6 +115,66 @@
                     android:layout_marginBottom="8dp"
                     android:background="?android:attr/listDivider"
                     app:layout_constraintBottom_toTopOf="@id/edt_input" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_parent_guests"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="16dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="@font/lexend_deca_bold"
+                    android:padding="4dp"
+                    android:text="@string/Contas_sincronizando_com_voce"
+                    android:textAlignment="viewStart"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_guests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="16dp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_parent_host"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="16dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="@font/lexend_deca_bold"
+                    android:padding="4dp"
+                    android:text="@string/Voce_esta_sincronizando_seus_dados_com"
+                    android:textAlignment="viewStart"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_host"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="16dp" />
+
 
             </LinearLayout>
 
@@ -147,26 +207,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_interrupt_sync"
-                style="@style/Margins_edittext"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/back_textview_menu"
-                android:drawablePadding="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/Gerenciar_contas"
-                android:textColor="?attr/colorPrimaryVariant"
-                app:drawableStartCompat="@drawable/vec_interrupt_sinc_with_other_account"
-                app:drawableTint="?attr/colorPrimaryVariant"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
 
-            <View
+
+           <View
                 android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -174,6 +217,8 @@
                 android:layout_marginBottom="8dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintBottom_toTopOf="@id/edt_input" />
+
+
 
             <TextView
                 android:layout_width="wrap_content"

@@ -100,10 +100,10 @@
     <string name="Gerencie_sua_conta">Gerencie sua conta</string>
     <string name="Sincronizar_dados_com_outra_conta">Sincronizar dados com outra conta</string>
     <string name="Colaboracao">Colaboração</string>
-    <string name="Enviar_solicitacao">Enviar solicitação</string>
+    <string name="Enviar_convite">Enviar convite</string>
     <string name="Digite_o_email_do_usuario">Digite o email do usuário</string>
     <string name="Solicitar_permissao">Solicitar permissão</string>
-    <string name="Quando_a_sua_solicita_o_for_aceita_os_dados_de_ambos_ser_o_mesclados">Quando a sua solicitação for aceita, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.</string>
+    <string name="Quando_o_seu_convite_for_aceito_os_dados">Quando o seu convite for aceito, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.</string>
     <string name="Colaborar_com_outro_usu_rio">Colaborar com outro usuário</string>
     <string name="Perfil">Perfil</string>
     <string name="Gerenciar_contas">Interromper sincronismo</string>
@@ -114,7 +114,6 @@
     <string name="Insira_um_endere_o_v_lido">Insira um endereço válido</string>
     <string name="Solicita_o_enviada">Solicitação enviada</string>
     <string name="Entendi">Entendi</string>
-    <string name="Reinicie_o_app_ap_s_a_solicita_o_ser_aceita">Reinicie o App após a solicitação ser aceita.</string>
     <string name="Voce_nao_pode_convidar_a_s_mesmo">Você não pode convidar a sí mesmo</string>
     <string name="Usu_rio_n_o_existe">Usuário não existe</string>
     <string name="Voce_sera_desconectado_a_e_todos_os_dados_locais_ser_o_removidos_deseja_mesmo_continuar">Você será desconectado(a) e todos os dados locais serão removidos, deseja mesmo continuar?</string>
@@ -128,12 +127,28 @@
     <string name="Gerenciar_solicitacao">Gerenciar solicitação</string>
     <string name="Recusar">Recusar</string>
     <string name="Aceitar">Aceitar</string>
-    <string name="X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar">%1$s te enviou uma solicitação de sincronismo.\n\nAo aceitar a solicitação, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.\n\nNão aceite solicitações de pessoas desconhecidas.</string>
-    <string name="Solicita_o_aceita_com_sucesso_o_solicitante_deve_reiniciar_o_aplicativo">Solicitação aceita com sucesso.\n\nO solicitante deve reiniciar o aplicativo.</string>
+    <string name="X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar">%1$s te enviou um convite para sincronizar seus dados com ele(a).\n\nAo aceitar o convite, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.\n\nNão aceite convites de pessoas desconhecidas.</string>
+    <string name="Solicita_o_aceita_com_sucesso_o_solicitante_deve_reiniciar_o_aplicativo">Solicitação aceita com sucesso.\n\nO app será fechado para aplicar as alterações</string>
     <string name="Nao_foi_poss_vel_aceitar_a_solicita_o_tente_novamente_mais_tarde">Não foi possível aceitar a solicitação, tente novamente mais tarde</string>
     <string name="solicita_o_aceita">Solicitação aceita</string>
     <string name="Erro_ao_aceitar_solicita_o">Erro ao aceitar solicitação</string>
     <string name="Erro_ao_recusar_solicita_o">Erro ao recusar solicitação</string>
     <string name="solicita_recusada">Solicitação recusada</string>
+    <string name="Contas_sincronizando_com_voce">Usuários sincronizando com você</string>
+    <string name="Voce_esta_sincronizando_seus_dados_com">Você está sincronizando seus dados com:</string>
+    <string name="Voce_nao_pode_conectar_sua_conta_a_outra_enquanto">Você não pode conectar sua conta a outra enquanto houver outras contas conectadas à sua.\n\nInterrompa o sincronismo com as contas conectadas à sua antes de enviar uma solicitação a outro usuário.</string>
+    <string name="Erro">Erro</string>
+    <string name="Gerenciar_convidado">Gerenciar convidado</string>
+    <string name="Interromper_conexao_entre">Interromper conexão entre contas</string>
+    <string name="Interromper_conexao">Interromper conexão</string>
+    <string name="Ao_interromper_a_conexao_as_altera">Ao interromper a conexão, as alterações feitas não serão mais refletidas nas contas um do outro.</string>
+    <string name="Deseja_mesmo_interromper_a_conexao">Deseja mesmo interromper a conexão?</string>
+    <string name="Nao_foi_possivel_desconectar_o_convidado_por_favor_tente_novamente">"Não foi possível desconectar o convidado, por favor, tente novamente "</string>
+    <string name="Nao_foi_possivel_desconectar_o_anfitriao_por_favor_tente_novamente">"Não foi possível desconectar do anfitrião, por favor, tente novamente "</string>
+    <string name="Convidado_desconectado_com_sucesso">Convidado desconectado com sucesso</string>
+    <string name="Convite_enviado_com_sucesso">Convite enviado com sucesso</string>
+    <string name="Gerenciar_anfitriao">Gerenciar anfitrião</string>
+    <string name="O_app_ser_fechado_para_aplicar_as_altera_es">O app será fechado para aplicar as alterações</string>
+    <string name="Conta_desconectada_com_sucesso">Conta desconectada com sucesso</string>
 
 </resources>

@@ -2,7 +2,6 @@ package dev.gmarques.compras.ui.profile
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
@@ -14,19 +13,19 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
-import dev.gmarques.compras.data.model.SyncRequest
+import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityProfileBinding
-import dev.gmarques.compras.databinding.ItemSyncRequestBinding
+import dev.gmarques.compras.databinding.ItemGuestOrHostBinding
+import dev.gmarques.compras.databinding.ItemSyncInviteBinding
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.profile.ProfileActivityViewModel.ProfileActivityState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 class ProfileActivity : AppCompatActivity() {
 
-    private var currentState: ProfileActivityState = ProfileActivityState()
+    private var state: ProfileActivityViewModel.ProfileActivityState? = null
     private lateinit var binding: ActivityProfileBinding
     private lateinit var viewModel: ProfileActivityViewModel
 
@@ -47,47 +46,114 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun observeStateUpdates() {
+
         viewModel.uiStateLd.observe(this) { newState ->
-            updateRequests(newState.requests)
-            Log.d("USUK", "ProfileActivity.observeStateUpdates: requests ${currentState.requests}")
-            currentState = newState
+
+            loadInvitesViews(newState.requests)
+            loadGuestsViews(newState.guests)
+            loadHostView(newState.host)
+
+            this.state = newState
         }
     }
 
-    private fun updateRequests(requests: List<SyncRequest>?) = binding.apply {
+    /**Carrega as views de solicitações de sincronismo*/
+    private fun loadInvitesViews(
+        accountsInfo: List<SyncAccount>?,
+    ) {
 
-        llSyncRequests.removeAllViews()
-        llParentSyncRequest.visibility = if (requests.isNullOrEmpty()) GONE else VISIBLE
 
-        requests?.forEach { req ->
-            val item = ItemSyncRequestBinding.inflate(layoutInflater)
+        binding.llSyncInvites.removeAllViews()
+        binding.llParentSyncInvites.visibility = if (accountsInfo.isNullOrEmpty()) GONE else VISIBLE
+
+        accountsInfo?.forEach { req ->
+            val item = ItemSyncInviteBinding.inflate(layoutInflater)
 
             item.tvName.text = req.name
             item.tvEmail.text = req.email
 
-            Glide.with(root.context)
-                .load(req.photoUrl)
-                .circleCrop()
-                .placeholder(R.drawable.vec_invite_user)
-                .into(item.ivProfilePicture)
+            Glide.with(binding.root.context).load(req.photoUrl).circleCrop()
+                .placeholder(R.drawable.vec_invite_user).into(item.ivProfilePicture)
 
             item.root.setOnClickListener {
-                showViewSyncRequestDialog(req)
+                Vibrator.interaction()
+                showViewSyncInviteDialog(req)
             }
-            llSyncRequests.addView(item.root)
 
+            binding.llSyncInvites.addView(item.root)
         }
 
     }
 
-    private fun showViewSyncRequestDialog(req: SyncRequest) {
-        BsdManageSyncRequest(req, this, lifecycleScope).show()
+    /**Carrega as views de guests*/
+    private fun loadGuestsViews(
+        guests: List<SyncAccount>?,
+    ) {
 
+        binding.llGuests.removeAllViews()
+        binding.llParentGuests.visibility = if (guests.isNullOrEmpty()) GONE else VISIBLE
+
+        guests?.forEach { guest ->
+            val item = ItemGuestOrHostBinding.inflate(layoutInflater)
+
+            item.tvName.text = guest.name
+
+            Glide.with(binding.root.context).load(guest.photoUrl).circleCrop()
+                .placeholder(R.drawable.vec_invite_user).into(item.ivProfilePicture)
+
+            item.root.setOnClickListener {
+                Vibrator.interaction()
+                showDisconnectGuestDialog(guest)
+            }
+
+            binding.llGuests.addView(item.root)
+        }
+
+    }
+
+
+    /**Carrega a view do anfitriao*/
+    private fun loadHostView(
+        host: List<SyncAccount>?,
+    ) {
+
+        binding.llHost.removeAllViews()
+        binding.llParentHost.visibility = if (host.isNullOrEmpty()) GONE else VISIBLE
+
+        host?.forEach { req ->
+            val item = ItemGuestOrHostBinding.inflate(layoutInflater)
+
+            item.tvName.text = req.name
+
+            Glide.with(binding.root.context).load(req.photoUrl).circleCrop()
+                .placeholder(R.drawable.vec_invite_user).into(item.ivProfilePicture)
+
+            item.root.setOnClickListener {
+                Vibrator.interaction()
+                showDisconnectFromHostDialog(req)
+            }
+
+            binding.llHost.addView(item.root)
+        }
+
+    }
+
+    private fun showViewSyncInviteDialog(req: SyncAccount) {
+        BsdManageSyncInvite(req, this, lifecycleScope).show()
+    }
+
+    private fun showDisconnectGuestDialog(guest: SyncAccount) {
+        BsdDisconnectAccount(guest, this, lifecycleScope, false).show()
+    }
+
+    private fun showDisconnectFromHostDialog(host: SyncAccount) {
+        BsdDisconnectAccount(host, this, lifecycleScope, true).show()
     }
 
     private fun setupLogOff() {
 
         binding.tvLogOff.setOnClickListener {
+            Vibrator.interaction()
             showDialog(
                 getString(R.string.Por_favor_confirme),
                 getString(R.string.Voce_sera_desconectado_a_e_todos_os_dados_locais_ser_o_removidos_deseja_mesmo_continuar),
@@ -121,20 +187,27 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun showDialog(title: String, msg: String, confirm: String, callback: () -> Any) {
-        AlertDialog.Builder(this@ProfileActivity)
-            .setTitle(title)
-            .setMessage(msg)
+        AlertDialog.Builder(this@ProfileActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(confirm) { dialog, _ ->
                 dialog.dismiss()
                 callback()
-            }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
-                dialog.dismiss()
             }.show()
     }
 
     private fun setupRequestPermission() {
         binding.tvRequestPermission.setOnClickListener {
-            BsdSendSyncRequest(this, lifecycleScope).show()
+
+            if (state!!.guests!!.isEmpty()) {
+                Vibrator.interaction()
+                BsdSendSyncInvite(this, lifecycleScope).show()
+            } else {
+                Vibrator.error()
+                showDialog(
+                    getString(R.string.Erro),
+                    getString(R.string.Voce_nao_pode_conectar_sua_conta_a_outra_enquanto),
+                    getString(R.string.Entendi)
+                ) {}
+            }
         }
 
     }
@@ -145,7 +218,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun setupToolbar() = binding.toolbar.apply {
 
         tvActivityTitle.text = getString(R.string.Perfil)
-        ivGoBack.setOnClickListener { finish() }
+        ivGoBack.setOnClickListener { Vibrator.interaction(); finish() }
         ivMenu.visibility = GONE
 
     }
@@ -156,9 +229,7 @@ class ProfileActivity : AppCompatActivity() {
         binding.tvUserName.text = user.displayName
 
         user.photoUrl?.let { photoUrl ->
-            Glide.with(binding.root.context)
-                .load(photoUrl)
-                .circleCrop()
+            Glide.with(binding.root.context).load(photoUrl).circleCrop()
                 .into(binding.ivProfilePicture)
         }
     }

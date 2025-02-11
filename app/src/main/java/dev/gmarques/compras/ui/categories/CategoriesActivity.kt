@@ -63,7 +63,7 @@ class CategoriesActivity : AppCompatActivity(), CategoryAdapter.Callback {
     private fun setupToolbar() = binding.toolbar.apply {
         tvActivityTitle.text =
             if (selectionMode) getString(R.string.Selecionar_categoria) else getString(R.string.Gerenciar_categorias)
-        ivGoBack.setOnClickListener { finish() }
+        ivGoBack.setOnClickListener { Vibrator.interaction();finish() }
         ivMenu.visibility = GONE
     }
 

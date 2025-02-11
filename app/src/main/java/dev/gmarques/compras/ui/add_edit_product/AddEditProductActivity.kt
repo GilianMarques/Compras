@@ -408,7 +408,7 @@ class AddEditProductActivity : AppCompatActivity() {
      */
     private fun setupToolbar() = binding.toolbar.apply {
         tvActivityTitle.text = getString(R.string.Adicionar_produto)
-        ivGoBack.setOnClickListener { finish() }
+        ivGoBack.setOnClickListener {Vibrator.interaction(); finish() }
         ivMenu.visibility = GONE
     }
 

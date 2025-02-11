@@ -11,22 +11,20 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.repository.UserRepository
-import dev.gmarques.compras.databinding.BsdSendSyncRequestBinding
+import dev.gmarques.compras.databinding.BsdSendSyncInviteBinding
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class BsdSendSyncRequest(
+class BsdSendSyncInvite(
     private val targetActivity: Activity,
     private val lifecycleScope: LifecycleCoroutineScope,
 ) {
 
-    private var binding = BsdSendSyncRequestBinding.inflate(targetActivity.layoutInflater)
+    private var binding = BsdSendSyncInviteBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
-
-
 
     init {
         dialog.setContentView(binding.root)
@@ -38,8 +36,6 @@ class BsdSendSyncRequest(
         }
 
     }
-
-
 
     private fun validateInput(email: String) = lifecycleScope.launch(Dispatchers.IO) {
 
@@ -68,7 +64,7 @@ class BsdSendSyncRequest(
 
     private fun sendRequest(email: String) = lifecycleScope.launch {
 
-        val success = UserRepository.sendSyncRequest(email)
+        val success = UserRepository.sendSyncInvite(email)
         if (success) Vibrator.success() else Vibrator.error()
 
         val title =
@@ -78,7 +74,7 @@ class BsdSendSyncRequest(
             )
         val msg =
             targetActivity.getString(
-                if (success) R.string.Reinicie_o_app_ap_s_a_solicita_o_ser_aceita
+                if (success) R.string.Convite_enviado_com_sucesso
                 else R.string.Houve_um_erro_ao_enviar_a_solicitacao
             )
 
@@ -88,8 +84,8 @@ class BsdSendSyncRequest(
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
                 binding.root.postDelayed({
-                    this@BsdSendSyncRequest.dialog.dismiss()
-                }, 500) // 500ms delay
+                    this@BsdSendSyncInvite.dialog.dismiss()
+                }, 250) // 250ms delay
             }
             .show()
 

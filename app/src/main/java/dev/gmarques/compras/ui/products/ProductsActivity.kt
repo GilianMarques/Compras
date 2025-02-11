@@ -28,7 +28,6 @@ import dev.gmarques.compras.databinding.ActivityProductsBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.observeOnce
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
@@ -43,7 +42,7 @@ import kotlin.math.min
 
 class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
 
-    private lateinit var state: ProductsActivityViewModel.UiState
+    private lateinit var uiState: ProductsActivityViewModel.UiState
     private lateinit var viewModel: ProductsActivityViewModel
     private lateinit var binding: ActivityProductsBinding
     private lateinit var rvAdapterProducts: ProductAdapter
@@ -136,10 +135,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
                 }
             }
 
-            this.state = newState
+            this.uiState = newState
         }
     }
-
 
     private fun initSearch() {
 
@@ -171,7 +169,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     }
 
     private fun initToolbar() {
-        binding.toolbar.ivGoBack.setOnClickListener { this.onBackPressedDispatcher.onBackPressed() }
+        binding.toolbar.ivGoBack.setOnClickListener { Vibrator.interaction(); this.onBackPressedDispatcher.onBackPressed() }
 
         binding.toolbar.ivMenu.setOnClickListener {
             showMenuDialog()
@@ -227,14 +225,14 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     private fun startActivityAddProduct() {
 
         Vibrator.interaction()
-        val intent = AddEditProductActivity.newIntentAddProduct(this@ProductsActivity, state.shopList.id)
+        val intent = AddEditProductActivity.newIntentAddProduct(this@ProductsActivity, uiState.shopList.id)
         startActivity(intent)
 
     }
 
     private fun startActivitySuggestProduct() {
         Vibrator.interaction()
-        val intent = SuggestProductsActivity.newIntent(this@ProductsActivity, state.shopList.id)
+        val intent = SuggestProductsActivity.newIntent(this@ProductsActivity, uiState.shopList.id)
         startActivity(intent)
 
     }
@@ -242,14 +240,14 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     private fun startActivityEditProduct(product: Product) {
 
         Vibrator.interaction()
-        val intent = AddEditProductActivity.newIntentEditProduct(this@ProductsActivity, state.shopList.id, product.id)
+        val intent = AddEditProductActivity.newIntentEditProduct(this@ProductsActivity, uiState.shopList.id, product.id)
         startActivity(intent)
     }
 
     private fun showMenuDialog() {
         Vibrator.interaction()
 
-        BsdShopListMenu.Builder(this, state.shopList)
+        BsdShopListMenu.Builder(this, uiState.shopList)
             .setRenameListener { showRenameDialog() }
             .setSortListener { showSortProductsDialog() }
             .setSuggestionListener { startActivitySuggestProduct() }
@@ -278,7 +276,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         startActivity(
             AddEditShopListActivity.newIntentEditShopList(
                 this,
-                state.shopList.id
+                uiState.shopList.id
             )
         )
     }
