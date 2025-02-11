@@ -8,9 +8,15 @@
         <item name="android:fontFamily">@font/lexend_deca_medium</item>
     </style>
 
-    <style name="Profile.Theme.Compras" parent="Base.Theme.Compras">
+    <style name="Profile.Activity" parent="Base.Theme.Compras">
         <item name="android:statusBarColor">?attr/colorPrimaryContainer</item>
         <item name="profileActivityAppBarColor">?attr/colorPrimaryContainer</item>
+    </style>
+
+
+    <style name="Login.Activity" parent="Base.Theme.Compras">
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
     </style>
 
     <style name="Theme.EditText" parent="Base.Theme.Compras">

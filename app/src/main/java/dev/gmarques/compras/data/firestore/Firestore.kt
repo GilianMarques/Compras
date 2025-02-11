@@ -38,8 +38,7 @@ class Firestore {
         private const val SYNCING_WITH = "syncing_with"
 
         suspend fun setupDatabase() {
-
-            Log.d("USUK", "Firestore.".plus("setupDatabase() host $host"))
+            Log.d("USUK", "Firestore.setupDatabase: host $host")
             if (host != "null") return
 
             val data = hostCollection.document(SYNCING_WITH).get().await()
@@ -47,6 +46,7 @@ class Firestore {
 
             this.host = host?.email ?: UserRepository.getUser()!!.email!!
             PreferencesHelper().saveValue(PreferencesHelper.PrefsKeys.HOST, this.host)
+            Log.d("USUK", "Firestore.setupDatabase: host ${this.host}")
         }
 
         val shopListCollection by lazy {

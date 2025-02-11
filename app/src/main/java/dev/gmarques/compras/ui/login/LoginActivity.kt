@@ -18,7 +18,7 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityLoginBinding
 import dev.gmarques.compras.domain.utils.InternetConnectionChecker
-import dev.gmarques.compras.ui.main.MainActivity
+import dev.gmarques.compras.ui.splash.SplashActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -141,7 +141,7 @@ class LoginActivity : AppCompatActivity() {
 
                 Handler().postDelayed({
                     startActivity(
-                        Intent(applicationContext, MainActivity::class.java).addFlags(
+                        Intent(applicationContext, SplashActivity::class.java).addFlags(
                             Intent.FLAG_ACTIVITY_NEW_TASK
                         )
                     )

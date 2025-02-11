@@ -65,6 +65,7 @@ class BsdSendSyncInvite(
     private fun sendRequest(email: String) = lifecycleScope.launch {
 
         val success = UserRepository.sendSyncInvite(email)
+
         if (success) Vibrator.success() else Vibrator.error()
 
         val title =

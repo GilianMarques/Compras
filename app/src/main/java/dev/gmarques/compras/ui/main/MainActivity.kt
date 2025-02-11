@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
@@ -18,11 +17,9 @@ import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityMainBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
-import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.ui.profile.ProfileActivity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 
@@ -41,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
 
-        checkUserAuthenticated()
+        attUiWithUserData(UserRepository.getUser()!!)
         initRecyclerView()
         initFabAddList()
         observeListsUpdates()
@@ -53,33 +50,6 @@ class MainActivity : AppCompatActivity() {
             App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
-
-    private fun checkUserAuthenticated() = lifecycleScope.launch {
-
-
-        val user = UserRepository.getUser()
-
-        if (user != null) {
-            attUiWithUserData(user)
-            setupDataBase()
-
-        } else {
-            startActivity(
-                Intent(
-                    applicationContext, LoginActivity::class.java
-                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            )
-
-            this@MainActivity.finishAffinity()
-        }
-    }
-
-    private suspend fun setupDataBase() = withContext(Dispatchers.IO) {
-
-        Firestore.setupDatabase()
-        viewModel.observeUpdates()
-    }
-
 
     private fun attUiWithUserData(user: FirebaseUser) = binding.apply {
         binding.tvUserName.text = user.displayName

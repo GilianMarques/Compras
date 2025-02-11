@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.view.View
 import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
@@ -91,7 +92,11 @@ class BsdDisconnectAccount(
                     .show()
 
 
-            } else showErrorMsg(targetActivity.getString(R.string.Nao_foi_possivel_desconectar_o_anfitriao_por_favor_tente_novamente))
+            } else {
+                showErrorMsg(targetActivity.getString(R.string.Nao_foi_possivel_desconectar_o_anfitriao_por_favor_tente_novamente))
+                binding.pbAccept.visibility + INVISIBLE
+                binding.fabDisconnect.isEnabled = true
+            }
         }
     }
 

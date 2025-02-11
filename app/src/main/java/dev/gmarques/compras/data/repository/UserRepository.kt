@@ -43,7 +43,9 @@ object UserRepository {
      * @return true se o usuario existe no banco de dados, senao, false
      */
     suspend fun checkIfUserExists(targetEmail: String): Boolean {
-        return !Firestore.findTargetAccountCollection(targetEmail).limit(1).get().await().isEmpty
+        return Firestore.findTargetAccountCollection(targetEmail)
+            .document("metadata").get().await()
+            .exists()
     }
 
     /**
@@ -120,11 +122,13 @@ object UserRepository {
         if (!checkIfUserExists(email)) throw IllegalStateException("O usuario alvo nao existe, é necessario verificar isso quando o usuario (local) insere o email (do alvo) na interface")
 
         try {
+            Log.d("USUK", "UserRepository.".plus("sendSyncInvite() email = $email 0 "))
             val myUser = getUser()!!
 
             // salvo os dados do convidado na seçao de convidados do local, isso permite o convidado modificar o banco de dados do usuario local
             Firestore.guestsCollection.document(email).set(SyncAccount("", email, "", false))
                 .await()
+            Log.d("USUK", "UserRepository.".plus("sendSyncInvite() email = $email 1 "))
 
             Firestore.findGuestSyncInvitesCollection(email).document(myUser.email!!)
                 .set(

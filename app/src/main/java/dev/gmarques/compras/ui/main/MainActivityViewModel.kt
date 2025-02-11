@@ -11,7 +11,12 @@ import dev.gmarques.compras.domain.utils.ListenerRegister
 
 class MainActivityViewModel : ViewModel() {
 
-    fun observeUpdates() {
+
+    init {
+        observeShoplists()
+    }
+
+    private fun observeShoplists() {
 
         listenerRegister = ShopListRepository.observeShopListsUpdates { lists, error ->
             if (error == null) {
