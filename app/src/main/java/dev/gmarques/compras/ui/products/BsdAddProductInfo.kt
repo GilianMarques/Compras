@@ -30,6 +30,7 @@ class BsdAddProductInfo(
 
     private var binding = BsdAddProductInfoBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
+    private var canSave = false
 
     init {
         dialog.setContentView(binding.root)
@@ -62,17 +63,32 @@ class BsdAddProductInfo(
         errorView.text = errorMessage
         errorView.visibility = VISIBLE
         Vibrator.error()
+        targetView.clearFocus()
+        targetView.postDelayed({ targetView.requestFocus() }, 2000)
     }
 
     private fun resetFocus(edtTarget: AppCompatEditText, tvTarget: TextView) {
-        edtTarget.setBackgroundResource(R.drawable.back_addproduct_edittext)
+        edtTarget.setBackgroundResource(R.drawable.back_edit_text)
         tvTarget.visibility = GONE
     }
 
     private fun setupListeners() = binding.apply {
 
         fabConfirm.setOnClickListener {
-            dialog.dismiss()
+            if (edtInfo.text.isNullOrEmpty()) showError(
+                edtInfo, tvInfoError, targetActivity.getString(R.string.Nao_poss_vel_salvar_com_o_campo_vazio)
+            )
+            else {
+
+                val result = Product.Validator.validateInfo(binding.edtInfo.text.toString(), targetActivity)
+                if (result.isSuccess) {
+                    canSave = true
+                    dialog.dismiss()
+                } else showError(
+                    edtInfo, tvInfoError, targetActivity.getString(R.string.Conteudo_inv_lido_tente_novamente)
+                )
+
+            }
         }
 
     }
@@ -84,12 +100,11 @@ class BsdAddProductInfo(
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    override fun onDismiss(dialog: DialogInterface?) {
-        val term = binding.edtInfo.text.toString()
-        val result = Product.Validator.validateInfo(term, targetActivity)
-
-        if (result.isSuccess) callback(result.getOrThrow())
-        else callback("")
+    override fun onDismiss(p0: DialogInterface?) {
+        if (canSave) {
+            val result = Product.Validator.validateInfo(binding.edtInfo.text.toString(), targetActivity)
+            callback(result.getOrThrow())
+        } else callback("")
     }
 
 

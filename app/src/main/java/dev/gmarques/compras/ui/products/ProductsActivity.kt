@@ -50,8 +50,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     private lateinit var rvAdapterProducts: ProductAdapter
     private lateinit var rvAdapterCategories: CategoryAdapter
     private var fabHidden: Boolean = false
-    private var lastAdapterPosition =
-        0 // ajuda a escrolar o rv de categorias pra categoria selecionada
+    private var lastAdapterPosition =   0 // ajuda a escrolar o rv de categorias pra categoria selecionada
 
     companion object {
         private const val LIST_ID = "list_id"
