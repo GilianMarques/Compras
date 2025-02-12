@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
 import android.text.Spanned
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -30,7 +31,6 @@ import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
@@ -112,13 +112,15 @@ class AddEditProductActivity : AppCompatActivity() {
 
     private fun setupActivityResultLauncher() {
 
-        categoryResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val selectedCategory = result.data!!.getSerializableExtra(SELECTED_CATEGORY) as Category
-                viewModel.validatedCategory = selectedCategory
-                binding.edtCategory.clearFocus()
+        categoryResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val selectedCategory =
+                        result.data!!.getSerializableExtra(SELECTED_CATEGORY) as Category
+                    viewModel.validatedCategory = selectedCategory
+                    binding.edtCategory.clearFocus()
+                }
             }
-        }
     }
 
     private fun observeViewmodelErrorMessages() {
@@ -167,7 +169,8 @@ class AddEditProductActivity : AppCompatActivity() {
         binding.llSuggestion.removeAllViews()
 
         val layoutParams =
-            LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { marginStart = 4.dp(); marginEnd = 4.dp() }
+            LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+                .apply { marginStart = 4.dp(); marginEnd = 4.dp() }
 
         suggestions.forEach { suggestion ->
             val chip = Chip(this@AddEditProductActivity)
@@ -176,11 +179,15 @@ class AddEditProductActivity : AppCompatActivity() {
 
             if (suggestion is Product) {
                 chip.text = suggestion.name
-                chip.chipIcon = AppCompatResources.getDrawable(this@AddEditProductActivity, R.drawable.vec_product)
+                chip.chipIcon = AppCompatResources.getDrawable(
+                    this@AddEditProductActivity,
+                    R.drawable.vec_product
+                )
             } else {
                 val nameSuggestion = suggestion as String
                 chip.text = nameSuggestion
-                chip.chipIcon = AppCompatResources.getDrawable(this@AddEditProductActivity, R.drawable.vec_name)
+                chip.chipIcon =
+                    AppCompatResources.getDrawable(this@AddEditProductActivity, R.drawable.vec_name)
             }
 
             chip.setOnClickListener {
@@ -218,35 +225,37 @@ class AddEditProductActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateViewModelAndUiWithEditableProduct(product: Product, category: Category) = binding.apply {
-        viewModel.apply {
+    private fun updateViewModelAndUiWithEditableProduct(product: Product, category: Category) =
+        binding.apply {
+            viewModel.apply {
 
-            viewModel.canLoadSuggestion = false
-            edtName.setText(product.name)
-            viewModel.canLoadSuggestion = true
-            validatedName = product.name
+                viewModel.canLoadSuggestion = false
+                edtName.setText(product.name)
+                viewModel.canLoadSuggestion = true
+                validatedName = product.name
 
-            edtInfo.setText(product.info)
-            validatedInfo = product.info
+                edtInfo.setText(product.info)
+                validatedInfo = product.info
 
-            edtPrice.setText(product.price.toCurrency())
-            validatedPrice = product.price
+                edtPrice.setText(product.price.toCurrency())
+                validatedPrice = product.price
 
-            edtQuantity.setText(String.format(getString(R.string.un), product.quantity))
-            validatedQuantity = product.quantity
+                edtQuantity.setText(String.format(getString(R.string.un), product.quantity))
+                validatedQuantity = product.quantity
 
-            edtCategory.hint = category.name
-            (edtCategory.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(category.color)
+                edtCategory.hint = category.name
+                (edtCategory.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(category.color)
 
-            validatedCategory = category
+                validatedCategory = category
 
-            if (editingProduct) {
-                cbSuggestProduct.visibility = GONE
-                toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), product.name)
-                fabSave.text = getString(R.string.Salvar_produto)
+                if (editingProduct) {
+                    cbSuggestProduct.visibility = GONE
+                    toolbar.tvActivityTitle.text =
+                        String.format(getString(R.string.Editar_x), product.name)
+                    fabSave.text = getString(R.string.Salvar_produto)
+                }
             }
         }
-    }
 
     /**
      * Configura o botão de salvar produto (FAB).
@@ -330,7 +339,13 @@ class AddEditProductActivity : AppCompatActivity() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
+                Log.d(
+                    "USUK",
+                    "AddEditProductActivity.setupInputPrice: antes ${edtTarget.text.toString()}"
+                )
                 val term = edtTarget.text.toString().ifBlank { "-1" }.currencyToDouble()
+                Log.d("USUK", "AddEditProductActivity.setupInputPrice: depois ${term}")
+
                 val result = Product.Validator.validatePrice(term, App.getContext())
 
                 if (result.isSuccess) {
@@ -358,7 +373,12 @@ class AddEditProductActivity : AppCompatActivity() {
 
                 if (result.isSuccess) {
                     viewModel.validatedQuantity = result.getOrThrow()
-                    edtTarget.setText(String.format(getString(R.string.un), viewModel.validatedQuantity))
+                    edtTarget.setText(
+                        String.format(
+                            getString(R.string.un),
+                            viewModel.validatedQuantity
+                        )
+                    )
                 } else {
                     viewModel.validatedQuantity = -1
                     showError(edtTarget, tvTarget, result.exceptionOrNull()!!.message!!)
@@ -376,7 +396,12 @@ class AddEditProductActivity : AppCompatActivity() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 resetFocus(edtTarget, tvTarget)
-                categoryResultLauncher.launch(CategoriesActivity.newIntent(this@AddEditProductActivity, true))
+                categoryResultLauncher.launch(
+                    CategoriesActivity.newIntent(
+                        this@AddEditProductActivity,
+                        true
+                    )
+                )
 
             } else {
 
@@ -408,7 +433,7 @@ class AddEditProductActivity : AppCompatActivity() {
      */
     private fun setupToolbar() = binding.toolbar.apply {
         tvActivityTitle.text = getString(R.string.Adicionar_produto)
-        ivGoBack.setOnClickListener {Vibrator.interaction(); finish() }
+        ivGoBack.setOnClickListener { Vibrator.interaction(); finish() }
         ivMenu.visibility = GONE
     }
 

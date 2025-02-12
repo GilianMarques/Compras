@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
-    private val rvAdapter = ShopListAdapter(isDarkThemeEnabled(), ::rvItemClick)
+    private val rvAdapter = ShopListAdapter(isDarkThemeEnabled(), ::rvItemClick, ::rvLongItemClick)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,10 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         user.photoUrl?.let { photoUrl ->
-            Glide.with(root.context)
-                .load(photoUrl)
-                .circleCrop()
-                .into(ivProfilePicture)
+            Glide.with(root.context).load(photoUrl).circleCrop().into(ivProfilePicture)
         } ?: run {
             // Esconde a imagem se não houver foto
             ivProfilePicture.visibility = View.GONE
@@ -73,9 +70,12 @@ class MainActivity : AppCompatActivity() {
             tvGreetings.visibility = View.GONE
         }
 
-        ivMenu.setOnClickListener {
-            startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
+        listOf(ivMenu, tvUserName, ivProfilePicture).forEach { view ->
+            view.setOnClickListener {
+                startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
+            }
         }
+
     }
 
     private fun initRecyclerView() {
@@ -98,6 +98,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun rvItemClick(shopList: ShopList) {
         startActivityProducts(shopList, false)
+    }
+
+    private fun rvLongItemClick(shopList: ShopList) {
+        startActivity(
+            AddEditShopListActivity.newIntentEditShopList(
+                this, shopList.id
+            )
+        )
     }
 
     private fun startActivityProducts(shopList: ShopList, suggestProducts: Boolean) {

@@ -75,21 +75,6 @@
                 app:layout_constraintTop_toTopOf="@id/cb_bought">
 
                 <TextView
-                    android:id="@+id/tv_category_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/back_round"
-                    android:ellipsize="marquee"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:paddingStart="8dp"
-                    android:paddingTop="2dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="2dp"
-                    android:textSize="12sp"
-                    tools:text="Massas" />
-
-                <TextView
                     android:id="@+id/tv_product_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -106,6 +91,21 @@
                     android:paddingBottom="2dp"
                     android:textSize="12sp"
                     tools:text="Espageti apollo, 500gr" />
+
+                <TextView
+                    android:id="@+id/tv_category_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/back_round"
+                    android:ellipsize="marquee"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="12sp"
+                    tools:text="Massas" />
 
             </LinearLayout>
 

@@ -207,9 +207,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-
-
-           <View
+            <View
                 android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -217,8 +215,6 @@
                 android:layout_marginBottom="8dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintBottom_toTopOf="@id/edt_input" />
-
-
 
             <TextView
                 android:layout_width="wrap_content"
@@ -249,7 +245,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-
             <TextView
                 android:id="@+id/tv_remove_account"
                 style="@style/Margins_edittext"
@@ -268,6 +263,30 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cb_production_database"
+                style="@style/Margins_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/back_textview_menu"
+                android:button="@null"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/Usar_banco_de_dados_de_producao"
+                android:textColor="?attr/colorPrimaryVariant"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/vec_check"
+                app:drawableTint="?attr/colorPrimaryVariant"
+                app:layout_constraintBottom_toTopOf="@id/tv_sort_products"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:visibility="visible" />
+
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

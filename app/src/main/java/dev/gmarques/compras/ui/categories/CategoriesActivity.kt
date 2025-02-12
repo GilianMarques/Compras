@@ -17,7 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.databinding.ActivityCategoriesBinding
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
+
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
@@ -152,7 +152,7 @@ class CategoriesActivity : AppCompatActivity(), CategoryAdapter.Callback {
     }
 
     override fun rvCategoriesOnRemove(category: Category) {
-        val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x), category.name).formatHtml()
+        val msg = String.format(getString(R.string.Deseja_mesmo_remover_x), category.name)
 
         val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
             .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->

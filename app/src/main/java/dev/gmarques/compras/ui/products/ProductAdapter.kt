@@ -21,7 +21,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import java.util.Collections
 
-class ProductAdapter(val darkModeEnabled: Boolean, val callback: Callback) :
+class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callback) :
     ListAdapter<ProductWithCategory, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
 
     private var itemTouchHelper: ItemTouchHelper? = null
@@ -34,7 +34,7 @@ class ProductAdapter(val darkModeEnabled: Boolean, val callback: Callback) :
             LayoutInflater.from(parent.context), R.layout.rv_item_product, parent, false
         )
 
-        return ProductViewHolder(binding, callback, dragnDropEnabled, itemTouchHelper!!)
+        return ProductViewHolder(binding, callback,  itemTouchHelper!!)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
@@ -82,14 +82,9 @@ class ProductAdapter(val darkModeEnabled: Boolean, val callback: Callback) :
         super.submitList(list)
     }
 
-    fun toggleDragnDropState(dragnDropEnabled: Boolean) {
-        this.dragnDropEnabled = dragnDropEnabled
-    }
-
     class ProductViewHolder(
         private val binding: RvItemProductBinding,
         val callback: Callback,
-        private val dragnDropEnabled: Boolean,
         private val itemTouchHelper: ItemTouchHelper,
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -104,13 +99,8 @@ class ProductAdapter(val darkModeEnabled: Boolean, val callback: Callback) :
                 tvProductPrice.text = product.price.toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
                 cbBought.isChecked = product.hasBeenBought
-               /* if (!darkModeEnabled) (tvCategoryName.background.mutate() as GradientDrawable).setStroke(
-                    (1.dp() * 1.5).toInt(),
-                    productWithCategory.category.color
-                )*/
                 tvCategoryName.text = productWithCategory.category.name
-                ivHandle.visibility = if (dragnDropEnabled) VISIBLE else GONE
-                tvProductInfo.visibility = if (product.info.isNotEmpty()) VISIBLE else INVISIBLE
+                tvProductInfo.visibility = if (product.info.isNotEmpty()) VISIBLE else GONE
             }
 
             setListeners(binding, product)

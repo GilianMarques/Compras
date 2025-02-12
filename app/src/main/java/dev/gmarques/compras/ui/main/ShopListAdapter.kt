@@ -14,9 +14,13 @@ import dev.gmarques.compras.databinding.RvItemShopListBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.adjustSaturation
 import kotlin.math.min
 
-class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (ShopList) -> Any) :
+class ShopListAdapter(
+    val darkModeEnable: Boolean,
+    private val onItemClick: (ShopList) -> Any,
+    private val onLongItemClick: (ShopList) -> Any,
+) :
     ListAdapter<ShopList, ShopListAdapter.ListViewHolder>(ShopListDiffCallback()) {
-    var x = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
 
         val binding = DataBindingUtil.inflate<RvItemShopListBinding>(
@@ -31,7 +35,8 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
         holder.bind(getItem(position))
     }
 
-    inner class ListViewHolder(private val binding: RvItemShopListBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ListViewHolder(private val binding: RvItemShopListBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(shopList: ShopList) = binding.apply {
 
@@ -39,6 +44,7 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
             tvListName.text = shopList.name
 
             cvChild.setOnClickListener { onItemClick(shopList) }
+            cvChild.setOnLongClickListener { onLongItemClick(shopList); return@setOnLongClickListener true }
 
             val saturatedColor = shopList.color.adjustSaturation(1.5f)
             ivListIcon.background?.mutate()?.apply {
@@ -55,11 +61,11 @@ class ShopListAdapter(val darkModeEnable: Boolean, private val onItemClick: (Sho
         private fun animate() {
             itemView.clearAnimation()
             itemView.alpha = 0f
-            itemView.animate().alpha(1f).setDuration(450).setStartDelay(min(50L * adapterPosition, 500)).start()
+            itemView.animate().alpha(1f).setDuration(450)
+                .setStartDelay(min(50L * adapterPosition, 500)).start()
         }
 
     }
-
 
     class ShopListDiffCallback : DiffUtil.ItemCallback<ShopList>() {
 

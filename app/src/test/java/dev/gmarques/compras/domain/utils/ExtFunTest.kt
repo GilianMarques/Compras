@@ -23,7 +23,8 @@ class ExtFunTest {
             ".$1,23456 " to 1.23,
             ".$1,23456." to 123456.0,
             "R$1.234,56" to 1234.56,
-            "R1234.56" to 1234.56
+            "R1234.56" to 1234.56,
+            "R$ 39.60" to 39.6
         )
 
         testCases.forEach { (input, expected) ->

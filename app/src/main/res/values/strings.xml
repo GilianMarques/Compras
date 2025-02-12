@@ -150,5 +150,7 @@
     <string name="Gerenciar_anfitriao">Gerenciar anfitrião</string>
     <string name="O_app_ser_fechado_para_aplicar_as_altera_es">O app será fechado para aplicar as alterações</string>
     <string name="Conta_desconectada_com_sucesso">Conta desconectada com sucesso</string>
+    <string name="Informacoes_adicionais">Informações adicionais</string>
+    <string name="Inclua_detalhes_do_item_como_marca_ou_peso">Inclua detalhes do item como marca ou peso.</string>
 
 </resources>

@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import dev.gmarques.compras.BuildConfig
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.model.SyncAccount
@@ -42,6 +43,25 @@ class ProfileActivity : AppCompatActivity() {
         setupRequestPermission()
         setupLogOff()
         observeStateUpdates()
+        setupDebugOptions()
+
+    }
+
+    private fun setupDebugOptions() = binding.apply {
+        if (BuildConfig.DEBUG) {
+            cbProductionDatabase.visibility = VISIBLE
+
+            cbProductionDatabase.isChecked =
+                PreferencesHelper().getValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, false)
+
+            cbProductionDatabase.setOnCheckedChangeListener { _, checked ->
+                PreferencesHelper().saveValue(
+                    PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE,
+                    checked
+                )
+                exitProcess(0)
+            }
+        }
 
     }
 

@@ -20,7 +20,7 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivitySuggestProductsBinding
 import dev.gmarques.compras.domain.model.SelectableProduct
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
+
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
@@ -131,9 +131,9 @@ class SuggestProductsActivity : AppCompatActivity() {
     }
 
     private fun adapterOnRemoveListener(product: Product) {
-        val msg: Spanned =
+        val msg =
             String.format(getString(R.string.Deseja_mesmo_remover_x_das_sugestoes), product.name)
-                .formatHtml()
+
 
         val dialogBuilder =
             AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
