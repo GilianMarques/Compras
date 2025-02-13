@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AnticipateInterpolator
@@ -90,7 +91,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     private fun observeStateChanges() {
         viewModel.uiStateLD.observe(this) { newState ->
-
+            Log.d("USUK", "ProductsActivity.".plus("observeStateChanges() newState = $newState"))
             binding.toolbar.tvActivityTitle.text = newState.shopList.name
 
             rvAdapterCategories.submitList(newState.listCategories)

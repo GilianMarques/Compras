@@ -1,5 +1,6 @@
 package dev.gmarques.compras.ui.products
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,6 +24,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,26 +41,29 @@ class ProductsActivityViewModel : ViewModel() {
 
     private var searchTerm: String = ""
 
-    private lateinit var productsToBePosted: List<ProductWithCategory>
-    private lateinit var pricesToBePosted: Pair<Double, Double>
     private lateinit var uiState: UiState
+
+    private var init = false // pra saber se o vm foi inicializado
+
+    private var throttlingJob: Job? = null
 
     private var productsDatabaseListener: ListenerRegister? = null
     private var shopListDatabaseListener: ListenerRegister? = null
     private var categoriesDatabaseListener: ListenerRegister? = null
 
-    private var throttlingScope: CoroutineScope? = null // todo pq?
-
     private val _uiStateLD = MutableLiveData<UiState>()
     val uiStateLD: LiveData<UiState> get() = _uiStateLD
 
     fun init(shopListId: String) {
+
+        if (init) return
+        else init = true
+
         uiState = UiState()
 
 
         // lista temporaria pra permitir o carregamento imediato dos produtos, esta sera substituida apos o carrregamento do banco de dados
         uiState.shopList = ShopList(shopListId)
-        _uiStateLD.postValue(uiState)
         viewModelScope.launch(IO) {
             loadSortPreferences()
             observeCategoriesUpdates()
@@ -70,7 +75,7 @@ class ProductsActivityViewModel : ViewModel() {
         productsDatabaseListener?.remove()
         shopListDatabaseListener?.remove()
         categoriesDatabaseListener?.remove()
-        throttlingScope?.cancel()
+        throttlingJob?.cancel()
 
         super.onCleared()
     }
@@ -85,25 +90,28 @@ class ProductsActivityViewModel : ViewModel() {
     private fun observeCategoriesUpdates() {
         if (categoriesDatabaseListener != null) return
 
-        categoriesDatabaseListener = CategoryRepository.observeCategoryUpdates { dbCategories, exception ->
+        categoriesDatabaseListener =
+            CategoryRepository.observeCategoryUpdates { dbCategories, exception ->
 
-            if (exception != null) throw exception
-            if (dbCategories != null) {
-                categories = dbCategories.associateBy { it.id }.toMap(HashMap())
-                filterCategoriesWithProductsDataAndDispatchToUi(uiState.products.map { it.product })
+                if (exception != null) throw exception
+                if (dbCategories != null) {
+                    categories = dbCategories.associateBy { it.id }.toMap(HashMap())
+                    filterCategoriesWithProductsDataAndDispatchToUi(uiState.products.map { it.product })
+                }
+                observeProductsUpdates()
+
             }
-            observeProductsUpdates()
-
-        }
     }
 
+    /**
+     * Filtra as categorias para que apenas as que existem na lista de compras (com base nos produtos da lista)
+     * sejam enviados para a UI,tambem salva na categoria dados referentes aos produtos que a usam
+     */
     private fun filterCategoriesWithProductsDataAndDispatchToUi(products: List<Product>) {
-
 
         requireNotNull(categories) { "Carregue as categorias antes de tentar filtrar os dados." }
 
         val noRepeatedCategories = HashMap<String, CategoryWithProductsStats>()
-
 
         for (i in products.indices) {
 
@@ -111,7 +119,8 @@ class ProductsActivityViewModel : ViewModel() {
 
             val categoryOnMap = noRepeatedCategories[product.categoryId]
             val totalProductsWithMatchingCategory = (categoryOnMap?.totalProducts ?: 0) + 1
-            val totalBoughtProductsFromCategory = (categoryOnMap?.boughtProducts ?: 0) + if (product.hasBeenBought) 1 else 0
+            val totalBoughtProductsFromCategory =
+                (categoryOnMap?.boughtProducts ?: 0) + if (product.hasBeenBought) 1 else 0
 
             noRepeatedCategories[product.categoryId] = CategoryWithProductsStats(
                 categories!![product.categoryId]!!,
@@ -123,13 +132,14 @@ class ProductsActivityViewModel : ViewModel() {
         }
 
         val updatedList = noRepeatedCategories.map { it.value }.toList()
-        val sorted = updatedList.sortedWith(compareBy { it.category.name }).sortedWith(compareBy { it.category.position })
+
+        val sorted = updatedList.sortedWith(compareBy { it.category.name })
+            .sortedWith(compareBy { it.category.position })
             .sortedWith(compareBy { it.boughtProducts == it.totalProducts })
 
-        if (sorted != uiState.listCategories) {
-            uiState.listCategories = sorted
-            _uiStateLD.postValue(uiState)
-        }
+        uiState.listCategories = sorted
+
+        postDataWithThrottling()
 
     }
 
@@ -139,20 +149,25 @@ class ProductsActivityViewModel : ViewModel() {
      */
     private fun observeProductsUpdates() {
         if (productsDatabaseListener != null) return
-        productsDatabaseListener = ProductRepository.observeProductUpdates(uiState.shopList.id) { products, error ->
+        productsDatabaseListener =
+            ProductRepository.observeProductUpdates(uiState.shopList.id) { products, error ->
 
-            if (error != null) throw error
-            if (products != null) viewModelScope.launch(IO) {
+                if (error != null) throw error
+                if (products != null) viewModelScope.launch(IO) {
 
-                val filteredProductsWithCategories = filterProducts(products)
-                val sortedProductsWithPrices = sortProducts(filteredProductsWithCategories)
+                    val filteredProductsWithCategories = filterProducts(products)
+                    val sortedProductsWithPrices = sortProducts(filteredProductsWithCategories)
 
-                postDataWithThrottling(sortedProductsWithPrices)
+                    uiState.apply {
+                        this.priceBought = sortedProductsWithPrices.boughtPrice
+                        this.priceFull = sortedProductsWithPrices.fullPrice
+                        this.products = sortedProductsWithPrices.productsWithCategory
+                    }
 
-                viewModelScope.launch(IO) { filterCategoriesWithProductsDataAndDispatchToUi(products) }
+                    filterCategoriesWithProductsDataAndDispatchToUi(products)
 
+                }
             }
-        }
     }
 
     /**
@@ -211,7 +226,8 @@ class ProductsActivityViewModel : ViewModel() {
             }
 
             SortCriteria.CATEGORY -> {
-                sorted = newData.sortedWith(compareBy { it.product.name }).sortedWith(compareBy { it.category.name })
+                sorted = newData.sortedWith(compareBy { it.product.name })
+                    .sortedWith(compareBy { it.category.name })
             }
 
             SortCriteria.CREATION_DATE -> {
@@ -219,12 +235,14 @@ class ProductsActivityViewModel : ViewModel() {
             }
 
             SortCriteria.POSITION -> {
-                sorted = newData.sortedWith(compareBy { it.category.name }).sortedWith(compareBy { it.product.position })
+                sorted = newData.sortedWith(compareBy { it.category.name })
+                    .sortedWith(compareBy { it.product.position })
             }
         }
 
         sorted = if (!uiState.sortAscending) sorted.reversed() else sorted
-        sorted = sorted.sortedWith(compareBy { if (uiState.boughtProductsAtEnd) it.product.hasBeenBought else false })
+        sorted =
+            sorted.sortedWith(compareBy { if (uiState.boughtProductsAtEnd) it.product.hasBeenBought else false })
 
 
         return filteredProductsWithPrices.copy(productsWithCategory = sorted)
@@ -233,30 +251,16 @@ class ProductsActivityViewModel : ViewModel() {
     /**
      *Aplica o  throttling mais simples que consegui pensar pra evitar atualizaçoes repetidas na UI
      */
-    private fun postDataWithThrottling(sortedProductsWithPrices: ProductsWithPrices) {
+    private fun postDataWithThrottling() {
 
-        productsToBePosted = sortedProductsWithPrices.productsWithCategory
-        pricesToBePosted = sortedProductsWithPrices.fullPrice to sortedProductsWithPrices.boughtPrice
+        val delayMillis = if (throttlingJob == null) 0L else 250L
 
-
-        var delayMillis = 0L
-
-        throttlingScope?.apply { delayMillis = 250; cancel() }
-        throttlingScope = CoroutineScope(IO)
-        throttlingScope!!.launch {
-
+        throttlingJob?.cancel()
+        throttlingJob = Job()
+        viewModelScope.launch(throttlingJob!!) {
             delay(delayMillis)
-
-            uiState.apply {
-                priceBought = pricesToBePosted.second
-                priceFull = pricesToBePosted.first
-                products = productsToBePosted
-            }
-
-            _uiStateLD.postValue(uiState)
-
-            productsToBePosted = emptyList()
-            pricesToBePosted = Pair(0.0, 0.0)
+            Log.d("USUK", "ProductsActivityViewModel.".plus("postDataWithThrottling() "))
+            _uiStateLD.value = uiState
         }
 
     }
@@ -266,7 +270,9 @@ class ProductsActivityViewModel : ViewModel() {
      */
     fun updateProductAsIs(updatedProduct: Product) = viewModelScope.launch(IO) {
         ProductRepository.addOrUpdateProduct(ValidatedProduct(updatedProduct))
-        SuggestionProductRepository.updateSuggestionProduct(updatedProduct, ValidatedSuggestionProduct(updatedProduct))
+        SuggestionProductRepository.updateSuggestionProduct(
+            updatedProduct, ValidatedSuggestionProduct(updatedProduct)
+        )
     }
 
     /**
@@ -307,12 +313,17 @@ class ProductsActivityViewModel : ViewModel() {
      * Após carregar a lista chama a função para carregar as categorias
      */
     private fun loadList(shopListId: String) {
-        shopListDatabaseListener = ShopListRepository.observeShopList(shopListId) { shopList, error ->
-            if (error == null && shopList != null) {
-                uiState.shopList = shopList
-                _uiStateLD.postValue(uiState)
+        shopListDatabaseListener =
+            ShopListRepository.observeShopList(shopListId) { shopList, error ->
+                if (error == null && shopList != null) {
+                    uiState.shopList = shopList
+                    Log.d(
+                        "USUK",
+                        "ProductsActivityViewModel.".plus("loadList() shopList = $shopList, error = $error")
+                    )
+                    postDataWithThrottling()
+                }
             }
-        }
     }
 
     fun removeProduct(product: Product) {
@@ -321,10 +332,16 @@ class ProductsActivityViewModel : ViewModel() {
 
     fun loadSortPreferences() {
         val prefs = PreferencesHelper()
-        uiState.sortCriteria =
-            SortCriteria.fromValue(prefs.getValue(PrefsKeys.SORT_CRITERIA, PrefsDefaultValue.SORT_CRITERIA.value))!!
-        uiState.sortAscending = prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
-        uiState.boughtProductsAtEnd = prefs.getValue(PrefsKeys.BOUGHT_PRODUCTS_AT_END, PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END)
+        uiState.sortCriteria = SortCriteria.fromValue(
+            prefs.getValue(
+                PrefsKeys.SORT_CRITERIA, PrefsDefaultValue.SORT_CRITERIA.value
+            )
+        )!!
+        uiState.sortAscending =
+            prefs.getValue(PrefsKeys.SORT_ASCENDING, PrefsDefaultValue.SORT_ASCENDING)
+        uiState.boughtProductsAtEnd = prefs.getValue(
+            PrefsKeys.BOUGHT_PRODUCTS_AT_END, PrefsDefaultValue.BOUGHT_PRODUCTS_AT_END
+        )
     }
 
     fun filterByCategory(category: Category) {
