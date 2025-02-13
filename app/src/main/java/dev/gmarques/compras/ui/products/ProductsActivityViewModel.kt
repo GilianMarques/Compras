@@ -22,10 +22,8 @@ import dev.gmarques.compras.domain.model.CategoryWithProductsStats
 import dev.gmarques.compras.domain.model.ProductWithCategory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import dev.gmarques.compras.domain.utils.ListenerRegister
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -139,7 +137,7 @@ class ProductsActivityViewModel : ViewModel() {
 
         uiState.listCategories = sorted
 
-        postDataWithThrottling()
+        postDelayedData()
 
     }
 
@@ -171,7 +169,7 @@ class ProductsActivityViewModel : ViewModel() {
     }
 
     /**
-     * Aplica os termos de busca do ususario, caso hajam
+     * Aplica os termos de busca do usuario, caso hajam
      */
     private fun filterProducts(products: List<Product>?): ProductsWithPrices {
 
@@ -250,8 +248,9 @@ class ProductsActivityViewModel : ViewModel() {
 
     /**
      *Aplica o  throttling mais simples que consegui pensar pra evitar atualizaçoes repetidas na UI
+     * Essa funcionalidade se faz necessária principalmente por conta o drg and drop do rv de produtos.
      */
-    private fun postDataWithThrottling() {
+    private fun postDelayedData() {
 
         val delayMillis = if (throttlingJob == null) 0L else 250L
 
@@ -301,11 +300,14 @@ class ProductsActivityViewModel : ViewModel() {
         observeProductsUpdates()
     }
 
-    suspend fun removeShopList(shopList: ShopList) = withContext(IO) {
+    suspend fun tryToRemoveShopList(shopList: ShopList) = withContext(IO) {
         shopListDatabaseListener?.remove()
 
-        ProductRepository.removeAllProductsFromList(shopList.id)
-        ShopListRepository.removeShopList(shopList)
+        val productsRemoved = ProductRepository.removeAllProductsFromShopList(shopList.id)
+        if (productsRemoved) {
+            ShopListRepository.removeShopList(shopList)
+            return@withContext true
+        } else return@withContext false
     }
 
     /**
@@ -321,7 +323,7 @@ class ProductsActivityViewModel : ViewModel() {
                         "USUK",
                         "ProductsActivityViewModel.".plus("loadList() shopList = $shopList, error = $error")
                     )
-                    postDataWithThrottling()
+                    postDelayedData()
                 }
             }
     }

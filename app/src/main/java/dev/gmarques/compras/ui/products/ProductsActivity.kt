@@ -19,15 +19,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
-import dev.gmarques.compras.data.repository.ProductRepository
-import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.databinding.ActivityProductsBinding
-import dev.gmarques.compras.databinding.BsdAddProductInfoBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
@@ -51,7 +49,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     private lateinit var rvAdapterProducts: ProductAdapter
     private lateinit var rvAdapterCategories: CategoryAdapter
     private var fabHidden: Boolean = false
-    private var lastAdapterPosition =   0 // ajuda a escrolar o rv de categorias pra categoria selecionada
+
+    // ajuda a escrolar o rv de categorias pra categoria selecionada
+    private var lastAdapterPosition = 0
 
     companion object {
         private const val LIST_ID = "list_id"
@@ -307,11 +307,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
                 .setMessage(msg)
                 .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
-                    lifecycleScope.launch {
-                        viewModel.removeShopList(shopList)
-                        dialog.dismiss()
-                        finish()
-                    }
+                    tryToRemoveShopList(shopList)
+                    dialog.dismiss()
                 }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
                     dialog.dismiss()
                 }
@@ -335,6 +332,24 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
         val dialog = dialogBuilder.create()
         dialog.show()
+    }
+
+    private fun tryToRemoveShopList(shopList: ShopList) {
+        lifecycleScope.launch {
+
+            if (viewModel.tryToRemoveShopList(shopList)) {
+                Vibrator.success()
+                finish()
+            } else {
+                Vibrator.error()
+                Snackbar.make(
+                    binding.root,
+                    getString(R.string.Erro_removendo_lista_de_compras_tente_novamente),
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+
+        }
     }
 
     private fun isDarkThemeEnabled(): Boolean {
@@ -375,7 +390,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         else viewModel.updateProductBoughtState(product, isBought)
 
     }
-
 
     override fun rvCategoriesOnSelect(category: Category, adapterPosition: Int) {
         Vibrator.interaction()

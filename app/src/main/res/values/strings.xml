@@ -154,5 +154,6 @@
     <string name="Inclua_detalhes_do_item_como_marca_ou_peso">Inclua detalhes do item como marca ou peso.</string>
     <string name="Nao_poss_vel_salvar_com_o_campo_vazio">Não é possível salvar com o campo vazio</string>
     <string name="Conteudo_inv_lido_tente_novamente">Conteúdo inválido, tente novamente</string>
+    <string name="Erro_removendo_lista_de_compras_tente_novamente">Erro removendo lista de compras, tente novamente</string>
 
 </resources>
