@@ -1,48 +1,50 @@
 package dev.gmarques.compras.ui.splash
 
+import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
-import android.os.Handler
-import android.view.View
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseUser
-import dev.gmarques.compras.App
-import dev.gmarques.compras.R
 import dev.gmarques.compras.data.firestore.Firestore
-import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.data.firestore.migration.Migration_1_2
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivitySplashBinding
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.main.MainActivity
-import dev.gmarques.compras.ui.main.MainActivityViewModel
-import dev.gmarques.compras.ui.main.ShopListAdapter
-import dev.gmarques.compras.ui.products.ProductsActivity
-import dev.gmarques.compras.ui.profile.ProfileActivity
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.util.Calendar
+import kotlin.properties.Delegates
 
 
 class SplashActivity : AppCompatActivity() {
 
+    private var updateUserMetadata by Delegates.notNull<Boolean>()
     private lateinit var binding: ActivitySplashBinding
+
+    companion object {
+        private const val UPDATE_USER_METADATA = "update_user_metadata"
+
+        fun newIntentUpdateMetadata(context: Context): Intent {
+            return Intent(context, SplashActivity::class.java).apply {
+                putExtra(UPDATE_USER_METADATA, true)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        updateUserMetadata = intent.getBooleanExtra(UPDATE_USER_METADATA, false)
+
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.root.postDelayed({ checkUserAuthenticated() }, 100)
+        binding.root.postDelayed({ checkUserAuthenticated() }, 10)
 
     }
 
@@ -51,8 +53,11 @@ class SplashActivity : AppCompatActivity() {
         val user = UserRepository.getUser()
 
         if (user != null) {
-            setupDataBase()
-
+            Firestore.loadDatabasePaths()
+            if (updateUserMetadata) UserRepository.updateDatabaseMetadata()
+            checkDatabaseVersion()
+            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+            finish()
         } else {
             startActivity(
                 Intent(
@@ -64,12 +69,19 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupDataBase() = runBlocking {
-        Firestore.setupDatabase()
-        startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-        finish()
+    private suspend fun checkDatabaseVersion() = withContext(IO) {
+
+        val cloudVersion = Firestore.getCloudDatabaseVersion()
+        if (cloudVersion < 2) {
+            updateUi()
+            Migration_1_2().beginMigration()
+        }
     }
 
+    private suspend fun updateUi() = withContext(Main) {
+        binding.tvInfo.visibility = VISIBLE
+        Vibrator.interaction()
+    }
 
 }
 

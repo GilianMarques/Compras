@@ -22,6 +22,7 @@ import dev.gmarques.compras.ui.splash.SplashActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.text.MessageFormat
 
 // TODO: usa api credentials 
@@ -129,22 +130,16 @@ class LoginActivity : AppCompatActivity() {
             this
         ) { task ->
             if (task.isSuccessful) {
+
                 val user: FirebaseUser = checkNotNull(mAuth.currentUser)
                 this.binding.progressBar.visibility = View.GONE
+
                 val nome = if (user.displayName != null) user.displayName else "?"
                 this.binding.tvInfo.text = MessageFormat.format(getString(R.string.BemvindoX),
-                    nome!!.split(" ".toRegex()).dropLastWhile { it.isEmpty() }
-                        .toTypedArray()[0])
-
-                //deve rodar mesmo setivity fechar
-                CoroutineScope(Dispatchers.IO).launch { UserRepository.initUserDatabase() }
+                    nome!!.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0])
 
                 Handler().postDelayed({
-                    startActivity(
-                        Intent(applicationContext, SplashActivity::class.java).addFlags(
-                            Intent.FLAG_ACTIVITY_NEW_TASK
-                        )
-                    )
+                    startActivity(SplashActivity.newIntentUpdateMetadata(this@LoginActivity))
                     finishAffinity()
                 }, 2000)
             } else {

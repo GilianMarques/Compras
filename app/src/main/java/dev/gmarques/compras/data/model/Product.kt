@@ -7,6 +7,7 @@ import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_nimo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_ximo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_nao_pode_ficar_vazio
 import dev.gmarques.compras.R.string.Os_detalhes_devem_ter_ate_x_caracteres
+import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeSpaces
 import java.util.Locale
 import java.util.UUID
@@ -22,7 +23,11 @@ data class Product(
     val hasBeenBought: Boolean = false, // isBought estava dando problema com o firebase
     val id: String = getNewId(),
     val creationDate: Long = System.currentTimeMillis(),
-) {
+    val removed: Boolean = false,
+    val createdBy: String = UserRepository.getUser()!!.email!!,
+    val updatedBy: String? = null,
+
+    ) {
 
     @Suppress("unused")  // necessario pra uso com firebase
     constructor() : this("", "", "not_initialized", -1, 0.0, 0, "not_initialized", false)
@@ -84,18 +89,26 @@ data class Product(
 
                     input.length < MIN_CHARS_NAME -> Result.failure(
                         Exception(
-                            String.format(context.getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS_NAME)
+                            String.format(
+                                context.getString(O_nome_deve_ter_no_m_nimo_x_caracteres),
+                                MIN_CHARS_NAME
+                            )
                         )
                     )
 
                     input.length > MAX_CHARS_NAME -> Result.failure(
                         Exception(
-                            String.format(context.getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS_NAME)
+                            String.format(
+                                context.getString(O_nome_deve_ter_no_m_ximo_x_caracteres),
+                                MAX_CHARS_NAME
+                            )
                         )
                     )
 
                     else -> {
-                        Result.success(input.removeSpaces().replaceFirstChar { it.titlecase(Locale.getDefault()) })
+                        Result.success(
+                            input.removeSpaces()
+                                .replaceFirstChar { it.titlecase(Locale.getDefault()) })
                     }
                 }
             }
@@ -106,12 +119,17 @@ data class Product(
 
                     input.length > MAX_CHARS_INFO -> Result.failure(
                         Exception(
-                            String.format(context.getString(Os_detalhes_devem_ter_ate_x_caracteres), MAX_CHARS_INFO)
+                            String.format(
+                                context.getString(Os_detalhes_devem_ter_ate_x_caracteres),
+                                MAX_CHARS_INFO
+                            )
                         )
                     )
 
                     else -> {
-                        Result.success(input.removeSpaces().replaceFirstChar { it.titlecase(Locale.getDefault()) })
+                        Result.success(
+                            input.removeSpaces()
+                                .replaceFirstChar { it.titlecase(Locale.getDefault()) })
                     }
                 }
 

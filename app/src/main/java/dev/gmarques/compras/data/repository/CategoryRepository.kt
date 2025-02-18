@@ -13,7 +13,7 @@ object CategoryRepository {
 
     fun addOrUpdateCategory(validatedCategory: ValidatedCategory) {
         val category = validatedCategory.category
-        Firestore.categoryCollection.document(category.id).set(category)
+        Firestore.categoriesCollection.document(category.id).set(category)
     }
 
     suspend fun tryAndRemoveCategory(validatedCategory: ValidatedCategory): Result<Boolean> {
@@ -29,13 +29,13 @@ object CategoryRepository {
                 Exception(App.getContext().getString(R.string.A_categoria_esta_em_uso_e_nao_pode_ser_removida))
             )
         } else {
-            Firestore.categoryCollection.document(category.id).delete()
+            Firestore.categoriesCollection.document(category.id).delete()
             return Result.success(true)
         }
     }
 
     suspend fun getCategoryByName(name: String): Result<Category?> {
-        val querySnapshot = Firestore.categoryCollection.whereEqualTo("name", name).limit(1).get().await()
+        val querySnapshot = Firestore.categoriesCollection.whereEqualTo("name", name).limit(1).get().await()
 
         return if (!querySnapshot.isEmpty) {
             val targetCategory = querySnapshot.documents[0].toObject<Category>()
@@ -44,7 +44,7 @@ object CategoryRepository {
     }
 
     suspend fun getCategory(idCategory: String): Result<Category> {
-        val querySnapshot = Firestore.categoryCollection.document(idCategory).get().await()
+        val querySnapshot = Firestore.categoriesCollection.document(idCategory).get().await()
 
         val targetCategory = querySnapshot.toObject<Category>()!!
         return Result.success(targetCategory)
@@ -55,7 +55,7 @@ object CategoryRepository {
      * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
      * */
     fun observeCategoryUpdates(onSnapshot: (List<Category>?, Exception?) -> Any): ListenerRegister {
-        return ListenerRegister(Firestore.categoryCollection.addSnapshotListener { querySnapshot, fbException ->
+        return ListenerRegister(Firestore.categoriesCollection.addSnapshotListener { querySnapshot, fbException ->
 
             if (fbException != null) onSnapshot(null, fbException)
             else querySnapshot?.let {

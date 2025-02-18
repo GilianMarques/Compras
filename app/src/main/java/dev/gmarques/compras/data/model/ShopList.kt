@@ -5,6 +5,7 @@ import dev.gmarques.compras.R.string.A_cor_nao_pode_ficar_vazia
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_nimo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_ximo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_nao_pode_ficar_vazio
+import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeSpaces
 import java.io.Serializable
 import java.util.Locale
@@ -16,6 +17,9 @@ data class ShopList(
     val color: Int,
     val id: String = getNewId(),
     val creationDate: Long = System.currentTimeMillis(),
+    val removed: Boolean = false,
+    val createdBy: String = UserRepository.getUser()!!.email!!,
+    val updatedBy: String? = null,
 ) : Serializable {
 
     companion object {
@@ -38,32 +42,6 @@ data class ShopList(
     constructor() : this("not_initialized", 0)
 
     constructor(id: String) : this("", 0, id)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ShopList
-
-        if (name != other.name) return false
-        if (color != other.color) return false
-        if (id != other.id) return false
-        if (creationDate != other.creationDate) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + color
-        result = 31 * result + id.hashCode()
-        result = 31 * result + creationDate.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "ShopList(name='$name', color=$color, id='$id', creationDate=$creationDate)"
-    }
 
     class Validator {
         companion object {

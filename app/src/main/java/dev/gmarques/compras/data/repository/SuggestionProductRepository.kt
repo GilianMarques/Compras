@@ -15,7 +15,7 @@ object SuggestionProductRepository {
      * @return Um [Result] contendo o produto ou uma exceção se não encontrado.
      */
     suspend fun getSuggestionProduct(idProduct: String): Product {
-        val querySnapshot = Firestore.suggestionProductCollection.document(idProduct).get().await()
+        val querySnapshot = Firestore.suggestionProductsCollection.document(idProduct).get().await()
         val targetProduct = querySnapshot.toObject<Product>()
         if (targetProduct != null) return targetProduct
         else throw Exception("Produto nao encontrado! É um bug ou foi removido de outro lugar na app, servidor ou de outro dispositivo vinculado à conta")
@@ -26,7 +26,7 @@ object SuggestionProductRepository {
      * @return Uma lista de produtos sugeridos.
      */
     suspend fun getSuggestions(): List<Product> {
-        val querySnapshot = Firestore.suggestionProductCollection.get().await()
+        val querySnapshot = Firestore.suggestionProductsCollection.get().await()
         return querySnapshot.map { it.toObject<Product>() }
     }
 
@@ -37,7 +37,7 @@ object SuggestionProductRepository {
      */
     suspend fun hasAnyProductWithCategoryId(categoryId: String): Boolean {
         val suggestionProductsSnapshot =
-            Firestore.suggestionProductCollection.whereEqualTo("categoryId", categoryId).limit(1).get().await()
+            Firestore.suggestionProductsCollection.whereEqualTo("categoryId", categoryId).limit(1).get().await()
         return !suggestionProductsSnapshot.isEmpty
     }
 
@@ -49,7 +49,7 @@ object SuggestionProductRepository {
     fun observeSuggestionProductUpdates(
         onSnapshot: (List<Product>?, Exception?) -> Any,
     ): ListenerRegister {
-        return ListenerRegister(Firestore.suggestionProductCollection.addSnapshotListener { querySnapshot, fbException ->
+        return ListenerRegister(Firestore.suggestionProductsCollection.addSnapshotListener { querySnapshot, fbException ->
             if (fbException != null) onSnapshot(null, fbException)
             else querySnapshot?.let {
                 val products = arrayListOf<Product>()
@@ -64,7 +64,7 @@ object SuggestionProductRepository {
      * @param validatedProduct Objeto contendo o produto sugerido a ser removido.
      */
     fun removeSuggestionProduct(vsp: ValidatedSuggestionProduct) {
-        Firestore.suggestionProductCollection.document(vsp.suggestionProduct.id).delete()
+        Firestore.suggestionProductsCollection.document(vsp.suggestionProduct.id).delete()
     }
 
     /**
@@ -73,14 +73,14 @@ object SuggestionProductRepository {
      */
     suspend fun updateOrAddProductAsSuggestion(vsp: ValidatedSuggestionProduct) {
 
-        val querySnapshot = Firestore.suggestionProductCollection.whereEqualTo("name", vsp.suggestionProduct.name).limit(1).get().await()
+        val querySnapshot = Firestore.suggestionProductsCollection.whereEqualTo("name", vsp.suggestionProduct.name).limit(1).get().await()
         val suggestionProduct = if (querySnapshot.isEmpty) vsp.suggestionProduct
         else {
             val oldProduct = querySnapshot.documents[0].toObject<Product>()!!
             vsp.suggestionProduct.copy(id = oldProduct.id)
         }
 
-        Firestore.suggestionProductCollection.document(suggestionProduct.id).set(suggestionProduct)
+        Firestore.suggestionProductsCollection.document(suggestionProduct.id).set(suggestionProduct)
     }
 
     /**
@@ -90,12 +90,12 @@ object SuggestionProductRepository {
      */
     suspend fun updateSuggestionProduct(oldSuggestion: Product, newValidatedSuggestion: ValidatedSuggestionProduct) {
         val documentSnapshot =
-            Firestore.suggestionProductCollection.whereEqualTo("name", oldSuggestion.name).limit(1).get().await()
+            Firestore.suggestionProductsCollection.whereEqualTo("name", oldSuggestion.name).limit(1).get().await()
 
         if (!documentSnapshot.isEmpty) {
             val targetSuggestion = documentSnapshot.documents.first().toObject<Product>()!!
             val updatedSuggestionWithOldId = newValidatedSuggestion.suggestionProduct.copy(id = targetSuggestion.id)
-            Firestore.suggestionProductCollection.document(updatedSuggestionWithOldId.id).set(updatedSuggestionWithOldId)
+            Firestore.suggestionProductsCollection.document(updatedSuggestionWithOldId.id).set(updatedSuggestionWithOldId)
         }
     }
 }

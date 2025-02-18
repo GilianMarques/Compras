@@ -252,7 +252,7 @@ class ProductsActivityViewModel : ViewModel() {
      */
     private fun postDelayedData() {
 
-        val delayMillis = if (throttlingJob == null) 0L else 250L
+        val delayMillis = if (throttlingJob == null) 0L else 100L
 
         throttlingJob?.cancel()
         throttlingJob = Job()

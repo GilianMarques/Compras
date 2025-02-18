@@ -11,6 +11,7 @@ import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.firestore.Firestore
+import dev.gmarques.compras.data.model.LastLogin
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.tasks.await
@@ -43,23 +44,22 @@ object UserRepository {
      * @return true se o usuario existe no banco de dados, senao, false
      */
     suspend fun checkIfUserExists(targetEmail: String): Boolean {
-        return Firestore.findTargetAccountCollection(targetEmail)
-            .document("metadata").get().await()
-            .exists()
+        return Firestore.findTargetAccountCollection(targetEmail).document(Firestore.LAST_LOGIN)
+            .get()
+            .await().exists()
     }
 
     /**
      * Salva dados na raiz do banco do usuario para permitir que ele seja descoberto no caso de algum outro
      * usuario querer enviar um syncinvite
      * */
-    fun initUserDatabase() {
-        Firestore.rootCollection.document("metadata").set(Metadata())
-
+    suspend fun updateDatabaseMetadata() {
+        Firestore.lastLoginDocument.set(LastLogin()).await()
     }
 
     fun observeSyncInvites(callback: (MutableList<SyncAccount>) -> Any): ListenerRegister {
-        val listenerRegistration = Firestore.syncInvitesCollection
-            .addSnapshotListener { querySnapshot: QuerySnapshot?, _: FirebaseFirestoreException? ->
+        val listenerRegistration =
+            Firestore.syncInvitesCollection.addSnapshotListener { querySnapshot: QuerySnapshot?, _: FirebaseFirestoreException? ->
 
                 val invites = mutableListOf<SyncAccount>()
 
@@ -79,20 +79,19 @@ object UserRepository {
     fun observeGuests(callback: (MutableList<SyncAccount>) -> Any): ListenerRegister {
         val localUserEmail = getUser()!!.email!!
 
-        val listenerRegistration =
-            Firestore.guestsCollection.whereEqualTo("accepted", true)
-                .addSnapshotListener { querySnapshot: QuerySnapshot?, _: FirebaseFirestoreException? ->
+        val listenerRegistration = Firestore.guestsCollection.whereEqualTo("accepted", true)
+            .addSnapshotListener { querySnapshot: QuerySnapshot?, _: FirebaseFirestoreException? ->
 
-                    val guests = mutableListOf<SyncAccount>()
+                val guests = mutableListOf<SyncAccount>()
 
-                    querySnapshot?.documents?.forEach { snap ->
-                        val guest = snap.toObject<SyncAccount>()!!
-                        //Quando o usuario aceita ser convidado de outra conta, as contas convidadas do anfitriao aparecem para ele.
-                        //Esse filtro impede que a conta do usuario apareça com convidada dela mesma
-                        if (guest.email != localUserEmail) guests.add(guest)
-                    }
-                    callback(guests)
+                querySnapshot?.documents?.forEach { snap ->
+                    val guest = snap.toObject<SyncAccount>()!!
+                    //Quando o usuario aceita ser convidado de outra conta, as contas convidadas do anfitriao aparecem para ele.
+                    //Esse filtro impede que a conta do usuario apareça com convidada dela mesma
+                    if (guest.email != localUserEmail) guests.add(guest)
                 }
+                callback(guests)
+            }
 
         return ListenerRegister(listenerRegistration)
     }
@@ -130,16 +129,11 @@ object UserRepository {
                 .await()
             Log.d("USUK", "UserRepository.".plus("sendSyncInvite() email = $email 1 "))
 
-            Firestore.findGuestSyncInvitesCollection(email).document(myUser.email!!)
-                .set(
-                    SyncAccount(
-                        myUser.displayName!!,
-                        myUser.email!!,
-                        myUser.photoUrl.toString(),
-                        true
-                    ),
-                )
-                .await()
+            Firestore.findGuestSyncInvitesCollection(email).document(myUser.email!!).set(
+                SyncAccount(
+                    myUser.displayName!!, myUser.email!!, myUser.photoUrl.toString(), true
+                ),
+            ).await()
 
             return true
         } catch (e: Exception) {
@@ -154,8 +148,8 @@ object UserRepository {
 
             //Atualizo o db do anfitriao com os dados do usuario local, para que ele saiba que o convite foi aceito
             val localUser = getUser()!!
-            Firestore.findTargetAccountGuestsCollection(invite.email)
-                .document(localUser.email!!).set(
+            Firestore.findTargetAccountGuestsCollection(invite.email).document(localUser.email!!)
+                .set(
                     SyncAccount(
                         localUser.displayName!!,
                         localUser.email!!,
@@ -182,8 +176,8 @@ object UserRepository {
     suspend fun declineInvite(invite: SyncAccount): Boolean {
         return try {
 
-            Firestore.findTargetAccountGuestsCollection(invite.email)
-                .document(getUser()!!.email!!).delete().await()
+            Firestore.findTargetAccountGuestsCollection(invite.email).document(getUser()!!.email!!)
+                .delete().await()
 
             Firestore.syncInvitesCollection.document(invite.email).delete().await()
 
@@ -222,8 +216,8 @@ object UserRepository {
             Firestore.hostDocument.delete().await()
 
             // Remover dados do local da seçao guests do anfitriao
-            Firestore.findTargetAccountGuestsCollection(host.email)
-                .document(localUser.email!!).delete().await()
+            Firestore.findTargetAccountGuestsCollection(host.email).document(localUser.email!!)
+                .delete().await()
 
             // Atualiza email de host  nas preferencias
             PreferencesHelper().saveValue(PreferencesHelper.PrefsKeys.HOST, localUser.email!!)
@@ -237,5 +231,4 @@ object UserRepository {
 
     }
 
-    data class Metadata(val lastLogin: Long = System.currentTimeMillis())
 }

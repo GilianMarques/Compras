@@ -1,13 +1,12 @@
 package dev.gmarques.compras.data.firestore
 
-import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.BuildConfig
 import dev.gmarques.compras.data.PreferencesHelper
+import dev.gmarques.compras.data.model.DatabaseVersion
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import kotlinx.coroutines.tasks.await
@@ -15,6 +14,8 @@ import kotlinx.coroutines.tasks.await
 class Firestore {
 
     companion object {
+
+        const val VERSION = 2
 
         private var host: String = PreferencesHelper()
             .getValue(PreferencesHelper.PrefsKeys.HOST, "null")
@@ -26,48 +27,48 @@ class Firestore {
             if (BuildConfig.DEBUG && !useProductionDb) "debug" else "production"
 
         private const val USERS = "users"
-        private const val DATABASE = "Data"
-        private const val SHOP_LISTS = "ShopLists"
-        private const val PRODUCTS = "Products"
-        private const val CATEGORIES = "Categories"
-        private const val SUGGESTION_PRODUCT = "Suggestion_products"
+        private const val DATABASE = "v$VERSION"
+        private const val SHOP_LISTS = "shopLists"
+        private const val PRODUCTS = "products"
+        private const val CATEGORIES = "categories"
+        private const val SUGGESTION_PRODUCT = "suggestion_products"
         private const val COLLABORATION = "collaboration"
         private const val SYNC_INVITES = "sync_invites"
         private const val GUESTS = "guests"
         private const val HOST = "host"
-        private const val SYNCING_WITH = "syncing_with"
+        private const val HOST_DATA = "data"
+        const val LAST_LOGIN = "last_login"
+        private const val DATABASE_VERSION = "database_version"
 
-        suspend fun setupDatabase() {
-            Log.d("USUK", "Firestore.setupDatabase: host $host")
+        suspend fun loadDatabasePaths() {
             if (host != "null") return
 
-            val data = hostCollection.document(SYNCING_WITH).get().await()
+            val data = hostCollection.document(HOST_DATA).get().await()
             val host = data.toObject<SyncAccount>()
 
             this.host = host?.email ?: UserRepository.getUser()!!.email!!
             PreferencesHelper().saveValue(PreferencesHelper.PrefsKeys.HOST, this.host)
-            Log.d("USUK", "Firestore.setupDatabase: host ${this.host}")
         }
 
-        val shopListCollection by lazy {
+        val shopListsCollection by lazy {
             Firebase.firestore.collection(environment).document(USERS).collection(host)
                 .document(DATABASE)
                 .collection(SHOP_LISTS)
         }
 
-        val categoryCollection by lazy {
+        val categoriesCollection by lazy {
             Firebase.firestore.collection(environment).document(USERS).collection(host)
                 .document(DATABASE)
                 .collection(CATEGORIES)
         }
 
-        val productCollection by lazy {
+        val productsCollection by lazy {
             Firebase.firestore.collection(environment).document(USERS).collection(host)
                 .document(DATABASE)
                 .collection(PRODUCTS)
         }
 
-        val suggestionProductCollection by lazy {
+        val suggestionProductsCollection by lazy {
             Firebase.firestore.collection(environment).document(USERS).collection(host)
                 .document(DATABASE)
                 .collection(SUGGESTION_PRODUCT)
@@ -79,7 +80,7 @@ class Firestore {
                 .collection(SYNC_INVITES)
         }
 
-        val rootCollection by lazy {
+        private val rootCollection by lazy {
             Firebase.firestore.collection(environment).document(USERS).collection(host)
 
         }
@@ -103,9 +104,16 @@ class Firestore {
                 .collection(UserRepository.getUser()!!.email!!)
                 .document(COLLABORATION)
                 .collection(HOST)
-                .document(SYNCING_WITH)
+                .document(HOST_DATA)
         }
 
+        val lastLoginDocument by lazy {
+            rootCollection.document(LAST_LOGIN)
+        }
+
+        val databaseVersionDocument by lazy {
+            rootCollection.document(DATABASE_VERSION)
+        }
 
         /**
          * Retorna o caminho onde ficam os convites para sincronismo no banco de dados do
@@ -128,13 +136,6 @@ class Firestore {
                 .collection(targetEmail)
         }
 
-        fun findTargetAccountHostdocument(targetEmail: String): DocumentReference {
-            return Firebase.firestore.collection(environment).document(USERS)
-                .collection(targetEmail).document(COLLABORATION)
-                .collection(HOST)
-                .document(SYNCING_WITH)
-        }
-
         /**
          * Retorna a coleçao do email alvo onde ficam os convidados
          */
@@ -142,6 +143,12 @@ class Firestore {
             return Firebase.firestore.collection(environment).document(USERS)
                 .collection(targetEmail).document(COLLABORATION)
                 .collection(GUESTS)
+        }
+
+        suspend fun getCloudDatabaseVersion(): Int {
+            return databaseVersionDocument.get().await()
+                ?.toObject<DatabaseVersion>()?.databaseVersion ?: 1
+
         }
     }
 }

@@ -1,5 +1,11 @@
 package dev.gmarques.compras.domain.utils
 
+import com.google.firebase.firestore.getField
+import com.google.firebase.firestore.toObject
+import dev.gmarques.compras.data.firestore.Firestore
+import dev.gmarques.compras.data.model.Category
+import kotlinx.coroutines.tasks.await
+
 /**
  * Autor: Gilian
  * Data de Criação: 22/12/2024
@@ -9,7 +15,6 @@ package dev.gmarques.compras.domain.utils
 class RefactorKlass {
     init {
         //--------------------
-
 
 
     //--------------------

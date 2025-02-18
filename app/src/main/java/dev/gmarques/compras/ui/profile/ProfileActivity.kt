@@ -59,7 +59,7 @@ class ProfileActivity : AppCompatActivity() {
                     PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE,
                     checked
                 )
-                exitProcess(0)
+                cbProductionDatabase.postDelayed({ exitProcess(0) }, 1000)
             }
         }
 

@@ -5,6 +5,7 @@ import dev.gmarques.compras.R.string.A_cor_nao_pode_ficar_vazia
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_nimo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_ximo_x_caracteres
 import dev.gmarques.compras.R.string.O_nome_nao_pode_ficar_vazio
+import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeSpaces
 import java.io.Serializable
 import java.util.Locale
@@ -17,6 +18,9 @@ data class Category(
     val position: Int = 0,
     val id: String = getNewId(),
     val creationDate: Long = System.currentTimeMillis(),
+    val removed: Boolean = false,
+    val createdBy: String = UserRepository.getUser()!!.email!!,
+    val updatedBy: String? = null,
 ) : Serializable {
 
 
@@ -31,8 +35,16 @@ data class Category(
      */
     fun selfValidate(context: Context) {
 
-        if (Validator.validateName(name, context).isFailure) throw Exception("Nome da categoria é invalido: '${name}'")
-        if (Validator.validateColor(color, context).isFailure) throw Exception("Cor da categoria é invalida: '${color}'")
+        if (Validator.validateName(
+                name,
+                context
+            ).isFailure
+        ) throw Exception("Nome da categoria é invalido: '${name}'")
+        if (Validator.validateColor(
+                color,
+                context
+            ).isFailure
+        ) throw Exception("Cor da categoria é invalida: '${color}'")
     }
 
     @Suppress("unused") // necessario pra uso com firebase
@@ -56,18 +68,26 @@ data class Category(
 
                     input.length < MIN_CHARS -> Result.failure(
                         Exception(
-                            String.format(context.getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS)
+                            String.format(
+                                context.getString(O_nome_deve_ter_no_m_nimo_x_caracteres),
+                                MIN_CHARS
+                            )
                         )
                     )
 
                     input.length > MAX_CHARS -> Result.failure(
                         Exception(
-                            String.format(context.getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS)
+                            String.format(
+                                context.getString(O_nome_deve_ter_no_m_ximo_x_caracteres),
+                                MAX_CHARS
+                            )
                         )
                     )
 
                     else -> {
-                        Result.success(input.removeSpaces().replaceFirstChar { it.titlecase(Locale.getDefault()) })
+                        Result.success(
+                            input.removeSpaces()
+                                .replaceFirstChar { it.titlecase(Locale.getDefault()) })
                     }
                 }
             }
