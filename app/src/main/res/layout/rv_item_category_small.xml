@@ -15,6 +15,17 @@
 
 
     <ImageView
+        android:id="@+id/iv_all_bought"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/Todos_os_produtos_desta_categoria_foram_comprados"
+        android:src="@drawable/vec_check"
+        app:tint="?attr/colorPrimary" />
+
+    <ImageView
         android:id="@+id/iv_list_icon"
         android:layout_width="12dp"
         android:layout_height="12dp"
@@ -37,17 +48,6 @@
         android:textSize="14sp"
         tools:text="a" />
 
-
-    <ImageView
-        android:id="@+id/iv_all_bought"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="4dp"
-        android:contentDescription="@string/Todos_os_produtos_desta_categoria_foram_comprados"
-        android:src="@drawable/vec_check"
-        app:tint="?attr/colorPrimary" />
 
 </LinearLayout>
 

@@ -34,7 +34,7 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
             LayoutInflater.from(parent.context), R.layout.rv_item_product, parent, false
         )
 
-        return ProductViewHolder(binding, callback,  itemTouchHelper!!)
+        return ProductViewHolder(binding, callback, itemTouchHelper!!)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
@@ -123,7 +123,6 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
             }
 
             ivHandle.setOnTouchListener { it, motionEvent ->
-
                 when (motionEvent.action) {
                     MotionEvent.ACTION_DOWN -> {
                         // Inicia o drag and drop
@@ -143,6 +142,11 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
                     }
                 }
             }
+
+            tvProductPrice.setOnClickListener { Vibrator.interaction(); callback.rvProductsOnPriceClick(product) }
+            tvProductQuantity.setOnClickListener { Vibrator.interaction(); callback.rvProductsOnQuantityClick(product) }
+            tvProductInfo.setOnClickListener { Vibrator.interaction(); callback.rvProductsOnInfoClick(product) }
+
         }
     }
 
@@ -164,6 +168,9 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
     interface Callback {
         fun rvProductsOnDragAndDrop(toPosition: Int, product: Product)
         fun rvProductsOnEditItemClick(product: Product)
+        fun rvProductsOnPriceClick(product: Product)
+        fun rvProductsOnQuantityClick(product: Product)
+        fun rvProductsOnInfoClick(product: Product)
         fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean)
     }
 

@@ -370,17 +370,64 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             .setProduct(product)
             .setEditListener {
                 startActivityEditProduct(it)
-
             }
             .setRemoveListener {
                 confirmRemove(it)
-
             }
             .setConfirmListener {
                 viewModel.updateProductAsIs(it)
             }
             .build().show()
     }
+
+    override fun rvProductsOnPriceClick(product: Product) {
+        BsdEditProductPriceOrQuantity
+            .Builder()
+            .setActivity(this@ProductsActivity)
+            .setProduct(product)
+            .focusOnPrice()
+            .setEditListener {
+                startActivityEditProduct(it)
+            }
+            .setRemoveListener {
+                confirmRemove(it)
+            }
+            .setConfirmListener {
+                viewModel.updateProductAsIs(it)
+            }.build().show()
+    }
+
+    override fun rvProductsOnQuantityClick(product: Product) {
+        BsdEditProductPriceOrQuantity
+            .Builder()
+            .setActivity(this@ProductsActivity)
+            .setProduct(product)
+            .focusOnQuantity()
+            .setEditListener {
+                startActivityEditProduct(it)
+            }
+            .setRemoveListener {
+                confirmRemove(it)
+            }
+            .setConfirmListener {
+                viewModel.updateProductAsIs(it)
+            }.build().show()    }
+
+    override fun rvProductsOnInfoClick(product: Product) {
+        BsdEditProductPriceOrQuantity
+            .Builder()
+            .setActivity(this@ProductsActivity)
+            .setProduct(product)
+            .focusOnInfo()
+            .setEditListener {
+                startActivityEditProduct(it)
+            }
+            .setRemoveListener {
+                confirmRemove(it)
+            }
+            .setConfirmListener {
+                viewModel.updateProductAsIs(it)
+            }.build().show()    }
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {
 
