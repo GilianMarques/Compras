@@ -43,7 +43,7 @@ object CategoryRepository {
         } else Result.success(null)
     }
 
-    suspend fun getCategory(idCategory: String): Result<Category> {
+    suspend fun getCategory(idCategory: String): Result<Category> { // TODO: retornar uma categoria ou null
         val querySnapshot = Firestore.categoriesCollection.document(idCategory).get().await()
 
         val targetCategory = querySnapshot.toObject<Category>()!!
