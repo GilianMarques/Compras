@@ -157,5 +157,6 @@
     <string name="Erro_removendo_lista_de_compras_tente_novamente">Erro removendo lista de compras, tente novamente</string>
     <string name="Atualizando_banco_de_dados_por_favor_aguarde_n_o_feche_o_app_ou_desconecte_se_da_internet">Atualizando banco de dados, por favor aguarde. Não feche o app ou desconecte-se da internet.</string>
     <string name="Comprar_e_salvar">Comprar e salvar</string>
+    <string name="X_ja_esta_sincronizando_com_voce">%1$s já está sincronizando com você</string>
 
 </resources>

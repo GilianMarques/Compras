@@ -55,7 +55,6 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/vec_email"
             android:hint="@string/Digite_o_email_do_usuario"
-            android:importantForAutofill="no"
             android:inputType="textEmailAddress"
             android:selectAllOnFocus="true"
             android:theme="@style/Theme.EditText.Dialog"

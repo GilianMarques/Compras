@@ -158,14 +158,23 @@ class ProfileActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * Mostra um bottomsheet dialog que permite gerenciar um convite de sincronismo
+     * */
     private fun showViewSyncInviteDialog(req: SyncAccount) {
         BsdManageSyncInvite(req, this, lifecycleScope).show()
     }
 
+    /**
+     * Mostra um bottomsheet dialog que permite desconectar um convidado
+     * */
     private fun showDisconnectGuestDialog(guest: SyncAccount) {
         BsdDisconnectAccount(guest, this, lifecycleScope, false).show()
     }
 
+    /**
+     * Mostra um bottomsheet dialog que permite que o usuario se desconecte do anfitriao
+     * */
     private fun showDisconnectFromHostDialog(host: SyncAccount) {
         BsdDisconnectAccount(host, this, lifecycleScope, true).show()
     }
@@ -206,6 +215,9 @@ class ProfileActivity : AppCompatActivity() {
         exitProcess(0)
     }
 
+    /**
+     * Mostra um alertdialog com conteudo dianmico
+     * */
     private fun showDialog(title: String, msg: String, confirm: String, callback: () -> Any) {
         AlertDialog.Builder(this@ProfileActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(confirm) { dialog, _ ->
@@ -217,9 +229,9 @@ class ProfileActivity : AppCompatActivity() {
     private fun setupRequestPermission() {
         binding.tvRequestPermission.setOnClickListener {
 
-            if (state!!.guests!!.isEmpty()) {
+            if (state!!.host!!.isEmpty()) {
                 Vibrator.interaction()
-                BsdSendSyncInvite(this, lifecycleScope).show()
+                BsdSendSyncInvite(this, lifecycleScope,state!!.guests).show()
             } else {
                 Vibrator.error()
                 showDialog(

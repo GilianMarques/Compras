@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         listOf(ivMenu, tvUserName, ivProfilePicture).forEach { view ->
             view.setOnClickListener {
                 startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
+                Vibrator.interaction()
             }
         }
 

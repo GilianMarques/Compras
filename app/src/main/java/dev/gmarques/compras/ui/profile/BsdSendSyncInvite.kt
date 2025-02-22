@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdSendSyncInviteBinding
 import dev.gmarques.compras.ui.Vibrator
@@ -21,6 +22,7 @@ import kotlinx.coroutines.withContext
 class BsdSendSyncInvite(
     private val targetActivity: Activity,
     private val lifecycleScope: LifecycleCoroutineScope,
+    private val guests: List<SyncAccount>?,
 ) {
 
     private var binding = BsdSendSyncInviteBinding.inflate(targetActivity.layoutInflater)
@@ -51,10 +53,18 @@ class BsdSendSyncInvite(
         } else if (!UserRepository.checkIfUserExists(email)) {
             showErrorMsg(targetActivity.getString(R.string.Usu_rio_n_o_existe))
 
+        } else if (targetEmailIsAlreadyAGuest(email)) {
+            showErrorMsg(targetActivity.getString(R.string.X_ja_esta_sincronizando_com_voce, email))
+
         } else {
             updateUiStatus(true)
             sendRequest(email)
         }
+    }
+
+    private fun targetEmailIsAlreadyAGuest(email: String): Boolean {
+        guests?.forEach { if (email == it.email) return true }
+        return false
     }
 
     private suspend fun updateUiStatus(freeze: Boolean) = withContext(Dispatchers.Main) {

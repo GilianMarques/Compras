@@ -44,7 +44,8 @@ object UserRepository {
      * @return true se o usuario existe no banco de dados, senao, false
      */
     suspend fun checkIfUserExists(targetEmail: String): Boolean {
-        return Firestore.findTargetAccountCollection(targetEmail).document(Firestore.LAST_LOGIN)
+        return Firestore.findTargetAccountCollection(targetEmail)
+            .document(Firestore.LAST_LOGIN)
             .get()
             .await().exists()
     }
