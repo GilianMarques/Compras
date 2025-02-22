@@ -16,18 +16,20 @@ import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeAccents
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
 class AddEditProductActivityViewModel : ViewModel() {
 
 
-    private val uiState = UiState()
+    private var uiState = UiState()
+        set(value) {
+            field = value
+            _mutableLiveData.postValue(field)
+        }
 
-    private val _uiStateLD = MutableLiveData<UiState>()
-    val uiStateLD: LiveData<UiState> get() = _uiStateLD
+    private val _mutableLiveData = MutableLiveData<UiState>()
+    val uiStateLD: LiveData<UiState> get() = _mutableLiveData
 
     var validatedName: String = ""
     var validatedInfo: String = ""
@@ -52,7 +54,7 @@ class AddEditProductActivityViewModel : ViewModel() {
 
         // se adicionando produto ou se durante a ediçao o usuario trocar o nome do produto, preciso verificar se o novo nome ja nao existe na lista
         val needCheckName =
-            uiState.toEditProduct == null || uiState.toEditProduct!!.name != validatedName
+            uiState.editingProduct == null || uiState.editingProduct!!.name != validatedName
 
         if (needCheckName) {
             val result = ProductRepository.getProductByName(validatedName, listId)
@@ -62,8 +64,7 @@ class AddEditProductActivityViewModel : ViewModel() {
                 val msg = String.format(
                     App.getContext().getString(R.string.X_ja_existe_na_lista), validatedName
                 )
-                uiState.errorMessage = msg
-                this@AddEditProductActivityViewModel.postData()
+                uiState = uiState.copy(errorMessage = msg)
             }
 
         } else saveProduct(saveAsSuggestion)
@@ -72,9 +73,9 @@ class AddEditProductActivityViewModel : ViewModel() {
 
     private fun saveProduct(saveAsSuggestion: Boolean) = viewModelScope.launch(IO) {
 
-        val editingProduct = uiState.toEditProduct != null
+        val editingProduct = uiState.editingProduct != null
 
-        val newProduct = if (editingProduct) uiState.toEditProduct!!.copy(
+        val newProduct = if (editingProduct) uiState.editingProduct!!.copy(
             name = validatedName,
             price = validatedPrice,
             quantity = validatedQuantity,
@@ -94,31 +95,28 @@ class AddEditProductActivityViewModel : ViewModel() {
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
 
         if (editingProduct) SuggestionProductRepository.updateSuggestionProduct(
-            uiState.toEditProduct!!, ValidatedSuggestionProduct(newProduct)
+            uiState.editingProduct!!, ValidatedSuggestionProduct(newProduct)
         )
         else if (saveAsSuggestion) SuggestionProductRepository.updateOrAddProductAsSuggestion(
             ValidatedSuggestionProduct(newProduct)
         )
 
-        uiState.finishActivity = true
-        this@AddEditProductActivityViewModel.postData()
+        uiState = uiState.copy(finishActivity = true)
 
     }
 
     private fun loadEditingProduct() = viewModelScope.launch(IO) {
         productId?.let {
             val result = ProductRepository.getProduct(it)
-            uiState.toEditProduct = result
-            this@AddEditProductActivityViewModel.postData()
+            uiState = uiState.copy(editingProduct = result)
         }
     }
 
-    private fun postData() = _uiStateLD.postValue(uiState)
 
     fun loadCategory(categoryId: String) = viewModelScope.launch(IO) {
         val result = CategoryRepository.getCategory(categoryId)
-        uiState.toEditCategory = result.getOrThrow()
-        this@AddEditProductActivityViewModel.postData()
+
+        uiState = uiState.copy(editingCategory = result.getOrThrow())
     }
 
     fun loadSuggestions(term: String) = viewModelScope.launch(IO) {
@@ -131,15 +129,10 @@ class AddEditProductActivityViewModel : ViewModel() {
 
         val sub = filteredSuggestions.subList(0, min(filteredSuggestions.size, maxSuggestions))
 
-        uiState.suggestions = sub to term
-        this@AddEditProductActivityViewModel.postData()
-    }
+        uiState = uiState.copy(productsAndNamesSuggestions = sub.ifEmpty {
+            productNameSuggestion.getSuggestion(term, maxSuggestions).sortedBy { it.length }
+        })
 
-    fun loadNameSuggestions(term: String) = viewModelScope.launch(IO) {
-
-        uiState.nameSuggestions = productNameSuggestion
-            .getSuggestion(term, maxSuggestions).sortedBy { it.length }
-        this@AddEditProductActivityViewModel.postData()
     }
 
     fun setup(listId: String, productId: String?) {
@@ -152,14 +145,22 @@ class AddEditProductActivityViewModel : ViewModel() {
         loadEditingProduct()
     }
 
-    class UiState {
+    fun loadSuggestionCategory(product: Product) = viewModelScope.launch(IO) {
+        val category = CategoryRepository.getCategory(product.categoryId).getOrThrow()
+        uiState = uiState.copy(suggestionProductAndCategory = product to category)
 
-        var toEditProduct: Product? = null
-        var toEditCategory: Category? = null
-        var suggestions: Pair<List<Product>, String>? = null
-        var nameSuggestions: List<String>? = null
-        var errorMessage: String = ""
-        var finishActivity = false
+    }
+
+
+    data class UiState(
+        val editingProduct: Product? = null,
+        val editingCategory: Category? = null,
+        val suggestionProductAndCategory: Pair<Product, Category>? = null,
+        val productsAndNamesSuggestions: List<Any> = emptyList(),
+        val errorMessage: String = "",
+        val finishActivity: Boolean = false,
+    ) {
+
 
     }
 

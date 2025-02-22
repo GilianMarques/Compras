@@ -19,7 +19,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
@@ -29,17 +28,12 @@ import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity.Companion.SELECTED_CATEGORY
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Activity para adicionar ou editar produtos em uma lista.
@@ -101,33 +95,31 @@ class AddEditProductActivity : AppCompatActivity() {
     private fun observeUiStateChanges() {
         viewModel.uiStateLD.observe(this@AddEditProductActivity) { newState ->
 
-            newState.toEditProduct?.let {
-                if (it == currentState?.toEditProduct) return@let
+            newState.editingProduct?.let {
+                if (it == currentState?.editingProduct) return@let
                 viewModel.loadCategory(it.categoryId)
             }
 
-            newState.toEditCategory?.let {
-                if (it == currentState?.toEditCategory) return@let
-                updateViewModelAndUiWithEditableProduct(newState.toEditProduct!!, it)
+            newState.editingCategory?.let {
+                if (it == currentState?.editingCategory) return@let
+                updateViewModelAndUiWithEditableProduct(newState.editingProduct!!, it)
             }
 
-            newState.suggestions.let {
-                if (it == currentState?.suggestions) return@let
-
-                val (suggestions, term) = it!!
-                if (suggestions.isEmpty()) viewModel.loadNameSuggestions(term)
-                else showSuggestions(suggestions)
+            newState.suggestionProductAndCategory?.let {
+                if (it == currentState?.suggestionProductAndCategory) return@let
+                updateViewModelAndUiWithEditableProduct(it.first, it.second)
             }
 
-            newState.nameSuggestions.let {
-                if (it == currentState?.nameSuggestions) return@let
+            newState.productsAndNamesSuggestions.let {
+                if (it == currentState?.productsAndNamesSuggestions) return@let
 
-                if (it!!.isNotEmpty()) showSuggestions(it)
-                else hideSuggestions()
+                if (it.isEmpty()) hideSuggestions()
+                else showSuggestions(it)
             }
 
             newState.errorMessage.let {
-                if (it == currentState?.errorMessage) return@let
+                if (it == currentState?.errorMessage || it.isEmpty()) return@let
+
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
                 Vibrator.error()
             }
@@ -137,13 +129,8 @@ class AddEditProductActivity : AppCompatActivity() {
             }
 
             this.currentState = newState
-            Log.d(
-                "USUK",
-                "AddEditProductActivity.".plus("observeUiStateChanges() newState = ${newState.toString()}")
-            )
+
         }
-
-
     }
 
     private fun setupActivityResultLauncher() {
@@ -189,8 +176,7 @@ class AddEditProductActivity : AppCompatActivity() {
                 hideSuggestions()
 
                 if (suggestion is Product) {
-                    viewModel.loadCategory(suggestion.categoryId)
-                    binding.edtName.hideKeyboard()
+                    viewModel.loadSuggestionCategory(suggestion)
                 } else {
                     val nameSuggestion = suggestion as String
                     viewModel.canLoadSuggestion = false
@@ -232,10 +218,14 @@ class AddEditProductActivity : AppCompatActivity() {
 
                 validatedCategory = category
 
-                cbSuggestProduct.visibility = GONE
-                toolbar.tvActivityTitle.text =
-                    String.format(getString(R.string.Editar_x), product.name)
-                fabSave.text = getString(R.string.Salvar_produto)
+                // essa funçao atualiza a UI em caso de ediçao de produto ou seleção de sugestão ao adicionar o produto, por iso faço a verificação
+                val editingProduct = currentState?.editingProduct != null
+                if (editingProduct) {
+                    cbSuggestProduct.visibility = GONE
+                    toolbar.tvActivityTitle.text =
+                        String.format(getString(R.string.Editar_x), product.name)
+                    fabSave.text = getString(R.string.Salvar_produto)
+                }
             }
         }
 
@@ -283,7 +273,7 @@ class AddEditProductActivity : AppCompatActivity() {
         }
 
         edtTarget.doOnTextChanged { text, _, _, _ ->
-            if (edtTarget.hasFocus() && !text.isNullOrEmpty() && text.length > 1 && viewModel.canLoadSuggestion) {
+            if (edtTarget.hasFocus() && !text.isNullOrEmpty() && viewModel.canLoadSuggestion) {
                 viewModel.loadSuggestions(text.toString())
             } else hideSuggestions()
 
