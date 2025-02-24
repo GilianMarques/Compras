@@ -8,9 +8,9 @@
     <string name="Voce_cancelou_o_login">Você cancelou o login</string>
     <string name="Hamaisdeumprocessodeloginemandamentoquantas">Há mais de um processo de login em andamento. Quantas vezes você apertou esse botão?</string>
     <string name="Houveumerroaoautenticarsuacontatente">Houve um erro ao autenticar sua conta, tente novamente. Causa: {0}</string>
-    <string name="BemvindoX">Bem-vindo(a) {0}</string>
-    <string name="Ologinfalhou">O login falhou. Código: {0}</string>
-    <string name="Houveumerroaocontactaraapidogoole">Houve um erro ao contactar a API do Google, verfique sua conexão e tente reiniciar o app.  Código: {0}</string>
+    <string name="BemvindoX">Bem-vindo(a) %1$s</string>
+    <string name="Ologinfalhou">O login falhou. Código: %1$d \nMensagem: %2$s</string>
+    <string name="Houveumerroaocontactaraapidogoole">Houve um erro ao contactar a API do Google, verfique sua conexão e tente reiniciar o app.  Código: {%1$d}</string>
     <string name="Foto_de_perfil_do_usuario">Foto de perfil do usuário</string>
     <string name="Bom_dia">Bom dia</string>
     <string name="Boa_tarde">Boa tarde</string>
@@ -158,5 +158,7 @@
     <string name="Atualizando_banco_de_dados_por_favor_aguarde_n_o_feche_o_app_ou_desconecte_se_da_internet">Atualizando banco de dados, por favor aguarde. Não feche o app ou desconecte-se da internet.</string>
     <string name="Comprar_e_salvar">Comprar e salvar</string>
     <string name="X_ja_esta_sincronizando_com_voce">%1$s já está sincronizando com você</string>
+    <string name="O_login_falhou_por_um_erro_de_desenvolvimento_da_aplica_o_contate_o_desenvolvedor_c_digo_de_erro_1_mensagem_2">O login falhou por um erro de desenvolvimento da aplicação, contate o desenvolvedor. Código de erro:%1$d \nMensagem: %2$s</string>
+    <string name="O_login_falhou_por_um_erro_no_provedor_de_login">O login falhou por um erro no provedor de login, tente novamente mais tarde. Código de erro:%1$d \nMensagem: %2$s</string>
 
 </resources>

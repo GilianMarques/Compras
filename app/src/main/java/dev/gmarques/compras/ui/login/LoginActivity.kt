@@ -1,41 +1,30 @@
 package dev.gmarques.compras.ui.login
 
-import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
-import com.google.android.gms.common.api.ApiException
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.ErrorCodes.DEVELOPER_ERROR
+import com.firebase.ui.auth.ErrorCodes.NO_NETWORK
+import com.firebase.ui.auth.ErrorCodes.PROVIDER_ERROR
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.IdpResponse
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityLoginBinding
-import dev.gmarques.compras.domain.utils.InternetConnectionChecker
+import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.splash.SplashActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.text.MessageFormat
 
-// TODO: usa api credentials 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
 
-    companion object {
-        private const val REQ_LOGIN_CODE: Int = 123
-    }
-
-    private lateinit var mGoogleSignInClient: GoogleSignInClient
-    private lateinit var mAuth: FirebaseAuth
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract(),
+    ) { res -> this.onSignInResult(res) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,115 +32,101 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(this.binding.root)
 
-        checkInternetConnection()
-        initTryAgainFab()
+        setupFabTryAgain()
+        doLogin()
     }
 
-    private fun initTryAgainFab() {
-        binding.btnTentarNovamente.setOnClickListener {
+    private fun setupFabTryAgain() {
+        binding.fabTryAgain.setOnClickListener {
 
-            binding.progressBar.visibility = View.VISIBLE
-            binding.btnTentarNovamente.visibility = View.GONE
+            binding.fabTryAgain.visibility = View.GONE
             binding.tvInfo.text = ""
-            checkInternetConnection()
+            doLogin()
         }
-    }
-
-    private fun checkInternetConnection() {
-        InternetConnectionChecker().checkConnection { connected ->
-            if (connected) {
-                initObjects()
-                doLogin()
-            } else {
-                binding.progressBar.visibility = View.GONE
-                binding.btnTentarNovamente.visibility = View.VISIBLE
-
-                binding.tvInfo.setText(R.string.Vocenaoestaconectadoainternetouadata)
-            }
-        }
-    }
-
-    private fun initObjects() {
-        mAuth = FirebaseAuth.getInstance()
-
-        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.Google_auth_web_client_id)).requestEmail().build()
-
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions)
     }
 
     /**
-     * a execuçao continua a partir do onActivityResult
+     * a execuçao continua a partir do onSignInResult
+     * @see onSignInResult
      */
-    private fun doLogin() {
-        val signInIntent: Intent = mGoogleSignInClient.signInIntent
-        startActivityForResult(signInIntent, REQ_LOGIN_CODE)
+    private fun doLogin() { // TODO: fazer logoff nao esta funcionando corretamente, ajuste 
+
+        val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+
+        val signInIntent =
+            AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers)
+                .setLogo(R.drawable.vec_product) // Set logo drawable
+                .setTheme(R.style.Login_Activity) // Set theme
+                .build()
+
+        signInLauncher.launch(signInIntent)
     }
 
-    @Deprecated("")
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    /**
+     * Retorna aqui após o ususario concluir o fluxo de autenticação do firebase
+     */
+    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+        val response = result.idpResponse
+        if (result.resultCode == RESULT_OK) {
+            signInSuccess(FirebaseAuth.getInstance().currentUser)
+        } else handleSignInErrors(response)
 
-        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            firebaseAuthWithGoogle(account)
-        } catch (e: ApiException) {
-            this.binding.progressBar.visibility = View.GONE
-            this.binding.btnTentarNovamente.visibility = View.VISIBLE
+    }
 
-            when (e.statusCode) {
-                GoogleSignInStatusCodes.SIGN_IN_CANCELLED -> {
-                    this.binding.tvInfo.setText(R.string.Voce_cancelou_o_login)
-                }
+    private fun signInSuccess(user: FirebaseUser?) {
+        Vibrator.success()
 
-                GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS -> {
-                    this.binding.tvInfo.setText(R.string.Hamaisdeumprocessodeloginemandamentoquantas)
-                }
+        val nome = if (user?.displayName != null) user.displayName else "?"
+        binding.tvInfo.text = getString(R.string.BemvindoX, nome!!.split(" ")[0]).ifBlank { nome }
 
-                GoogleSignInStatusCodes.SIGN_IN_FAILED -> {
-                    this.binding.tvInfo.text =
-                        MessageFormat.format(getString(R.string.Ologinfalhou), e.statusCode)
-                }
+        binding.fabTryAgain.postDelayed({
+            startActivity(SplashActivity.newIntentUpdateMetadata(this@LoginActivity))
+            finishAffinity()
+        }, 2000)
 
-                else -> {
-                    this.binding.tvInfo.text = MessageFormat.format(
-                        getString(R.string.Houveumerroaocontactaraapidogoole), e.statusCode
-                    )
-                }
+    }
+
+    /**
+    Sign in failed. If response is null the user canceled the sign-in flow using the back button. Otherwise check
+    response.getError().getErrorCode() and handle the error.
+     */
+    private fun handleSignInErrors(response: IdpResponse?) {
+        Vibrator.error()
+        this.binding.fabTryAgain.visibility = View.VISIBLE
+
+        if (response == null) this.binding.tvInfo.setText(R.string.Voce_cancelou_o_login)
+        else when (response.error?.errorCode) {
+
+            NO_NETWORK -> {
+                this.binding.tvInfo.setText(R.string.Vocenaoestaconectadoainternetouadata)
             }
-        }
-    }
 
-    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-        mAuth.signInWithCredential(credential).addOnCompleteListener(
-            this
-        ) { task ->
-            if (task.isSuccessful) {
+            DEVELOPER_ERROR -> {
+                this.binding.tvInfo.text = getString(
+                    R.string.O_login_falhou_por_um_erro_de_desenvolvimento_da_aplica_o_contate_o_desenvolvedor_c_digo_de_erro_1_mensagem_2,
+                    response.error!!.errorCode,
+                    response.error!!.message!!
+                )
+            }
 
-                val user: FirebaseUser = checkNotNull(mAuth.currentUser)
-                this.binding.progressBar.visibility = View.GONE
+            PROVIDER_ERROR -> {
+                this.binding.tvInfo.text = getString(
+                    R.string.O_login_falhou_por_um_erro_no_provedor_de_login,
+                    response.error!!.errorCode,
+                    response.error!!.message!!
+                )
+            }
 
-                val nome = if (user.displayName != null) user.displayName else "?"
-                this.binding.tvInfo.text = MessageFormat.format(getString(R.string.BemvindoX),
-                    nome!!.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0])
-
-                Handler().postDelayed({
-                    startActivity(SplashActivity.newIntentUpdateMetadata(this@LoginActivity))
-                    finishAffinity()
-                }, 2000)
-            } else {
-                this.binding.progressBar.visibility = View.GONE
-                this.binding.btnTentarNovamente.visibility = View.VISIBLE
-                val ex = task.exception
-                if (ex != null) this.binding.tvInfo.text = MessageFormat.format(
-                    getString(R.string.Houveumerroaoautenticarsuacontatente), ex.message
+            else -> {
+                this.binding.tvInfo.text = MessageFormat.format(
+                    getString(R.string.Ologinfalhou),
+                    response.error!!.errorCode,
+                    response.error!!.message!!
                 )
             }
         }
     }
+
 
 }
 
