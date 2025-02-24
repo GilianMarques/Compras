@@ -39,8 +39,8 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
 
         attUiWithUserData(UserRepository.getUser()!!)
-        initRecyclerView()
-        initFabAddList()
+        setupRecyclerView()
+        setupFabAddList()
         observeListsUpdates()
 
     }
@@ -79,13 +79,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun initRecyclerView() {
-
+    private fun setupRecyclerView() {
         binding.rv.layoutManager = LinearLayoutManager(this)
         binding.rv.adapter = rvAdapter
     }
 
-    private fun initFabAddList() = binding.fabAddList.setOnClickListener {
+    private fun setupFabAddList() = binding.fabAddList.setOnClickListener {
 
         startActivity(AddEditShopListActivity.newIntentAddShopList(this))
     }
@@ -98,7 +97,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun rvItemClick(shopList: ShopList) {
-        startActivityProducts(shopList, false)
+        startActivityProducts(shopList)
     }
 
     private fun rvLongItemClick(shopList: ShopList) {
@@ -109,9 +108,9 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun startActivityProducts(shopList: ShopList, suggestProducts: Boolean) {
+    private fun startActivityProducts(shopList: ShopList) {
         Vibrator.interaction()
-        val intent = ProductsActivity.newIntent(this, shopList.id, suggestProducts)
+        val intent = ProductsActivity.newIntent(this, shopList.id)
         startActivity(intent)
     }
 }

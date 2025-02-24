@@ -3,10 +3,10 @@ package dev.gmarques.compras.ui.splash
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import dev.gmarques.compras.data.firestore.FirebaseCloneDatabase
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.firestore.migration.Migration_1_2
 import dev.gmarques.compras.data.repository.UserRepository
@@ -49,16 +49,22 @@ class SplashActivity : AppCompatActivity() {
 
     }
 
+    // TODO: checar versao do db do app e da nuvem e impedir uso se forem incompatives
     private fun checkUserAuthenticated() = lifecycleScope.launch {
 
         val user = UserRepository.getUser()
 
         if (user != null) {
-            Firestore.loadDatabasePaths()
-            if (updateUserMetadata) UserRepository.updateDatabaseMetadata()
-            checkDatabaseVersion()
-            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-            finish()
+            val hostEmail = Firestore.loadDatabasePaths()
+            if (hostEmail != null) {
+                FirebaseCloneDatabase(hostEmail, UserRepository.getUser()!!.email!!).beginCloning()
+                //  avisar e reiniciar app finishAffinity()
+            } else {
+
+                if (updateUserMetadata) UserRepository.updateDatabaseMetadata()
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                finish()
+            }
         } else {
             startActivity(
                 Intent(
@@ -70,14 +76,7 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun checkDatabaseVersion() = withContext(IO) {
 
-        val cloudVersion = Firestore.getCloudDatabaseVersion()
-        if (cloudVersion < 2) {
-            updateUi()
-            Migration_1_2().beginMigration()
-        }
-    }
 
     private suspend fun updateUi() = withContext(Main) {
         binding.tvInfo.visibility = VISIBLE

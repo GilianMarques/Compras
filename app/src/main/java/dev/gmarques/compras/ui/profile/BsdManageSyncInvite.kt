@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import dev.gmarques.compras.BuildConfig
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.model.SyncAccount
@@ -81,7 +82,7 @@ class BsdManageSyncInvite(
 
     private fun startProgressAnimation(
         pbAccept: ProgressBar,
-        duration: Long = 5000L,
+        duration: Long = if (BuildConfig.DEBUG) 1L else 5000L,
         onComplete: () -> Unit,
     ) {
         ValueAnimator.ofInt(0, 100).apply {
@@ -127,7 +128,6 @@ class BsdManageSyncInvite(
 
         val success = UserRepository.acceptInvite(invite)
         if (success) {
-            PreferencesHelper().saveValue(PreferencesHelper.PrefsKeys.HOST, invite.email)
             Vibrator.success()
         } else {
             Vibrator.error()
@@ -147,6 +147,7 @@ class BsdManageSyncInvite(
         AlertDialog.Builder(targetActivity)
             .setTitle(title)
             .setMessage(msg)
+            .setCancelable(false)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
                 binding.root.postDelayed({

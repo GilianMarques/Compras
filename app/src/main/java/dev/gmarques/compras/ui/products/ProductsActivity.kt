@@ -25,6 +25,8 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.data.repository.SuggestionProductRepository
 import dev.gmarques.compras.databinding.ActivityProductsBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 
@@ -35,6 +37,7 @@ import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -55,12 +58,10 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     companion object {
         private const val LIST_ID = "list_id"
-        private const val SUGGEST_PRODUCTS = "suggest_products"
 
-        fun newIntent(context: Context, list: String, suggestProducts: Boolean = false): Intent {
+        fun newIntent(context: Context, list: String): Intent {
             return Intent(context, ProductsActivity::class.java).apply {
                 putExtra(LIST_ID, list)
-                putExtra(SUGGEST_PRODUCTS, suggestProducts)
             }
         }
     }
@@ -69,7 +70,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         super.onCreate(savedInstanceState)
 
         val shopListId = intent.getStringExtra(LIST_ID)!!
-        val suggestProducts = intent.getBooleanExtra(SUGGEST_PRODUCTS, false)
 
         binding = ActivityProductsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -84,9 +84,17 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         initFabAddProduct()
         observeStateChanges()
         setupOnBackPressed()
-        if (suggestProducts) startActivitySuggestProduct()
+        suggestProductsIfNeeded(shopListId)
 
 
+    }
+
+    private fun suggestProductsIfNeeded(shopListId: String) = lifecycleScope.launch(IO) {
+
+        if (ProductRepository.getProducts(shopListId).isEmpty()
+            &&
+            SuggestionProductRepository.getSuggestions().isNotEmpty()
+        ) startActivitySuggestProduct()
     }
 
     private fun observeStateChanges() {
@@ -411,7 +419,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             }
             .setConfirmListener {
                 viewModel.updateProductAsIs(it)
-            }.build().show()    }
+            }.build().show()
+    }
 
     override fun rvProductsOnInfoClick(product: Product) {
         BsdEditProductPriceOrQuantity
@@ -427,7 +436,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             }
             .setConfirmListener {
                 viewModel.updateProductAsIs(it)
-            }.build().show()    }
+            }.build().show()
+    }
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {
 

@@ -5,6 +5,7 @@ e enviar os dados do local para o sync_requests do alvo
 Ao aceitar o convite:
 marcar 'accepted' como true na coleçao de convidados do anfitriao (atualiza os dados do convite no db do anfitriao)
 salvar os dados do anfitriao na seçao host do local(convidado)
+remover convite da lista de convites
 
 Ao recusar o convite:
 remove os dados do convidado da coleçao de convidados do anfitriao

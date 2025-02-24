@@ -1,6 +1,5 @@
 package dev.gmarques.compras.ui.profile
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,10 +14,14 @@ class ProfileActivityViewModel : ViewModel() {
     private lateinit var lrGuests: ListenerRegister
     private lateinit var lrHost: ListenerRegister
 
-    private val uiState = ProfileActivityState()
+    private var uiState: UiState = UiState()
+        set(value) {
+            field = value
+            _liveData.postValue(field)
+        }
 
-    private val _uiStateLd = MutableLiveData<ProfileActivityState>()
-    val uiStateLd: LiveData<ProfileActivityState> get() = _uiStateLd
+    private val _liveData = MutableLiveData<UiState>()
+    val uiStateLd: LiveData<UiState> get() = _liveData
 
     init {
         observeSyncInvites()
@@ -36,33 +39,37 @@ class ProfileActivityViewModel : ViewModel() {
 
     private fun observeSyncInvites() {
         lrSyncInvite = UserRepository.observeSyncInvites { requests ->
-            requests.toList().also { uiState.requests = requests.toList() }
-            _uiStateLd.postValue(uiState)
-            Log.d(
-                "USUK",
-                "ProfileActivityViewModel.".plus("observeSyncInvites() requests = $requests")
-            )
+            requests.let {
+                uiState = uiState.copy(requests = it)
+            }
         }
     }
 
+
     private fun observeGuests() {
         lrGuests = UserRepository.observeGuests { guests ->
-            guests.toList().also { uiState.guests = guests.toList() }
-            _uiStateLd.postValue(uiState)
+            guests.let {
+                uiState = uiState.copy(guests = it)
+            }
+
         }
     }
 
     private fun observeHost() {
-        lrHost = UserRepository.observeHost { host ->
-            host.toList().also { uiState.host = host.toList() }
-            _uiStateLd.postValue(uiState)
+
+
+        lrHost = UserRepository.observeHost { host: MutableList<SyncAccount> ->
+            host.let {
+                uiState = uiState.copy(host = it)
+            }
         }
     }
 
     // TODO: replicar esse design em todo o app
-    class ProfileActivityState {
-        var requests: List<SyncAccount>? = null
-        var guests: List<SyncAccount>? = null
-        var host: List<SyncAccount>? = null
-    }
+    data class UiState(
+        val requests: List<SyncAccount> = emptyList(),
+        val guests: List<SyncAccount> = emptyList(),
+        val host: List<SyncAccount> = emptyList(),
+    )
+
 }

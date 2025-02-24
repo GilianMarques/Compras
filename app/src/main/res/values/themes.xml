@@ -15,8 +15,8 @@
 
 
     <style name="Login.Activity" parent="Base.Theme.Compras">
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
-        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">?android:attr/windowBackground</item>
+        <item name="android:navigationBarColor">?android:attr/windowBackground</item>
     </style>
 
     <style name="Theme.EditText" parent="Base.Theme.Compras">

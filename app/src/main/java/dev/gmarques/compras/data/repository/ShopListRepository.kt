@@ -13,7 +13,7 @@ object ShopListRepository {
 
     fun addOrUpdateShopList(validatedShopList: ValidatedShopList) {
         val shopList = validatedShopList.shopList
-        Firestore.shopListsCollection.document(shopList.id)
+        Firestore.shopListsCollection().document(shopList.id)
             .set(shopList)
     }
 
@@ -22,7 +22,7 @@ object ShopListRepository {
      * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
      * */
     fun observeShopListsUpdates(onSnapshot: (List<ShopList>?, Exception?) -> Any): ListenerRegister {
-        return ListenerRegister(Firestore.shopListsCollection.addSnapshotListener { querySnapshot, fbException ->
+        return ListenerRegister(Firestore.shopListsCollection().addSnapshotListener { querySnapshot, fbException ->
 
             if (fbException != null) onSnapshot(null, fbException)
             else querySnapshot?.let {
@@ -35,7 +35,7 @@ object ShopListRepository {
     }
 
     fun removeShopList(shopList: ShopList) {
-        Firestore.shopListsCollection.document(shopList.id).delete()
+        Firestore.shopListsCollection().document(shopList.id).delete()
     }
 
     /**
@@ -47,7 +47,7 @@ object ShopListRepository {
         onSnapshot: (ShopList?, Exception?) -> Any,
     ): ListenerRegister {
         return ListenerRegister(
-            Firestore.shopListsCollection.whereEqualTo("id", shopListId)
+            Firestore.shopListsCollection().whereEqualTo("id", shopListId)
                 .addSnapshotListener { querySnapshot, fbException ->
 
                     if (fbException != null) onSnapshot(null, fbException)
@@ -62,7 +62,7 @@ object ShopListRepository {
 
     suspend fun getShopListByName(name: String): Result<Category?> {
         val querySnapshot =
-            Firestore.shopListsCollection.whereEqualTo("name", name).limit(1).get().await()
+            Firestore.shopListsCollection().whereEqualTo("name", name).limit(1).get().await()
 
         return if (!querySnapshot.isEmpty) {
             val targetCategory = querySnapshot.documents[0].toObject<Category>()
@@ -72,7 +72,7 @@ object ShopListRepository {
 
 
     suspend fun getShopList(id: String): Result<ShopList> {
-        val querySnapshot = Firestore.shopListsCollection.document(id).get().await()
+        val querySnapshot = Firestore.shopListsCollection().document(id).get().await()
 
         val targetShopList = querySnapshot.toObject<ShopList>()!!
         return Result.success(targetShopList)

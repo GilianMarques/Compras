@@ -49,14 +49,14 @@ class LoginActivity : AppCompatActivity() {
      * a execuçao continua a partir do onSignInResult
      * @see onSignInResult
      */
-    private fun doLogin() { // TODO: fazer logoff nao esta funcionando corretamente, ajuste 
+    private fun doLogin() {
 
         val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
 
         val signInIntent =
             AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers)
-                .setLogo(R.drawable.vec_product) // Set logo drawable
-                .setTheme(R.style.Login_Activity) // Set theme
+              //  .setLogo(R.drawable.vec_product) // Set logo drawable
+              //  .setTheme(R.style.Login_Activity) // Set theme
                 .build()
 
         signInLauncher.launch(signInIntent)
@@ -79,10 +79,8 @@ class LoginActivity : AppCompatActivity() {
         val nome = if (user?.displayName != null) user.displayName else "?"
         binding.tvInfo.text = getString(R.string.BemvindoX, nome!!.split(" ")[0]).ifBlank { nome }
 
-        binding.fabTryAgain.postDelayed({
-            startActivity(SplashActivity.newIntentUpdateMetadata(this@LoginActivity))
-            finishAffinity()
-        }, 2000)
+        startActivity(SplashActivity.newIntentUpdateMetadata(this@LoginActivity))
+        finishAffinity()
 
     }
 

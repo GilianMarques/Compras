@@ -26,7 +26,7 @@ import kotlin.system.exitProcess
 
 class ProfileActivity : AppCompatActivity() {
 
-    private var state: ProfileActivityViewModel.ProfileActivityState? = null
+    private var state: ProfileActivityViewModel.UiState? = null
     private lateinit var binding: ActivityProfileBinding
     private lateinit var viewModel: ProfileActivityViewModel
 
@@ -188,21 +188,21 @@ class ProfileActivity : AppCompatActivity() {
                 getString(R.string.Voce_sera_desconectado_a_e_todos_os_dados_locais_ser_o_removidos_deseja_mesmo_continuar),
                 getString(R.string.Sair)
             ) {
+                lifecycleScope.launch {
+                    UserRepository.logOff(this@ProfileActivity) { error ->
+                        if (error == null) {
+                            Firebase.firestore.clearPersistence()
+                            Vibrator.success()
+                            closeApp()
 
-                UserRepository.logOff(this@ProfileActivity) { error ->
-                    if (error == null) {
-                        Firebase.firestore.clearPersistence()
-                        PreferencesHelper().removeValue(PreferencesHelper.PrefsKeys.HOST)
-                        Vibrator.success()
-                        closeApp()
-
-                    } else {
-                        Vibrator.error()
-                        Snackbar.make(
-                            binding.root,
-                            getString(R.string.Erro_fazendo_logoff_tente_novamente_mais_tarde),
-                            Snackbar.LENGTH_LONG
-                        ).show()
+                        } else {
+                            Vibrator.error()
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.Erro_fazendo_logoff_tente_novamente_mais_tarde),
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }
@@ -219,7 +219,10 @@ class ProfileActivity : AppCompatActivity() {
      * Mostra um alertdialog com conteudo dianmico
      * */
     private fun showDialog(title: String, msg: String, confirm: String, callback: () -> Any) {
-        AlertDialog.Builder(this@ProfileActivity).setTitle(title).setMessage(msg)
+        AlertDialog.Builder(this@ProfileActivity)
+            .setTitle(title)
+            .setMessage(msg)
+            .setCancelable(false)
             .setPositiveButton(confirm) { dialog, _ ->
                 dialog.dismiss()
                 callback()
@@ -229,9 +232,9 @@ class ProfileActivity : AppCompatActivity() {
     private fun setupRequestPermission() {
         binding.tvRequestPermission.setOnClickListener {
 
-            if (state!!.host!!.isEmpty()) {
+            if (state!!.host.isEmpty()) {
                 Vibrator.interaction()
-                BsdSendSyncInvite(this, lifecycleScope,state!!.guests).show()
+                BsdSendSyncInvite(this, lifecycleScope, state!!.guests).show()
             } else {
                 Vibrator.error()
                 showDialog(
