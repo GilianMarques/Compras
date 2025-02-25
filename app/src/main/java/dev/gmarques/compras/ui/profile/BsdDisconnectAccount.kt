@@ -10,18 +10,16 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdDisconnectAccountBinding
 import dev.gmarques.compras.ui.Vibrator
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.system.exitProcess
 
 class BsdDisconnectAccount(
     private val account: SyncAccount,
@@ -71,25 +69,20 @@ class BsdDisconnectAccount(
 
     }
 
-    private fun disconnectFromHost() = GlobalScope.launch(Dispatchers.IO) {
+    private fun disconnectFromHost() = lifecycleScope.launch(IO) {
 
         val result = UserRepository.disconnectFromHost(account)
-        withContext(Dispatchers.Main) {
+        withContext(Main) {
 
             if (result.isSuccess) {
-
+// TODO: migrar os dados qdo desconectar do host 
                 AlertDialog.Builder(targetActivity)
                     .setTitle(targetActivity.getString(R.string.Conta_desconectada_com_sucesso))
-                    .setMessage(targetActivity.getString(R.string.O_app_ser_fechado_para_aplicar_as_altera_es))
-                    .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
-                        GlobalScope.launch {
-                            dialog.dismiss()
-                            binding.root.postDelayed({
-                                exitProcess(0)
-                            }, 250) // 250ms delay)
-                        }
-                    }
-                    .show()
+                    .setMessage(targetActivity.getString(R.string.Reinicie_o_app_para_aplicar_as_alteracoes))
+                    .setCancelable(false)
+                    .setPositiveButton(targetActivity.getString(R.string.Entendi)) { _, _ ->
+                     App.close(targetActivity)
+                    }.show()
 
 
             } else {
@@ -100,7 +93,7 @@ class BsdDisconnectAccount(
         }
     }
 
-    private fun disconnectGuest() = GlobalScope.launch(Dispatchers.IO) {
+    private fun disconnectGuest() = lifecycleScope.launch(IO) {
 
         val result = UserRepository.disconnectGuest(account)
         if (result.isSuccess) {
@@ -109,15 +102,17 @@ class BsdDisconnectAccount(
 
     }
 
-    private suspend fun showErrorMsg(msg: String) = withContext(Dispatchers.Main) {
+    private suspend fun showErrorMsg(msg: String) = withContext(Main) {
         binding.tvErrorMsg.text = msg
         binding.tvErrorMsg.visibility = VISIBLE
 
         Vibrator.error()
-        withContext(Dispatchers.IO) {
-            delay(3000)
-            withContext(Dispatchers.Main) { binding.tvErrorMsg.visibility = GONE }
-        }
+        binding.tvErrorMsg.postDelayed(
+            {
+                binding.tvErrorMsg.visibility = GONE
+            },
+            3000
+        )
     }
 
     fun show() {

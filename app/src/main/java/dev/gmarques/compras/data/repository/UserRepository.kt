@@ -98,15 +98,16 @@ object UserRepository {
 
     fun observeHost(callback: (MutableList<SyncAccount>) -> Any): ListenerRegister {
         val listenerRegistration =
-            Firestore.hostCollection().addSnapshotListener { querySnapshot: QuerySnapshot?, _: FirebaseFirestoreException? ->
+            Firestore.hostCollection()
+                .addSnapshotListener { querySnapshot: QuerySnapshot?, _: FirebaseFirestoreException? ->
 
-                val invites = mutableListOf<SyncAccount>()
+                    val invites = mutableListOf<SyncAccount>()
 
-                querySnapshot?.documents?.forEach { snap ->
-                    invites.add(snap.toObject<SyncAccount>()!!)
+                    querySnapshot?.documents?.forEach { snap ->
+                        invites.add(snap.toObject<SyncAccount>()!!)
+                    }
+                    callback(invites)
                 }
-                callback(invites)
-            }
 
         return ListenerRegister(listenerRegistration)
     }
@@ -212,15 +213,14 @@ object UserRepository {
 // TODO: clonar o db aqui
             val localUser = getUser()!!
 
+
             // Limpar dados do host no db do usuario local
             Firestore.hostDocument().delete().await()
 
             // Remover dados do local da seçao guests do anfitriao
-            Firestore.guestsCollection(host.email).document(localUser.email!!)
-                .delete().await()
+            Firestore.guestsCollection(host.email).document(localUser.email!!).delete().await()
 
             Result.success(true)
-
 
         } catch (e: Exception) {
             Result.failure(e)

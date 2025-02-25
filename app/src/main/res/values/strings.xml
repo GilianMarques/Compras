@@ -148,7 +148,6 @@
     <string name="Convidado_desconectado_com_sucesso">Convidado desconectado com sucesso</string>
     <string name="Convite_enviado_com_sucesso">Convite enviado com sucesso</string>
     <string name="Gerenciar_anfitriao">Gerenciar anfitrião</string>
-    <string name="O_app_ser_fechado_para_aplicar_as_altera_es">O app será fechado para aplicar as alterações</string>
     <string name="Conta_desconectada_com_sucesso">Conta desconectada com sucesso</string>
     <string name="Informacoes_adicionais">Informações adicionais</string>
     <string name="Inclua_detalhes_do_item_como_marca_ou_peso">Inclua detalhes do item como marca ou peso.</string>
@@ -160,5 +159,10 @@
     <string name="X_ja_esta_sincronizando_com_voce">%1$s já está sincronizando com você</string>
     <string name="O_login_falhou_por_um_erro_de_desenvolvimento_da_aplica_o_contate_o_desenvolvedor_c_digo_de_erro_1_mensagem_2">O login falhou por um erro de desenvolvimento da aplicação, contate o desenvolvedor. Código de erro:%1$d \nMensagem: %2$s</string>
     <string name="O_login_falhou_por_um_erro_no_provedor_de_login">O login falhou por um erro no provedor de login, tente novamente mais tarde. Código de erro:%1$d \nMensagem: %2$s</string>
+    <string name="Reinicie_o_app_para_aplicar_as_alteracoes">Reinicie o app para aplicar as alterações</string>
+    <string name="Aguarde_enquanto_seus_dados_s_o_migrados_de_volta_n_o_feche_o_app_ou_se_desconecte_da_internet">Aguarde enquanto migramos seus dados…</string>
+    <string name="Sincronismo_entre_contas">Sincronismo entre contas</string>
+    <string name="O_sincronismo_entre_contas_foi_interrompido">O sincronismo entre contas foi interrompido. Antes de prossseguir é necessário migrar os dados da sua conta. Não feche o app ou desconecte-se da internet durante o processo.</string>
+    <string name="Sucesso">Sucesso</string>
 
 </resources>

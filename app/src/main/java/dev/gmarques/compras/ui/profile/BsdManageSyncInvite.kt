@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import dev.gmarques.compras.App
 import dev.gmarques.compras.BuildConfig
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
@@ -150,10 +151,7 @@ class BsdManageSyncInvite(
             .setCancelable(false)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
-                binding.root.postDelayed({
-                    this@BsdManageSyncInvite.dialog.dismiss()
-                    exitProcess(0)
-                }, 250) // 250ms delay
+                App.close(targetActivity)
             }
             .show()
 

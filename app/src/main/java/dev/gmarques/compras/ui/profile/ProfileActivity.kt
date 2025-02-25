@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import dev.gmarques.compras.App
 import dev.gmarques.compras.BuildConfig
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
@@ -21,6 +22,7 @@ import dev.gmarques.compras.databinding.ItemGuestOrHostBinding
 import dev.gmarques.compras.databinding.ItemSyncInviteBinding
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
@@ -193,7 +195,7 @@ class ProfileActivity : AppCompatActivity() {
                         if (error == null) {
                             Firebase.firestore.clearPersistence()
                             Vibrator.success()
-                            closeApp()
+                            App.close(this@ProfileActivity)
 
                         } else {
                             Vibrator.error()
@@ -209,11 +211,6 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    private fun closeApp() = lifecycleScope.launch(Dispatchers.IO) {
-
-        finishAffinity()
-        exitProcess(0)
-    }
 
     /**
      * Mostra um alertdialog com conteudo dianmico

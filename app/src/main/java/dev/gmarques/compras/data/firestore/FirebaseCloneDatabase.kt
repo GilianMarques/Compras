@@ -31,8 +31,19 @@ class FirebaseCloneDatabase(private val baseEmail: String, private val targetEma
      * ou até mesmo erros por conta de dados antigos no database que nao foram migrados com o passar do tempo
      * */
     private suspend fun cleanDatabase() {
-        Firestore.rootCollection(targetEmail).get().await().forEach { targetDoc ->
-            targetDoc.reference.delete().await()
+
+        val collectionsToClean = listOf(
+            Firestore.shopListsCollection(targetEmail),
+            Firestore.categoriesCollection(targetEmail),
+            Firestore.productsCollection(targetEmail),
+            Firestore.suggestionProductsCollection(targetEmail)
+        )
+
+        collectionsToClean.forEach {
+            it.get().await().forEach { targetDoc ->
+                targetDoc.reference.delete().await()
+            }
+
         }
     }
 
