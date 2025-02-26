@@ -12,6 +12,7 @@ import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
+import dev.gmarques.compras.data.firestore.FirebaseCloneDatabase
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.LastLogin
 import dev.gmarques.compras.data.model.SyncAccount
@@ -207,15 +208,22 @@ object UserRepository {
 
     }
 
+    /**
+     * Se desconeta do anfitriao, apagando as referencias das contas um dou outro e
+     * criando uma cópia do banco de dados para o convidado que esta se desconectando
+     * @see FirebaseCloneDatabase
+     * */
     suspend fun disconnectFromHost(host: SyncAccount): Result<Boolean> {
 
         return try {
-// TODO: clonar o db aqui
             val localUser = getUser()!!
 
-
-            // Limpar dados do host no db do usuario local
-            Firestore.hostDocument().delete().await()
+            /* Faz uma copia do banco de dados para o convidado que esta se desconectando
+            ao fim da clonagem os dados do host sao removidos do db do usuario*/
+            FirebaseCloneDatabase(
+                host.email,
+                localUser.email!!
+            ).beginCloning()
 
             // Remover dados do local da seçao guests do anfitriao
             Firestore.guestsCollection(host.email).document(localUser.email!!).delete().await()

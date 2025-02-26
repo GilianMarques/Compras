@@ -92,6 +92,7 @@ class BsdSendSyncInvite(
         AlertDialog.Builder(targetActivity)
             .setTitle(title)
             .setMessage(msg)
+            .setCancelable(false)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
                 binding.root.postDelayed({

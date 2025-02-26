@@ -139,6 +139,9 @@ class ProfileActivity : AppCompatActivity() {
         host: List<SyncAccount>?,
     ) {
 
+        binding.llInvite.visibility = if (host.isNullOrEmpty()) VISIBLE else GONE
+        binding.tvSendInvite.isEnabled = host.isNullOrEmpty()
+
         binding.llHost.removeAllViews()
         binding.llParentHost.visibility = if (host.isNullOrEmpty()) GONE else VISIBLE
 
@@ -227,7 +230,7 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun setupRequestPermission() {
-        binding.tvRequestPermission.setOnClickListener {
+        binding.tvSendInvite.setOnClickListener {
 
             if (state!!.host.isEmpty()) {
                 Vibrator.interaction()
@@ -236,7 +239,7 @@ class ProfileActivity : AppCompatActivity() {
                 Vibrator.error()
                 showDialog(
                     getString(R.string.Erro),
-                    getString(R.string.Voce_nao_pode_conectar_sua_conta_a_outra_enquanto),
+                    getString(R.string.Voce_nao_pode_convidar_um_usu_rio_para_a_sua_conta_enquanto_for_convidado_de_outra_pessoa),
                     getString(R.string.Entendi)
                 ) {}
             }

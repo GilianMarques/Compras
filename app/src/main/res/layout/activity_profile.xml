@@ -178,34 +178,47 @@
 
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:fontFamily="@font/lexend_deca_bold"
-                android:padding="4dp"
-                android:text="@string/Colaborar_com_outr_usuario"
-                android:textAlignment="viewStart"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/tv_request_permission"
-                style="@style/Margins_edittext"
+            <LinearLayout
+                android:id="@+id/ll_invite"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/back_textview_menu"
-                android:drawablePadding="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/Sincronize_com_outro_usu_rio"
-                android:textColor="?attr/colorPrimaryVariant"
-                app:drawableStartCompat="@drawable/vec_invite_user"
-                app:drawableTint="?attr/colorPrimaryVariant"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="16dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="@font/lexend_deca_bold"
+                    android:padding="4dp"
+                    android:text="@string/Colaborar_com_outr_usuario"
+                    android:textAlignment="viewStart"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_send_invite"
+                    style="@style/Margins_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/back_textview_menu"
+                    android:drawablePadding="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/Sincronize_com_outro_usu_rio"
+                    android:textColor="?attr/colorPrimaryVariant"
+                    app:drawableStartCompat="@drawable/vec_invite_user"
+                    app:drawableTint="?attr/colorPrimaryVariant"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+
+            </LinearLayout>
+
 
             <View
                 android:id="@+id/divider"

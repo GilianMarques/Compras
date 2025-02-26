@@ -12,6 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.firestore.FirebaseCloneDatabase
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdDisconnectAccountBinding
@@ -61,11 +62,36 @@ class BsdDisconnectAccount(
         AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Interromper_conexao)) { dialog, _ ->
                 dialog.dismiss()
+                if (accountIsHost) confirmDisconnectFromHost()
+                else {
+                    binding.fabDisconnect.isEnabled = false
+                    binding.pbAccept.visibility = VISIBLE
+                    disconnectGuest()
+                }
+            }.show()
+
+    }
+
+    private fun confirmDisconnectFromHost() {
+
+        val title = targetActivity.getString(R.string.Por_favor_confirme)
+        val msg = targetActivity.getString(
+            R.string.Ao_se_desconectar_de_ser_necessario_migrar,
+            account.name
+        )
+
+        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+            .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
+
                 binding.fabDisconnect.isEnabled = false
                 binding.pbAccept.visibility = VISIBLE
-                if (accountIsHost) disconnectFromHost()
-                else disconnectGuest()
-            }.show()
+                dialog.dismiss()
+                disconnectFromHost()
+
+            }.setNegativeButton(targetActivity.getString(R.string.Cancelar)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(false).show()
 
     }
 
@@ -75,15 +101,15 @@ class BsdDisconnectAccount(
         withContext(Main) {
 
             if (result.isSuccess) {
-// TODO: migrar os dados qdo desconectar do host 
+
+
                 AlertDialog.Builder(targetActivity)
                     .setTitle(targetActivity.getString(R.string.Conta_desconectada_com_sucesso))
                     .setMessage(targetActivity.getString(R.string.Reinicie_o_app_para_aplicar_as_alteracoes))
                     .setCancelable(false)
                     .setPositiveButton(targetActivity.getString(R.string.Entendi)) { _, _ ->
-                     App.close(targetActivity)
+                        App.close(targetActivity)
                     }.show()
-
 
             } else {
                 showErrorMsg(targetActivity.getString(R.string.Nao_foi_possivel_desconectar_o_anfitriao_por_favor_tente_novamente))

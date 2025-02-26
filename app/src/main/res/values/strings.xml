@@ -164,5 +164,7 @@
     <string name="Sincronismo_entre_contas">Sincronismo entre contas</string>
     <string name="O_sincronismo_entre_contas_foi_interrompido">O sincronismo entre contas foi interrompido. Antes de prossseguir é necessário migrar os dados da sua conta. Não feche o app ou desconecte-se da internet durante o processo.</string>
     <string name="Sucesso">Sucesso</string>
+    <string name="Ao_se_desconectar_de_ser_necessario_migrar">Ao se desconectar de %1$s será necessário migrar os dados da sua conta de volta, não feche ou app ou desconete-se de internet duranto o processo.</string>
+    <string name="Voce_nao_pode_convidar_um_usu_rio_para_a_sua_conta_enquanto_for_convidado_de_outra_pessoa">Você não pode convidar um usuário para a sua conta enquanto for convidado de outra pessoa.</string>
 
 </resources>
