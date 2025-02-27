@@ -75,7 +75,6 @@ class PreferencesHelper {
     class PrefsKeys {
         companion object {
             const val PRODUCTION_DATABASE = "use_production_db_on_debug"
-            const val HOST = "host"
             const val SORT_CRITERIA = "sort_criteria"
             const val SORT_ASCENDING = "sort_ascending"
             const val BOUGHT_PRODUCTS_AT_END = "bought_products_at_end"

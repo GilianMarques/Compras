@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     alias(libs.plugins.google.gms.google.services)
+
 }
 
 android {
@@ -65,13 +66,14 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.play.services.auth)
     implementation(libs.glide)
-    implementation(libs.play.services.fido)
     implementation(libs.firebase.firestore)
     implementation(libs.dropdown)
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.flexbox)
     implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.core.testing)
+    implementation(libs.firebase.ui.auth)
+    implementation(libs.firebase.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.kotlinx.coroutines.android)

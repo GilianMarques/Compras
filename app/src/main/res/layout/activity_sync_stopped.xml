@@ -23,18 +23,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="48dp"
                 android:elevation="2dp"
-                android:fontFamily="@font/lexend_deca_bold"
                 android:padding="16dp"
+                android:text="@string/O_sincronismo_entre_contas_foi_interrompido_reinicie_"
                 android:textAlignment="center"
-                android:textSize="18sp"
                 android:visibility="visible"
-                app:layout_constraintBottom_toTopOf="@id/fab_try_again"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:text="Erro fazendo login" />
+                app:layout_constraintTop_toTopOf="parent"
+
+                />
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/fab_try_again"
+                android:id="@+id/fab_close_app"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="64dp"
@@ -42,15 +43,14 @@
                 android:elevation="2dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/Tentar_novamente"
+                android:text="@string/Fechar"
                 android:textColor="?colorPrimary"
                 android:textSize="16sp"
-                android:visibility="gone"
-                app:icon="@drawable/vec_try_again"
+                app:icon="@drawable/vec_logoff"
                 app:layout_constraintBottom_toBottomOf="@id/parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:visibility="visible" />
+                />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

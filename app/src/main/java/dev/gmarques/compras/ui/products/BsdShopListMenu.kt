@@ -50,16 +50,6 @@ class BsdShopListMenu private constructor(
                 dialog.dismiss()
             }
 
-            if (BuildConfig.DEBUG) {
-                cbProductionDatabase.visibility = VISIBLE
-
-                cbProductionDatabase.isChecked =
-                    PreferencesHelper().getValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, false)
-
-                cbProductionDatabase.setOnCheckedChangeListener { _, checked ->
-                    PreferencesHelper().saveValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, checked)
-                }
-            }
 
             tvTitle.text = shopList.name
         }

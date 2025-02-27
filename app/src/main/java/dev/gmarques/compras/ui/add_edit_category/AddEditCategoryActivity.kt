@@ -36,12 +36,12 @@ class AddEditCategoryActivity : AppCompatActivity() {
         private const val CATEGORY_ID = "category_id"
 
         fun newIntentAddCategory(context: Context): Intent {
-            return Intent(context, AddEditShopListActivity::class.java).apply {
+            return Intent(context, AddEditCategoryActivity::class.java).apply {
             }
         }
 
         fun newIntentEditCategory(context: Context, categoryId: String): Intent {
-            return Intent(context, AddEditShopListActivity::class.java).apply {
+            return Intent(context, AddEditCategoryActivity::class.java).apply {
                 putExtra(CATEGORY_ID, categoryId)
             }
         }
@@ -210,7 +210,7 @@ class AddEditCategoryActivity : AppCompatActivity() {
      */
     private fun setupToolbar() = binding.toolbar.apply {
         tvActivityTitle.text = getString(R.string.Adicionar_categoria)
-        ivGoBack.setOnClickListener { finish() }
+        ivGoBack.setOnClickListener { Vibrator.interaction();finish() }
         ivMenu.visibility = GONE
     }
 

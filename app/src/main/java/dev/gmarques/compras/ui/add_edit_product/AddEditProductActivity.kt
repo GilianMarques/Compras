@@ -1,12 +1,11 @@
 package dev.gmarques.compras.ui.add_edit_product
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
-import android.text.Spanned
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -20,7 +19,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
@@ -30,20 +28,12 @@ import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
-import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity.Companion.SELECTED_CATEGORY
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Activity para adicionar ou editar produtos em uma lista.
@@ -51,6 +41,7 @@ import kotlinx.coroutines.withContext
  */
 class AddEditProductActivity : AppCompatActivity() {
 
+    private var currentState: AddEditProductActivityViewModel.UiState? = null
     private lateinit var categoryResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var binding: ActivityAddEditProductBinding
@@ -81,9 +72,7 @@ class AddEditProductActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this)[AddEditProductActivityViewModel::class.java]
-        viewModel.listId = intent.getStringExtra(LIST_ID)!!
-        viewModel.productId = intent.getStringExtra(PRODUCT_ID)
-
+        viewModel.setup(intent.getStringExtra(LIST_ID)!!, intent.getStringExtra(PRODUCT_ID))
 
         setupToolbar()
         initFabAddProduct()
@@ -92,73 +81,69 @@ class AddEditProductActivity : AppCompatActivity() {
         setupInputPrice()
         setupInputQuantity()
         setupInputCategory()
-        observeProduct()
-        observeSuggestions()
-        observeNameSuggestions()
-        observeViewmodelErrorMessages()
-        observeViewmodelFinishEvent()
+        observeUiStateChanges()
         setupActivityResultLauncher()
 
-        lifecycleScope.launch {
-            withContext(IO) {
-                delay(1000)
-                binding.cbSuggestProduct.post { binding.cbSuggestProduct.isChecked = true }
-            }
-        }
+        binding.cbSuggestProduct.postDelayed({
+            binding.cbSuggestProduct.isChecked = true
+        }, 1000)
 
         binding.edtName.showKeyboard()
 
     }
 
+    private fun observeUiStateChanges() {
+        viewModel.uiStateLD.observe(this@AddEditProductActivity) { newState ->
+
+            newState.editingProduct?.let {
+                if (it == currentState?.editingProduct) return@let
+                viewModel.loadCategory(it.categoryId)
+            }
+
+            newState.editingCategory?.let {
+                if (it == currentState?.editingCategory) return@let
+                updateViewModelAndUiWithEditableProduct(newState.editingProduct!!, it)
+            }
+
+            newState.suggestionProductAndCategory?.let {
+                if (it == currentState?.suggestionProductAndCategory) return@let
+                updateViewModelAndUiWithEditableProduct(it.first, it.second)
+            }
+
+            newState.productsAndNamesSuggestions.let {
+                if (it == currentState?.productsAndNamesSuggestions) return@let
+
+                if (it.isEmpty()) hideSuggestions()
+                else showSuggestions(it)
+            }
+
+            newState.errorMessage.let {
+                if (it == currentState?.errorMessage || it.isEmpty()) return@let
+
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+                Vibrator.error()
+            }
+
+            newState.finishActivity.let {
+                if (it) finish()
+            }
+
+            this.currentState = newState
+
+        }
+    }
+
     private fun setupActivityResultLauncher() {
 
-        categoryResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val selectedCategory = result.data!!.getSerializableExtra(SELECTED_CATEGORY) as Category
-                viewModel.validatedCategory = selectedCategory
-                binding.edtCategory.clearFocus()
+        categoryResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val selectedCategory = result.data!!
+                        .getSerializableExtra(SELECTED_CATEGORY) as Category
+                    viewModel.validatedCategory = selectedCategory
+                    binding.edtCategory.clearFocus()
+                }
             }
-        }
-    }
-
-    private fun observeViewmodelErrorMessages() {
-        viewModel.errorEventLD.observe(this@AddEditProductActivity) { event ->
-            Snackbar.make(binding.root, event, Snackbar.LENGTH_LONG).show()
-            Vibrator.error()
-        }
-    }
-
-    private fun observeViewmodelFinishEvent() {
-        viewModel.finishEventLD.observe(this@AddEditProductActivity) {
-            finish()
-        }
-    }
-
-    private fun observeProduct() = viewModel.apply {
-        loadEditingProduct()
-        editingProductLD.observe(this@AddEditProductActivity) {
-
-            it?.let {
-                editingProduct = true
-                loadCategory(it.categoryId)
-                observeCategory(it)
-            }
-        }
-    }
-
-    private fun observeSuggestions() {
-        viewModel.suggestionsLD.observe(this@AddEditProductActivity) { result ->
-            val (suggestions, term) = result
-            if (suggestions.isEmpty()) viewModel.loadNameSuggestions(term)
-            else showSuggestions(suggestions)
-        }
-    }
-
-    private fun observeNameSuggestions() = lifecycleScope.launch {
-        viewModel.nameSuggestionsLD.observe(this@AddEditProductActivity) { suggestions ->
-            if (suggestions.isNotEmpty()) showSuggestions(suggestions)
-            else hideSuggestions()
-        }
     }
 
     private fun showSuggestions(suggestions: List<Any>) {
@@ -166,8 +151,8 @@ class AddEditProductActivity : AppCompatActivity() {
         binding.tvSuggestion.visibility = VISIBLE
         binding.llSuggestion.removeAllViews()
 
-        val layoutParams =
-            LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { marginStart = 4.dp(); marginEnd = 4.dp() }
+        val layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+            .apply { marginStart = 4.dp(); marginEnd = 4.dp() }
 
         suggestions.forEach { suggestion ->
             val chip = Chip(this@AddEditProductActivity)
@@ -176,11 +161,14 @@ class AddEditProductActivity : AppCompatActivity() {
 
             if (suggestion is Product) {
                 chip.text = suggestion.name
-                chip.chipIcon = AppCompatResources.getDrawable(this@AddEditProductActivity, R.drawable.vec_product)
+                chip.chipIcon = AppCompatResources.getDrawable(
+                    this@AddEditProductActivity, R.drawable.vec_product
+                )
             } else {
                 val nameSuggestion = suggestion as String
                 chip.text = nameSuggestion
-                chip.chipIcon = AppCompatResources.getDrawable(this@AddEditProductActivity, R.drawable.vec_name)
+                chip.chipIcon =
+                    AppCompatResources.getDrawable(this@AddEditProductActivity, R.drawable.vec_name)
             }
 
             chip.setOnClickListener {
@@ -188,9 +176,7 @@ class AddEditProductActivity : AppCompatActivity() {
                 hideSuggestions()
 
                 if (suggestion is Product) {
-                    viewModel.loadCategory(suggestion.categoryId)
-                    observeCategory(suggestion)
-                    binding.edtName.hideKeyboard()
+                    viewModel.loadSuggestionCategory(suggestion)
                 } else {
                     val nameSuggestion = suggestion as String
                     viewModel.canLoadSuggestion = false
@@ -209,44 +195,39 @@ class AddEditProductActivity : AppCompatActivity() {
         binding.llSuggestion.removeAllViews()
     }
 
-    private fun observeCategory(product: Product) = lifecycleScope.launch {
-        viewModel.editingCategoryLD.observe(this@AddEditProductActivity) {
+    private fun updateViewModelAndUiWithEditableProduct(product: Product, category: Category) =
+        binding.apply {
+            viewModel.apply {
 
-            it?.let {
-                updateViewModelAndUiWithEditableProduct(product, it)
+                viewModel.canLoadSuggestion = false
+                edtName.setText(product.name)
+                viewModel.canLoadSuggestion = true
+                validatedName = product.name
+
+                edtInfo.setText(product.info)
+                validatedInfo = product.info
+
+                edtPrice.setText(product.price.toCurrency())
+                validatedPrice = product.price
+
+                edtQuantity.setText(String.format(getString(R.string.un), product.quantity))
+                validatedQuantity = product.quantity
+
+                edtCategory.hint = category.name
+                (edtCategory.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(category.color)
+
+                validatedCategory = category
+
+                // essa funçao atualiza a UI em caso de ediçao de produto ou seleção de sugestão ao adicionar o produto, por iso faço a verificação
+                val editingProduct = currentState?.editingProduct != null
+                if (editingProduct) {
+                    cbSuggestProduct.visibility = GONE
+                    toolbar.tvActivityTitle.text =
+                        String.format(getString(R.string.Editar_x), product.name)
+                    fabSave.text = getString(R.string.Salvar_produto)
+                }
             }
         }
-    }
-
-    private fun updateViewModelAndUiWithEditableProduct(product: Product, category: Category) = binding.apply {
-        viewModel.apply {
-
-            viewModel.canLoadSuggestion = false
-            edtName.setText(product.name)
-            viewModel.canLoadSuggestion = true
-            validatedName = product.name
-
-            edtInfo.setText(product.info)
-            validatedInfo = product.info
-
-            edtPrice.setText(product.price.toCurrency())
-            validatedPrice = product.price
-
-            edtQuantity.setText(String.format(getString(R.string.un), product.quantity))
-            validatedQuantity = product.quantity
-
-            edtCategory.hint = category.name
-            (edtCategory.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(category.color)
-
-            validatedCategory = category
-
-            if (editingProduct) {
-                cbSuggestProduct.visibility = GONE
-                toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), product.name)
-                fabSave.text = getString(R.string.Salvar_produto)
-            }
-        }
-    }
 
     /**
      * Configura o botão de salvar produto (FAB).
@@ -292,7 +273,7 @@ class AddEditProductActivity : AppCompatActivity() {
         }
 
         edtTarget.doOnTextChanged { text, _, _, _ ->
-            if (edtTarget.hasFocus() && !text.isNullOrEmpty() && text.length > 1 && viewModel.canLoadSuggestion) {
+            if (edtTarget.hasFocus() && !text.isNullOrEmpty() && viewModel.canLoadSuggestion) {
                 viewModel.loadSuggestions(text.toString())
             } else hideSuggestions()
 
@@ -330,7 +311,13 @@ class AddEditProductActivity : AppCompatActivity() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
+                Log.d(
+                    "USUK",
+                    "AddEditProductActivity.setupInputPrice: antes ${edtTarget.text.toString()}"
+                )
                 val term = edtTarget.text.toString().ifBlank { "-1" }.currencyToDouble()
+                Log.d("USUK", "AddEditProductActivity.setupInputPrice: depois ${term}")
+
                 val result = Product.Validator.validatePrice(term, App.getContext())
 
                 if (result.isSuccess) {
@@ -358,7 +345,11 @@ class AddEditProductActivity : AppCompatActivity() {
 
                 if (result.isSuccess) {
                     viewModel.validatedQuantity = result.getOrThrow()
-                    edtTarget.setText(String.format(getString(R.string.un), viewModel.validatedQuantity))
+                    edtTarget.setText(
+                        String.format(
+                            getString(R.string.un), viewModel.validatedQuantity
+                        )
+                    )
                 } else {
                     viewModel.validatedQuantity = -1
                     showError(edtTarget, tvTarget, result.exceptionOrNull()!!.message!!)
@@ -376,7 +367,11 @@ class AddEditProductActivity : AppCompatActivity() {
         edtTarget.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 resetFocus(edtTarget, tvTarget)
-                categoryResultLauncher.launch(CategoriesActivity.newIntent(this@AddEditProductActivity, true))
+                categoryResultLauncher.launch(
+                    CategoriesActivity.newIntent(
+                        this@AddEditProductActivity, true
+                    )
+                )
 
             } else {
 
@@ -408,7 +403,7 @@ class AddEditProductActivity : AppCompatActivity() {
      */
     private fun setupToolbar() = binding.toolbar.apply {
         tvActivityTitle.text = getString(R.string.Adicionar_produto)
-        ivGoBack.setOnClickListener { finish() }
+        ivGoBack.setOnClickListener { Vibrator.interaction(); finish() }
         ivMenu.visibility = GONE
     }
 

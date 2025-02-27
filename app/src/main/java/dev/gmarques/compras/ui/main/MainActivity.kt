@@ -12,18 +12,24 @@ import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.firestore.Firestore
+import dev.gmarques.compras.data.model.Category
+import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.data.repository.CategoryRepository
+import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.data.repository.ShopListRepository
+import dev.gmarques.compras.data.repository.SuggestionProductRepository
 import dev.gmarques.compras.data.repository.UserRepository
+import dev.gmarques.compras.data.repository.model.ValidatedCategory
+import dev.gmarques.compras.data.repository.model.ValidatedProduct
+import dev.gmarques.compras.data.repository.model.ValidatedShopList
+import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.databinding.ActivityMainBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
-import dev.gmarques.compras.ui.login.LoginActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.ui.profile.ProfileActivity
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 
@@ -31,7 +37,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
-    private val rvAdapter = ShopListAdapter(isDarkThemeEnabled(), ::rvItemClick)
+    private val rvAdapter = ShopListAdapter(isDarkThemeEnabled(), ::rvItemClick, ::rvLongItemClick)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,11 +48,34 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
 
-        checkUserAuthenticated()
-        initRecyclerView()
-        initFabAddList()
+        attUiWithUserData(UserRepository.getUser()!!)
+        setupRecyclerView()
+        setupFabAddList()
         observeListsUpdates()
+        
+       // lifecycleScope.launch { populateForTest() }
+    }
 
+    private suspend fun populateForTest() {
+
+        val name = UserRepository.getUser()!!.email!!.split("@")[0]
+
+        val list = ShopList("lista de $name", 125)
+        val category = Category(name = "categoria de $name", color = 12345)
+        val product = Product(
+            list.id,
+            category.id,
+            "produto de $name",
+            0,
+            1.5,
+            1,
+            ""
+        )
+
+        ProductRepository.addOrUpdateProduct(ValidatedProduct(product))
+        SuggestionProductRepository.updateOrAddProductAsSuggestion(ValidatedSuggestionProduct(product))
+        ShopListRepository.addOrUpdateShopList(ValidatedShopList(list))
+        CategoryRepository.addOrUpdateCategory(ValidatedCategory(category))
     }
 
     private fun isDarkThemeEnabled(): Boolean {
@@ -53,33 +83,6 @@ class MainActivity : AppCompatActivity() {
             App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
-
-    private fun checkUserAuthenticated() = lifecycleScope.launch {
-
-
-        val user = UserRepository.getUser()
-
-        if (user != null) {
-            attUiWithUserData(user)
-            setupDataBase()
-
-        } else {
-            startActivity(
-                Intent(
-                    applicationContext, LoginActivity::class.java
-                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            )
-
-            this@MainActivity.finishAffinity()
-        }
-    }
-
-    private suspend fun setupDataBase() = withContext(Dispatchers.IO) {
-
-        Firestore.setupDatabase()
-        viewModel.observeUpdates()
-    }
-
 
     private fun attUiWithUserData(user: FirebaseUser) = binding.apply {
         binding.tvUserName.text = user.displayName
@@ -92,10 +95,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         user.photoUrl?.let { photoUrl ->
-            Glide.with(root.context)
-                .load(photoUrl)
-                .circleCrop()
-                .into(ivProfilePicture)
+            Glide.with(root.context).load(photoUrl).circleCrop().into(ivProfilePicture)
         } ?: run {
             // Esconde a imagem se não houver foto
             ivProfilePicture.visibility = View.GONE
@@ -103,18 +103,21 @@ class MainActivity : AppCompatActivity() {
             tvGreetings.visibility = View.GONE
         }
 
-        ivMenu.setOnClickListener {
-            startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
+        listOf(ivMenu, tvUserName, ivProfilePicture).forEach { view ->
+            view.setOnClickListener {
+                startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
+                Vibrator.interaction()
+            }
         }
+
     }
 
-    private fun initRecyclerView() {
-
+    private fun setupRecyclerView() {
         binding.rv.layoutManager = LinearLayoutManager(this)
         binding.rv.adapter = rvAdapter
     }
 
-    private fun initFabAddList() = binding.fabAddList.setOnClickListener {
+    private fun setupFabAddList() = binding.fabAddList.setOnClickListener {
 
         startActivity(AddEditShopListActivity.newIntentAddShopList(this))
     }
@@ -127,14 +130,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun rvItemClick(shopList: ShopList) {
-        startActivityProducts(shopList, false)
+        startActivityProducts(shopList)
     }
 
-    private fun startActivityProducts(shopList: ShopList, suggestProducts: Boolean) {
+    private fun rvLongItemClick(shopList: ShopList) {
+        startActivity(
+            AddEditShopListActivity.newIntentEditShopList(
+                this, shopList.id
+            )
+        )
+    }
+
+    private fun startActivityProducts(shopList: ShopList) {
         Vibrator.interaction()
-        val intent = ProductsActivity.newIntent(this, shopList.id, suggestProducts)
+        val intent = ProductsActivity.newIntent(this, shopList.id)
         startActivity(intent)
     }
+
+
 }
 
 

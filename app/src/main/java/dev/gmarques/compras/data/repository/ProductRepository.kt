@@ -17,7 +17,7 @@ object ProductRepository {
      */
     fun addOrUpdateProduct(validatedProduct: ValidatedProduct) {
         val product = validatedProduct.product
-        Firestore.productCollection.document(product.id).set(product)
+        Firestore.productsCollection().document(product.id).set(product)
     }
 
     /**
@@ -26,7 +26,7 @@ object ProductRepository {
      * @return Um [Result] contendo o produto ou uma exceção se não encontrado.
      */
     suspend fun getProduct(idProduct: String): Product {
-        val querySnapshot = Firestore.productCollection.document(idProduct).get().await()
+        val querySnapshot = Firestore.productsCollection().document(idProduct).get().await()
         val targetProduct = querySnapshot.toObject<Product>()
         if (targetProduct != null) return targetProduct
         else throw Exception("Produto nao encontrado!")
@@ -39,9 +39,8 @@ object ProductRepository {
      * @return Um [Result] contendo o produto ou null se não encontrado.
      */
     suspend fun getProductByName(name: String, listId: String): Result<Product?> {
-        val querySnapShot = Firestore.productCollection
-            .whereEqualTo("name", name).whereEqualTo("shopListId", listId)
-            .limit(1).get().await()
+        val querySnapShot = Firestore.productsCollection().whereEqualTo("name", name)
+            .whereEqualTo("shopListId", listId).limit(1).get().await()
 
         return if (querySnapShot.isEmpty) Result.success(null)
         else Result.success(querySnapShot.documents.first().toObject<Product>())
@@ -53,7 +52,8 @@ object ProductRepository {
      * @return Uma lista de nomes de produtos.
      */
     suspend fun getProducts(shopListId: String): List<String> {
-        val querySnapshot: QuerySnapshot = Firestore.productCollection.whereEqualTo("shopListId", shopListId).get().await()
+        val querySnapshot: QuerySnapshot =
+            Firestore.productsCollection().whereEqualTo("shopListId", shopListId).get().await()
         return querySnapshot.map { it.toObject<Product>().name }
     }
 
@@ -62,7 +62,7 @@ object ProductRepository {
      * @return Uma lista de produtos sugeridos.
      */
     suspend fun getSuggestions(): List<Product> {
-        val querySnapshot = Firestore.suggestionProductCollection.get().await()
+        val querySnapshot = Firestore.suggestionProductsCollection().get().await()
         return querySnapshot.map { it.toObject<Product>() }
     }
 
@@ -72,7 +72,9 @@ object ProductRepository {
      * @return Um [Result] indicando se há produtos associados.
      */
     suspend fun hasAnyProductWithCategoryId(categoryId: String): Boolean {
-        val productsSnapshot = Firestore.productCollection.whereEqualTo("categoryId", categoryId).limit(1).get().await()
+        val productsSnapshot =
+            Firestore.productsCollection().whereEqualTo("categoryId", categoryId).limit(1).get()
+                .await()
         return !productsSnapshot.isEmpty
     }
 
@@ -86,7 +88,7 @@ object ProductRepository {
         shopListId: String,
         onSnapshot: (List<Product>?, Exception?) -> Any,
     ): ListenerRegister {
-        return ListenerRegister(Firestore.productCollection.whereEqualTo("shopListId", shopListId)
+        return ListenerRegister(Firestore.productsCollection().whereEqualTo("shopListId", shopListId)
             .addSnapshotListener { querySnapshot, fbException ->
                 if (fbException != null) onSnapshot(null, fbException)
                 else querySnapshot?.let {
@@ -102,11 +104,17 @@ object ProductRepository {
      * Remove todos os produtos associados a uma lista de compras do Firestore.
      * @param shopListId ID da lista de compras.
      */
-    suspend fun removeAllProductsFromList(shopListId: String) {
-        val querySnapshot = Firestore.productCollection.whereEqualTo("shopListId", shopListId).get().await()
-        for (document in querySnapshot.documents) {
-            document.reference.delete()
-            Log.d("USUK", "ProductRepository.removeAllProductsFromList: removendo: ${document.get("name")}")
+    suspend fun removeAllProductsFromShopList(shopListId: String): Boolean {
+        return try {
+
+            val querySnapshot = Firestore.productsCollection()
+                .whereEqualTo("shopListId", shopListId).get().await()
+
+            for (document in querySnapshot.documents) document.reference.delete().await()
+
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 
@@ -116,7 +124,7 @@ object ProductRepository {
      */
     fun removeProduct(validatedProduct: ValidatedProduct) {
         val product = validatedProduct.product
-        Firestore.productCollection.document(product.id).delete()
+        Firestore.productsCollection().document(product.id).delete()
     }
 
 }

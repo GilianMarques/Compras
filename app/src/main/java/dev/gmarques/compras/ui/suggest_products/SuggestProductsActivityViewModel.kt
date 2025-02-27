@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 class SuggestProductsActivityViewModel : ViewModel() {
 
 
+    private var init = false
     private lateinit var shopListId: String
     private var searchTerm: String = ""
 
@@ -48,9 +49,11 @@ class SuggestProductsActivityViewModel : ViewModel() {
     private var sortAscending = PrefsDefaultValue.SORT_ASCENDING
 
     fun init(shopListId: String) {
+        
+        if (init) return
+        else init = true
 
         this.shopListId = shopListId
-
         viewModelScope.launch(IO) {
             loadSortPreferences()
             observeProductsUpdates()
@@ -65,23 +68,24 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
     private fun observeProductsUpdates() {
         if (productsDatabaseListener != null) return
-        productsDatabaseListener = SuggestionProductRepository.observeSuggestionProductUpdates { products, error ->
+        productsDatabaseListener =
+            SuggestionProductRepository.observeSuggestionProductUpdates { products, error ->
 
-            if (error != null) throw error
+                if (error != null) throw error
 
-            if (products != null) viewModelScope.launch {
+                if (products != null) viewModelScope.launch {
 
-                val filteredProducts = filterAndCreateSelectableProducts(products)
-                val sortedProducts = sortProducts(filteredProducts)
+                    val filteredProducts = filterAndCreateSelectableProducts(products)
+                    val sortedProducts = sortProducts(filteredProducts)
 
-                postDataWithThrottling(sortedProducts)
+                    postDataWithThrottling(sortedProducts)
+                }
+
             }
-
-        }
     }
 
     /**
-     * Aplica os termos de busca do ususario, caso hajam, aproveita o loop para carregar as categorias
+     * Aplica os termos de busca do usuario, caso hajam, aproveita o loop para carregar as categorias
      */
     private fun filterAndCreateSelectableProducts(lists: List<Product>?): MutableList<SelectableProduct> {
 
@@ -93,7 +97,8 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
             if (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true)) {
 
-                val (selected, quantity) = updatedSelectionData[product.id] ?: (false to product.quantity)
+                val (selected, quantity) = updatedSelectionData[product.id]
+                    ?: (false to product.quantity)
                 filteredProducts.add(SelectableProduct(product, selected, quantity))
             }
         }
@@ -105,7 +110,8 @@ class SuggestProductsActivityViewModel : ViewModel() {
      */
     private fun sortProducts(newData: MutableList<SelectableProduct>): List<SelectableProduct> {
 
-        val sorted = newData.sortedWith(compareBy { it.product.name }).let { if (!sortAscending) it.reversed() else it }
+        val sorted = newData.sortedWith(compareBy { it.product.name })
+            .let { if (!sortAscending) it.reversed() else it }
 
         return sorted
     }
@@ -178,7 +184,10 @@ class SuggestProductsActivityViewModel : ViewModel() {
 
     private suspend fun saveProduct(oldProduct: Product, newProduct: Product) {
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
-        SuggestionProductRepository.updateSuggestionProduct(oldProduct, ValidatedSuggestionProduct(newProduct))
+        SuggestionProductRepository.updateSuggestionProduct(
+            oldProduct,
+            ValidatedSuggestionProduct(newProduct)
+        )
     }
 
     fun removeSuggestionProduct(product: Product) {

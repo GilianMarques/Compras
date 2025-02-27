@@ -161,29 +161,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_production_database"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/Margins_edittext"
-                    android:background="@drawable/back_textview_menu"
-                    android:button="@null"
-                    android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-                    android:drawablePadding="16dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="@string/Usar_banco_de_dados_de_producao"
-                    android:textColor="?attr/colorPrimaryVariant"
-                    android:visibility="gone"
-                    app:drawableStartCompat="@drawable/vec_check"
-                    app:drawableTint="?attr/colorPrimaryVariant"
-                    app:layout_constraintBottom_toTopOf="@id/tv_sort_products"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    tools:visibility="visible" />
-
             </LinearLayout>
 
         </ScrollView>

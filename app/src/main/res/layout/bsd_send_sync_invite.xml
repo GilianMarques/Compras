@@ -32,7 +32,7 @@
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/lexend_deca_bold"
             android:padding="16dp"
-            android:text="@string/Enviar_solicitacao"
+            android:text="@string/Enviar_convite"
             android:textAlignment="center"
             android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@id/divider"
@@ -55,7 +55,6 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/vec_email"
             android:hint="@string/Digite_o_email_do_usuario"
-            android:importantForAutofill="no"
             android:inputType="textEmailAddress"
             android:selectAllOnFocus="true"
             android:theme="@style/Theme.EditText.Dialog"
@@ -69,13 +68,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="-4dp"
+            android:layout_marginEnd="4dp"
             android:indeterminate="true"
             android:visibility="invisible"
-            tools:visibility="visible"
-            android:layout_marginEnd="4dp"
             app:layout_constraintEnd_toEndOf="@id/edt_input"
             app:layout_constraintStart_toStartOf="@+id/edt_input"
-            app:layout_constraintTop_toBottomOf="@id/edt_input" />
+            app:layout_constraintTop_toBottomOf="@id/edt_input"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_error_msg"
@@ -100,11 +99,21 @@
             style="@style/Margins_edittext"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="48dp"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
-            android:text="@string/Quando_a_sua_solicita_o_for_aceita_os_dados_de_ambos_ser_o_mesclados"
+            android:text="@string/Essa_funcao_permite_unificar_as_contas_refletindo_as_alteracoes_feitas"
             android:textAlignment="viewStart"
+            app:layout_constraintBottom_toTopOf="@id/sw_merge_data"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/sw_merge_data"
+            style="@style/Margins_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
+            android:text="@string/Mesclar_dados_das_duas_contas"
             app:layout_constraintBottom_toTopOf="@id/fab_confirm"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -118,7 +127,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="?attr/colorPrimary"
-            android:text="@string/Solicitar_permissao"
+            android:text="@string/Enviar_convite"
             android:textColor="?colorOnPrimary"
             app:icon="@drawable/vec_send"
             app:iconTint="?attr/colorOnPrimary"

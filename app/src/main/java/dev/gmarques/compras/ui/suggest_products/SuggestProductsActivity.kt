@@ -20,7 +20,7 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivitySuggestProductsBinding
 import dev.gmarques.compras.domain.model.SelectableProduct
-import dev.gmarques.compras.domain.utils.ExtFun.Companion.formatHtml
+
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
@@ -94,7 +94,7 @@ class SuggestProductsActivity : AppCompatActivity() {
 
     private fun initToolbar() {
 
-        binding.toolbar.ivGoBack.setOnClickListener { this.onBackPressedDispatcher.onBackPressed() }
+        binding.toolbar.ivGoBack.setOnClickListener { Vibrator.interaction(); this.onBackPressedDispatcher.onBackPressed() }
         binding.toolbar.tvActivityTitle.text = getString(R.string.Sugestao_de_produtos)
         binding.toolbar.ivMenu.visibility = GONE
 
@@ -131,15 +131,19 @@ class SuggestProductsActivity : AppCompatActivity() {
     }
 
     private fun adapterOnRemoveListener(product: Product) {
-        val msg: Spanned = String.format(getString(R.string.Deseja_mesmo_remover_x_das_sugestoes), product.name).formatHtml()
+        val msg =
+            String.format(getString(R.string.Deseja_mesmo_remover_x_das_sugestoes), product.name)
 
-        val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
-            .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
-                viewModel.removeSuggestionProduct(product)
-                dialog.dismiss()
-            }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
-                dialog.dismiss()
-            }
+
+        val dialogBuilder =
+            AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
+                .setMessage(msg)
+                .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
+                    viewModel.removeSuggestionProduct(product)
+                    dialog.dismiss()
+                }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
+                    dialog.dismiss()
+                }
 
         val dialog = dialogBuilder.create()
         dialog.show()
@@ -165,14 +169,16 @@ class SuggestProductsActivity : AppCompatActivity() {
                 if (dy > 0) {  // Rolando para cima - Esconde o FAB
                     if (fabHidden) return
 
-                    fabAddProduct.animate().translationY(fabAddProduct.height.toFloat() * 2).alpha(0f).setStartDelay(100)
+                    fabAddProduct.animate().translationY(fabAddProduct.height.toFloat() * 2)
+                        .alpha(0f).setStartDelay(100)
                         .setDuration(200L).start()
                     fabHidden = true
 
                 } else if (dy < 0) { // Rolando para baixo - Mostra o FAB
                     if (!fabHidden) return
 
-                    fabAddProduct.animate().translationY(0f).alpha(1f).setStartDelay(100).setDuration(200L).start()
+                    fabAddProduct.animate().translationY(0f).alpha(1f).setStartDelay(100)
+                        .setDuration(200L).start()
                     fabHidden = false
                 }
             }

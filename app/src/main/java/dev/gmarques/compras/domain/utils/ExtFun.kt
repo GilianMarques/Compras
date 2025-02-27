@@ -19,9 +19,6 @@ import kotlin.math.min
 class ExtFun {
     companion object {
 
-        fun String.formatHtml(): Spanned {
-            return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        }
 
         /**
          * Converte a string com valor monetário ou numérico em um double.
@@ -29,12 +26,12 @@ class ExtFun {
          * Retorna 0.0 caso usado em uma string vazia
          */
         fun String.currencyToDouble(): Double {
+
             return if (this.isEmpty()) 0.0
-            else try {
-                NumberFormat.getCurrencyInstance(Locale.getDefault()).parse(this)!!.toDouble()
-            } catch (e: Exception) {
+            else {
                 val newDecSep = "_"
-                val decimalSeparatorIndex = max(this.indexOfLast { it == '.' }, this.indexOfLast { it == ',' })
+                val decimalSeparatorIndex =
+                    max(this.indexOfLast { it == '.' }, this.indexOfLast { it == ',' })
 
                 return if (decimalSeparatorIndex == -1) {
                     this.replace("\\D".toRegex(), "").toDouble()
@@ -43,7 +40,6 @@ class ExtFun {
                     .replace("[^0-9$newDecSep]".toRegex(), "")
                     .replace(newDecSep, ".")
                     .toDouble()
-
             }
         }
 
@@ -113,7 +109,8 @@ class ExtFun {
 
         fun View.showKeyboard() {
             this.requestFocus() // Garante que a View tenha o foco
-            val imm = this.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val imm =
+                this.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
         }
 
@@ -122,7 +119,8 @@ class ExtFun {
          */
         fun View.hideKeyboard() {
             this.clearFocus()
-            val imm = App.getContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val imm = App.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(this.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         }
     }

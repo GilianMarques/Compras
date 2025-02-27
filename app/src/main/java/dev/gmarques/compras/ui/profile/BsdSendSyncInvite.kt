@@ -10,23 +10,23 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
-import dev.gmarques.compras.databinding.BsdSendSyncRequestBinding
+import dev.gmarques.compras.databinding.BsdSendSyncInviteBinding
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class BsdSendSyncRequest(
+class BsdSendSyncInvite(
     private val targetActivity: Activity,
     private val lifecycleScope: LifecycleCoroutineScope,
+    private val guests: List<SyncAccount>?,
 ) {
 
-    private var binding = BsdSendSyncRequestBinding.inflate(targetActivity.layoutInflater)
+    private var binding = BsdSendSyncInviteBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
-
-
 
     init {
         dialog.setContentView(binding.root)
@@ -35,11 +35,31 @@ class BsdSendSyncRequest(
             fabConfirm.setOnClickListener {
                 validateInput(edtInput.text.toString())
             }
+            swMergeData.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) showMergeDataWarningDialog()
+            }
         }
 
     }
 
+    private fun showMergeDataWarningDialog() {
 
+        Vibrator.interaction()
+
+        val title = targetActivity.getString(R.string.Atencao)
+        val msg = targetActivity.getString(
+            R.string.Marcar_a_opcao_X_fara_com_que_os_dados_da_conta,
+            targetActivity.getString(R.string.Mesclar_dados_das_duas_contas)
+        )
+
+        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+            .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
+
+            }.setNegativeButton(targetActivity.getString(R.string.Cancelar)) { dialog, _ ->
+                binding.swMergeData.isChecked = false
+            }
+            .setCancelable(false).show()
+    }
 
     private fun validateInput(email: String) = lifecycleScope.launch(Dispatchers.IO) {
 
@@ -55,10 +75,18 @@ class BsdSendSyncRequest(
         } else if (!UserRepository.checkIfUserExists(email)) {
             showErrorMsg(targetActivity.getString(R.string.Usu_rio_n_o_existe))
 
+        } else if (targetEmailIsAlreadyAGuest(email)) {
+            showErrorMsg(targetActivity.getString(R.string.X_ja_esta_sincronizando_com_voce, email))
+
         } else {
             updateUiStatus(true)
             sendRequest(email)
         }
+    }
+
+    private fun targetEmailIsAlreadyAGuest(email: String): Boolean {
+        guests?.forEach { if (email == it.email) return true }
+        return false
     }
 
     private suspend fun updateUiStatus(freeze: Boolean) = withContext(Dispatchers.Main) {
@@ -68,7 +96,8 @@ class BsdSendSyncRequest(
 
     private fun sendRequest(email: String) = lifecycleScope.launch {
 
-        val success = UserRepository.sendSyncRequest(email)
+        val success = UserRepository.sendSyncInvite(email, binding.swMergeData.isChecked)
+
         if (success) Vibrator.success() else Vibrator.error()
 
         val title =
@@ -78,18 +107,19 @@ class BsdSendSyncRequest(
             )
         val msg =
             targetActivity.getString(
-                if (success) R.string.Reinicie_o_app_ap_s_a_solicita_o_ser_aceita
+                if (success) R.string.Convite_enviado_com_sucesso
                 else R.string.Houve_um_erro_ao_enviar_a_solicitacao
             )
 
         AlertDialog.Builder(targetActivity)
             .setTitle(title)
             .setMessage(msg)
+            .setCancelable(false)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
                 binding.root.postDelayed({
-                    this@BsdSendSyncRequest.dialog.dismiss()
-                }, 500) // 500ms delay
+                    this@BsdSendSyncInvite.dialog.dismiss()
+                }, 250) // 250ms delay
             }
             .show()
 
