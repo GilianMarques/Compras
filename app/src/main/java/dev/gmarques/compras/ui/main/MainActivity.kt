@@ -1,6 +1,7 @@
 package dev.gmarques.compras.ui.main
 
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
@@ -11,16 +12,15 @@ import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityMainBinding
+import dev.gmarques.compras.domain.utils.ListenerRegister
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.ui.profile.ProfileActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import dev.gmarques.compras.ui.sinc_stopped.SyncStoppedActivity
 import java.util.Calendar
 
 
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerView()
         setupFabAddList()
         observeListsUpdates()
-
+        // TODO: tester a migração de dadops quando o ususario aceita o convite ou se desconecta 
     }
 
     private fun isDarkThemeEnabled(): Boolean {
@@ -113,6 +113,8 @@ class MainActivity : AppCompatActivity() {
         val intent = ProductsActivity.newIntent(this, shopList.id)
         startActivity(intent)
     }
+
+
 }
 
 

@@ -60,8 +60,11 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun setupDatabase() = lifecycleScope.launch(IO) {
+
         // TODO: tratar o retorno dessa forma nao ta legal, refatora isso
         hostEmail = Firestore.loadDatabasePaths()
+
+        App.getContext().toggleGuestListener(true)
 
         if (hostEmail != null) withContext(Main) {
             Vibrator.error()
@@ -75,10 +78,10 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-
     private fun showDialogConfirmIfCloneDataBeforeDisconnectFromHost() {
         val title = getString(R.string.Sincronismo_entre_contas_interrompido)
-        val msg = getString(R.string.Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta, hostEmail)
+        val msg =
+            getString(R.string.Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta, hostEmail)
 
         AlertDialog.Builder(this@SplashActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(getString(R.string.Manter_dados_atuais)) { dialog, _ ->
@@ -111,23 +114,28 @@ class SplashActivity : AppCompatActivity() {
 
     }
 
-
     private fun disconnectFromHost(cloneData: Boolean) = lifecycleScope.launch(IO) {
         updateUi(getString(R.string.Por_favor_aguarde))
-        val result = UserRepository.disconnectFromHost(SyncAccount(false, "_", hostEmail!!, "_", false), cloneData)
+
+        val result = UserRepository
+            .disconnectFromHost(SyncAccount("_", hostEmail!!, "_"), cloneData)
 
         if (result.isSuccess) {
             openApp()
             Vibrator.success()
         } else {
             Vibrator.error()
-            Snackbar.make(binding.root, getString(R.string.Algo_deu_errado_tente_novamente_mais_tarde), Snackbar.LENGTH_LONG)
-                .show()
+            Snackbar.make(
+                binding.root,
+                getString(R.string.Algo_deu_errado_tente_novamente_mais_tarde),
+                Snackbar.LENGTH_LONG
+            ).show()
             Log.d("USUK", "SplashActivity.cloneDatabase: ${result.exceptionOrNull()}")
         }
     }
 
     private fun openApp() {
+
         startActivity(
             Intent(
                 applicationContext, MainActivity::class.java

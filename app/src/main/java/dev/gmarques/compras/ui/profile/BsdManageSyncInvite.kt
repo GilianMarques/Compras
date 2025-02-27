@@ -15,7 +15,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.App
 import dev.gmarques.compras.BuildConfig
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdManageSyncInviteBinding
@@ -24,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.system.exitProcess
 
 class BsdManageSyncInvite(
     private val invite: SyncAccount,

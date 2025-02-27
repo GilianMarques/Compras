@@ -75,14 +75,18 @@ class BsdDisconnectAccount(
 
     private fun showDialogConfirmIfCloneDataBeforeDisconnectFromHost() {
         val title = targetActivity.getString(R.string.Como_deseja_prosseguir)
-        val msg = targetActivity.getString(R.string.Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta, account.name)
+        val msg = targetActivity.getString(
+            R.string.Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta,
+            account.name
+        )
 
         AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Manter_dados_atuais)) { dialog, _ ->
                 dialog.dismiss()
                 showDialogConfirmToKeepDeviceOnWhileCloningData()
 
-            }.setNegativeButton(targetActivity.getString(R.string.Ficar_com_dados_antigos)) { dialog, _ ->
+            }
+            .setNegativeButton(targetActivity.getString(R.string.Ficar_com_dados_antigos)) { dialog, _ ->
                 dialog.dismiss()
                 setUiInLoadingStat()
                 disconnectFromHost(false)
@@ -110,11 +114,12 @@ class BsdDisconnectAccount(
 
     private fun disconnectFromHost(cloneData: Boolean) = lifecycleScope.launch(IO) {
 
+        App.getContext().toggleGuestListener(false)
+
         val result = UserRepository.disconnectFromHost(account, cloneData)
         withContext(Main) {
 
             if (result.isSuccess) {
-
 
                 AlertDialog.Builder(targetActivity)
                     .setTitle(targetActivity.getString(R.string.Conta_desconectada_com_sucesso))
@@ -125,6 +130,8 @@ class BsdDisconnectAccount(
                     }.show()
 
             } else {
+                App.getContext().toggleGuestListener(true)
+
                 showErrorMsg(targetActivity.getString(R.string.Nao_foi_possivel_desconectar_o_anfitriao_por_favor_tente_novamente))
                 binding.pbAccept.visibility + INVISIBLE
                 binding.fabDisconnect.isEnabled = true

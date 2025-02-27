@@ -179,5 +179,6 @@
     <string name="Como_deseja_prosseguir">Como deseja prosseguir?</string>
     <string name="Manter_dados_atuais">manter dados atuais</string>
     <string name="Ficar_com_dados_antigos">Ficar com dados antigos</string>
+    <string name="O_sincronismo_entre_contas_foi_interrompido_reinicie_">O sincronismo entre contas foi interrompido. Reinicie o app para aplicar as alterações.</string>
 
 </resources>

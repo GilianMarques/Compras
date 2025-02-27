@@ -1,13 +1,14 @@
 package dev.gmarques.compras.data.model
 
+@Suppress("unused")
 data class SyncAccount(
-    val mergeData: Boolean = false,
     val name: String,
     val email: String,
     val photoUrl: String,
+    val mergeData: Boolean = false,
     val accepted: Boolean = false,
 ) {
-    constructor() : this(false,"", "", "", false)
-
+    /**Necessário para uso com o firebase*/
+    constructor() : this("", "", "")
 }
 

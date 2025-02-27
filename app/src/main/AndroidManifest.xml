@@ -55,6 +55,9 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.sinc_stopped.SyncStoppedActivity"
+            android:exported="false" />
 
         <activity
             android:name=".ui.splash.SplashActivity"

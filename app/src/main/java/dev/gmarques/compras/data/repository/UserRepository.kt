@@ -122,12 +122,16 @@ object UserRepository {
 
             // salvo os dados do convidado na seçao de convidados do local, isso permite o convidado modificar o banco de dados do usuario local
             Firestore.guestsCollection().document(email)
-                .set(SyncAccount(mergeData, "", email, "", false))
+                .set(SyncAccount("", email, "", mergeData, false))
                 .await()
 
             Firestore.syncInvitesCollection(email).document(myUser.email!!).set(
                 SyncAccount(
-                    mergeData, myUser.displayName!!, myUser.email!!, myUser.photoUrl.toString(), true
+                    myUser.displayName!!,
+                    myUser.email!!,
+                    myUser.photoUrl.toString(),
+                    mergeData,
+                    true
                 ),
             ).await()
 
@@ -138,7 +142,6 @@ object UserRepository {
         }
     }
 
-
     suspend fun acceptInvite(invite: SyncAccount): Boolean {
 
         return try {
@@ -148,10 +151,10 @@ object UserRepository {
             Firestore.guestsCollection(invite.email).document(localUser.email!!)
                 .set(
                     SyncAccount(
-                        false,
                         localUser.displayName!!,
                         localUser.email!!,
                         localUser.photoUrl.toString(),
+                        false,
                         true
                     )
                 )
@@ -197,7 +200,6 @@ object UserRepository {
         return try {
             // Removo os dados do convidado da seçao de convidados
             Firestore.guestsCollection().document(guest.email).delete().await()
-            Firestore.rootCollection().document(guest.email).delete().await()
             Result.success(true)
 
         } catch (e: Exception) {
@@ -235,5 +237,25 @@ object UserRepository {
             Result.failure(e)
         }
 
+    }
+
+    /**
+     * Observa o status de convidado do usuario atual, para que caso ele seja convidado de outro usuario
+     * e seja desconectado pelo anfitriao, o app possa prosseguir com o procedimento de desconexão
+     * imediatamente e nao apenas no proximo boot
+     *
+     * */
+    fun observeGuestStatus(callback: () -> Any): ListenerRegister? {
+
+        val localUserEmail = getUser()!!.email!!
+
+        if (!Firestore.imIGuest) return null
+        val listenerRegistration = Firestore.guestsCollection().document(localUserEmail)
+            .addSnapshotListener { snap, _ ->
+                snap?.let { if (!snap.exists()) callback() }
+            }
+
+
+        return ListenerRegister(listenerRegistration)
     }
 }

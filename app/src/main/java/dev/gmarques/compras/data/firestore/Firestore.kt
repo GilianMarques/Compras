@@ -17,9 +17,11 @@ class Firestore {
 
     companion object {
 
-        const val VERSION = 2
 
         private var host = "null"
+
+        var imIGuest = false
+            private set
 
         private val useProductionDb =
             PreferencesHelper().getValue(PreferencesHelper.PrefsKeys.PRODUCTION_DATABASE, false)
@@ -28,7 +30,7 @@ class Firestore {
             if (BuildConfig.DEBUG && !useProductionDb) "debug" else "production"
 
         private const val USERS = "users"
-        private const val DATABASE = "v$VERSION" // TODO: voltar ao padrao e usar versao nos objetos
+        private const val DATABASE = "v2" // TODO: voltar ao padrao e usar versao nos objetos
         private const val SHOP_LISTS = "shopLists"
         private const val PRODUCTS = "products"
         private const val CATEGORIES = "categories"
@@ -64,13 +66,15 @@ class Firestore {
             } else {
 
                 //Caso tenha, verifico se o host nao interrompeu o sincronismo com o convidado
-                val stillGuest = guestsCollection(hostAccount.email)
+                imIGuest = guestsCollection(hostAccount.email)
                     .document(localUserEmail).get().await()
                     .exists()
 
-                this.host = if (stillGuest) hostAccount.email else localUserEmail
-                Log.d("USUK", "Firestore.loadDatabasePaths: host: $host")
-                return if (stillGuest) null else hostAccount.email
+
+                this.host = if (imIGuest) hostAccount.email else localUserEmail
+
+                return if (imIGuest) null else hostAccount.email
+
             }
 
         }
