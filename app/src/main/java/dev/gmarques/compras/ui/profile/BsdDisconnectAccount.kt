@@ -12,7 +12,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.firestore.FirebaseCloneDatabase
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdDisconnectAccountBinding
@@ -31,7 +30,6 @@ class BsdDisconnectAccount(
 
     private var binding = BsdDisconnectAccountBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
-
 
     init {
         dialog.setContentView(binding.root)
@@ -62,31 +60,46 @@ class BsdDisconnectAccount(
         AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Interromper_conexao)) { dialog, _ ->
                 dialog.dismiss()
-                if (accountIsHost) confirmDisconnectFromHost()
+                if (accountIsHost) showDialogConfirmIfCloneDataBeforeDisconnectFromHost()
                 else {
-                    binding.fabDisconnect.isEnabled = false
-                    binding.pbAccept.visibility = VISIBLE
                     disconnectGuest()
                 }
             }.show()
 
     }
 
-    private fun confirmDisconnectFromHost() {
+    private fun setUiInLoadingStat() {
+        binding.fabDisconnect.isEnabled = false
+        binding.pbAccept.visibility = VISIBLE
+    }
 
-        val title = targetActivity.getString(R.string.Por_favor_confirme)
-        val msg = targetActivity.getString(
-            R.string.Ao_se_desconectar_de_ser_necessario_migrar,
-            account.name
-        )
+    private fun showDialogConfirmIfCloneDataBeforeDisconnectFromHost() {
+        val title = targetActivity.getString(R.string.Como_deseja_prosseguir)
+        val msg = targetActivity.getString(R.string.Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta, account.name)
+
+        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+            .setPositiveButton(targetActivity.getString(R.string.Manter_dados_atuais)) { dialog, _ ->
+                dialog.dismiss()
+                showDialogConfirmToKeepDeviceOnWhileCloningData()
+
+            }.setNegativeButton(targetActivity.getString(R.string.Ficar_com_dados_antigos)) { dialog, _ ->
+                dialog.dismiss()
+                setUiInLoadingStat()
+                disconnectFromHost(false)
+            }
+            .setCancelable(true).show()
+    }
+
+    private fun showDialogConfirmToKeepDeviceOnWhileCloningData() {
+
+        val title = targetActivity.getString(R.string.Atencao)
+        val msg = targetActivity.getString(R.string.Nao_feche_o_app_ou_se_desconecte_da_internet)
 
         AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
-
-                binding.fabDisconnect.isEnabled = false
-                binding.pbAccept.visibility = VISIBLE
                 dialog.dismiss()
-                disconnectFromHost()
+                setUiInLoadingStat()
+                disconnectFromHost(true)
 
             }.setNegativeButton(targetActivity.getString(R.string.Cancelar)) { dialog, _ ->
                 dialog.dismiss()
@@ -95,9 +108,9 @@ class BsdDisconnectAccount(
 
     }
 
-    private fun disconnectFromHost() = lifecycleScope.launch(IO) {
+    private fun disconnectFromHost(cloneData: Boolean) = lifecycleScope.launch(IO) {
 
-        val result = UserRepository.disconnectFromHost(account)
+        val result = UserRepository.disconnectFromHost(account, cloneData)
         withContext(Main) {
 
             if (result.isSuccess) {

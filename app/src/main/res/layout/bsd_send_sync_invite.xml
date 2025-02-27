@@ -68,13 +68,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="-4dp"
+            android:layout_marginEnd="4dp"
             android:indeterminate="true"
             android:visibility="invisible"
-            tools:visibility="visible"
-            android:layout_marginEnd="4dp"
             app:layout_constraintEnd_toEndOf="@id/edt_input"
             app:layout_constraintStart_toStartOf="@+id/edt_input"
-            app:layout_constraintTop_toBottomOf="@id/edt_input" />
+            app:layout_constraintTop_toBottomOf="@id/edt_input"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_error_msg"
@@ -99,11 +99,21 @@
             style="@style/Margins_edittext"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="48dp"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
-            android:text="@string/Quando_o_seu_convite_for_aceito_os_dados"
+            android:text="@string/Essa_funcao_permite_unificar_as_contas_refletindo_as_alteracoes_feitas"
             android:textAlignment="viewStart"
+            app:layout_constraintBottom_toTopOf="@id/sw_merge_data"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/sw_merge_data"
+            style="@style/Margins_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
+            android:text="@string/Mesclar_dados_das_duas_contas"
             app:layout_constraintBottom_toTopOf="@id/fab_confirm"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

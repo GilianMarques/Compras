@@ -21,8 +21,6 @@ import dev.gmarques.compras.databinding.ActivityProfileBinding
 import dev.gmarques.compras.databinding.ItemGuestOrHostBinding
 import dev.gmarques.compras.databinding.ItemSyncInviteBinding
 import dev.gmarques.compras.ui.Vibrator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
@@ -42,7 +40,7 @@ class ProfileActivity : AppCompatActivity() {
 
         setupToolbar()
         loadUserData()
-        setupRequestPermission()
+        setupSendInvite()
         setupLogOff()
         observeStateUpdates()
         setupDebugOptions()
@@ -167,7 +165,15 @@ class ProfileActivity : AppCompatActivity() {
      * Mostra um bottomsheet dialog que permite gerenciar um convite de sincronismo
      * */
     private fun showViewSyncInviteDialog(req: SyncAccount) {
-        BsdManageSyncInvite(req, this, lifecycleScope).show()
+        if (state?.guests.isNullOrEmpty()) BsdManageSyncInvite(req, this, lifecycleScope).show()
+        else {
+            Vibrator.error()
+            showDialog(
+                getString(R.string.Erro),
+                getString(R.string.Voce_nao_pode_aceitar_um_convite_enquanto_houverem_usu_rios_sincroniando_dados_com_voc),
+                getString(R.string.Entendi)
+            ) {}
+        }
     }
 
     /**
@@ -214,7 +220,6 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-
     /**
      * Mostra um alertdialog com conteudo dianmico
      * */
@@ -229,7 +234,7 @@ class ProfileActivity : AppCompatActivity() {
             }.show()
     }
 
-    private fun setupRequestPermission() {
+    private fun setupSendInvite() {
         binding.tvSendInvite.setOnClickListener {
 
             if (state!!.host.isEmpty()) {

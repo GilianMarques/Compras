@@ -35,8 +35,30 @@ class BsdSendSyncInvite(
             fabConfirm.setOnClickListener {
                 validateInput(edtInput.text.toString())
             }
+            swMergeData.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) showMergeDataWarningDialog()
+            }
         }
 
+    }
+
+    private fun showMergeDataWarningDialog() {
+
+        Vibrator.interaction()
+
+        val title = targetActivity.getString(R.string.Atencao)
+        val msg = targetActivity.getString(
+            R.string.Marcar_a_opcao_X_fara_com_que_os_dados_da_conta,
+            targetActivity.getString(R.string.Mesclar_dados_das_duas_contas)
+        )
+
+        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+            .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
+
+            }.setNegativeButton(targetActivity.getString(R.string.Cancelar)) { dialog, _ ->
+                binding.swMergeData.isChecked = false
+            }
+            .setCancelable(false).show()
     }
 
     private fun validateInput(email: String) = lifecycleScope.launch(Dispatchers.IO) {
@@ -74,7 +96,7 @@ class BsdSendSyncInvite(
 
     private fun sendRequest(email: String) = lifecycleScope.launch {
 
-        val success = UserRepository.sendSyncInvite(email)
+        val success = UserRepository.sendSyncInvite(email, binding.swMergeData.isChecked)
 
         if (success) Vibrator.success() else Vibrator.error()
 

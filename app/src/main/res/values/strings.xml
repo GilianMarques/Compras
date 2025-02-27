@@ -21,6 +21,7 @@
     <string name="Remover">Remover</string>
     <string name="Renomear_lista">Renomear lista</string>
     <string name="Por_favor_confirme">Por favor, confirme:</string>
+    <string name="Por_favor_aguarde">Por favor, aguarde…</string>
     <string name="Deseja_mesmo_remover_x">Deseja mesmo remover <b>%1$s</b>?</string>
     <string name="Deseja_mesmo_remover_x_das_sugestoes">Deseja mesmo remover <b>%1$s</b> das sugestões?</string>
     <string name="Cancelar">Cancelar</string>
@@ -127,8 +128,7 @@
     <string name="Gerenciar_solicitacao">Gerenciar solicitação</string>
     <string name="Recusar">Recusar</string>
     <string name="Aceitar">Aceitar</string>
-    <string name="X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar">%1$s te enviou um convite para sincronizar seus dados com ele(a).\n\nAo aceitar o convite, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.\n\nNão aceite convites de pessoas desconhecidas.</string>
-    <string name="Solicita_o_aceita_com_sucesso_o_solicitante_deve_reiniciar_o_aplicativo">Solicitação aceita com sucesso.\n\nO app será fechado para aplicar as alterações</string>
+    <string name="Solicita_o_aceita_com_sucesso_o_solicitante_deve_reiniciar_o_aplicativo">Solicitação aceita com sucesso.\n\nReinicie o app para aplicar as alterações</string>
     <string name="Nao_foi_poss_vel_aceitar_a_solicita_o_tente_novamente_mais_tarde">Não foi possível aceitar a solicitação, tente novamente mais tarde</string>
     <string name="solicita_o_aceita">Solicitação aceita</string>
     <string name="Erro_ao_aceitar_solicita_o">Erro ao aceitar solicitação</string>
@@ -162,9 +162,22 @@
     <string name="Reinicie_o_app_para_aplicar_as_alteracoes">Reinicie o app para aplicar as alterações</string>
     <string name="Aguarde_enquanto_seus_dados_s_o_migrados_de_volta_n_o_feche_o_app_ou_se_desconecte_da_internet">Aguarde enquanto migramos seus dados…</string>
     <string name="Sincronismo_entre_contas">Sincronismo entre contas</string>
+    <string name="Sincronismo_entre_contas_interrompido">Sincronismo entre contas interrompido</string>
     <string name="O_sincronismo_entre_contas_foi_interrompido">O sincronismo entre contas foi interrompido. Antes de prossseguir é necessário migrar os dados da sua conta. Não feche o app ou desconecte-se da internet durante o processo.</string>
     <string name="Sucesso">Sucesso</string>
-    <string name="Ao_se_desconectar_de_ser_necessario_migrar">Ao se desconectar de %1$s será necessário migrar os dados da sua conta de volta, não feche ou app ou desconete-se de internet duranto o processo.</string>
+    <string name="Nao_feche_o_app_ou_se_desconecte_da_internet">Não feche o app ou desconecte-se da internet durante o processo.</string>
     <string name="Voce_nao_pode_convidar_um_usu_rio_para_a_sua_conta_enquanto_for_convidado_de_outra_pessoa">Você não pode convidar um usuário para a sua conta enquanto for convidado de outra pessoa.</string>
+    <string name="Mesclar_dados_das_duas_contas">Mesclar dados das contas</string>
+    <string name="Essa_funcao_permite_unificar_as_contas_refletindo_as_alteracoes_feitas">Essa função permite unificar as contas, refletindo as alterações feitas por um usuário na conta do outro, sem que vocês precisem compartilhar login e senha. É possível encerrar a conexão com outro usuário a qualquer momento.\n\n Nunca envie convites para desconhecidos. </string>
+    <string name="Atencao">Atenção</string>
+    <string name="Marcar_a_opcao_X_fara_com_que_os_dados_da_conta">Marcar a opção \"%1$s\" fará com que os dados da conta do seu convidado sejam mesclados aos seus, isso inclui listas de compra, produtos, categorias, etc… A única forma de desfazer essa alteração será removendo os dados manualmente.</string>
+    <string name="X_te_enviou_um_convite_para_sincronizar_dados_com_ele">%1$s te enviou um convite para sincronizar dados com ele(a).\n\nAo aceitar o convite, os dados de ambas as contas serão mesclados e as alterções feitas por um usuário serão refletidas na conta do outro.\n\n Não aceite convites de pessoas desconhecidas.</string>
+    <string name="X_te_enviou_um_convite_para_a_conta_dele">%1$s te enviou um convite para a conta dele(a).\n\nAo aceitar o convite, você terá acesso total a outra conta podendo manipular produtos, listas de compra, categorias, etc… Seus dados ficarão salvos em sua conta e não serão mesclados aos dele(a).</string>
+    <string name="Algo_deu_errado_tente_novamente_mais_tarde">Algo deu errado, tente novamente mais tarde</string>
+    <string name="Voce_nao_pode_aceitar_um_convite_enquanto_houverem_usu_rios_sincroniando_dados_com_voc">Você não pode aceitar um convite enquanto houverem usuários sincroniando dados com você</string>
+    <string name="Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta">Você gostaria de manter os dados atuais da conta ou ficar com os dados antigos que tinha antes de se conectar a %1$s?\n\nEscolha com cautela por que não é possível desfazer essa ação.</string>
+    <string name="Como_deseja_prosseguir">Como deseja prosseguir?</string>
+    <string name="Manter_dados_atuais">manter dados atuais</string>
+    <string name="Ficar_com_dados_antigos">Ficar com dados antigos</string>
 
 </resources>

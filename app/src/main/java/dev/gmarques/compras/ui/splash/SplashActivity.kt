@@ -9,10 +9,11 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.firestore.FirebaseCloneDatabase
 import dev.gmarques.compras.data.firestore.Firestore
+import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivitySplashBinding
 import dev.gmarques.compras.ui.Vibrator
@@ -27,6 +28,7 @@ import kotlin.properties.Delegates
 
 class SplashActivity : AppCompatActivity() {
 
+    private var hostEmail: String? = null
     private var updateUserMetadata by Delegates.notNull<Boolean>()
     private lateinit var binding: ActivitySplashBinding
 
@@ -59,11 +61,13 @@ class SplashActivity : AppCompatActivity() {
 
     private fun setupDatabase() = lifecycleScope.launch(IO) {
         // TODO: tratar o retorno dessa forma nao ta legal, refatora isso
-        val hostEmail = Firestore.loadDatabasePaths()
+        hostEmail = Firestore.loadDatabasePaths()
 
         if (hostEmail != null) withContext(Main) {
+            Vibrator.error()
             binding.progressBar2.visibility = INVISIBLE
-            showDialogConfirmBeginMigration(hostEmail)
+            showDialogConfirmIfCloneDataBeforeDisconnectFromHost()
+
         }
         else {
             if (updateUserMetadata) UserRepository.updateDatabaseMetadata()
@@ -71,22 +75,56 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private fun showDialogConfirmBeginMigration(hostEmail: String) {
 
-        AlertDialog.Builder(this).setTitle(getString(R.string.Sincronismo_entre_contas))
-            .setMessage(getString(R.string.O_sincronismo_entre_contas_foi_interrompido))
-            .setCancelable(false).setPositiveButton(getString(R.string.Entendi)) { _, _ ->
-                binding.progressBar2.visibility = VISIBLE
-                lifecycleScope.launch(IO) { cloneDatabase(hostEmail) }
-            }.setNegativeButton(getString(R.string.Sair)) { _, _ ->
-                App.close(this)
-            }.show()
+    private fun showDialogConfirmIfCloneDataBeforeDisconnectFromHost() {
+        val title = getString(R.string.Sincronismo_entre_contas_interrompido)
+        val msg = getString(R.string.Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta, hostEmail)
+
+        AlertDialog.Builder(this@SplashActivity).setTitle(title).setMessage(msg)
+            .setPositiveButton(getString(R.string.Manter_dados_atuais)) { dialog, _ ->
+                dialog.dismiss()
+                showDialogConfirmToKeepDeviceOnWhileCloningData()
+
+            }.setNegativeButton(getString(R.string.Ficar_com_dados_antigos)) { dialog, _ ->
+                dialog.dismiss()
+                disconnectFromHost(false)
+            }
+            .setCancelable(true).show()
     }
 
-    private suspend fun cloneDatabase(hostEmail: String) {
-        updateUi(getString(R.string.Aguarde_enquanto_seus_dados_s_o_migrados_de_volta_n_o_feche_o_app_ou_se_desconecte_da_internet))
-        FirebaseCloneDatabase(hostEmail, UserRepository.getUser()!!.email!!).beginCloning()
-        openApp()
+    private fun showDialogConfirmToKeepDeviceOnWhileCloningData() {
+
+        val title = getString(R.string.Atencao)
+        val msg = getString(R.string.Nao_feche_o_app_ou_se_desconecte_da_internet)
+
+        AlertDialog.Builder(this@SplashActivity).setTitle(title).setMessage(msg)
+            .setPositiveButton(getString(R.string.Entendi)) { dialog, _ ->
+                dialog.dismiss()
+                binding.progressBar2.visibility = VISIBLE
+                disconnectFromHost(true)
+
+            }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
+                dialog.dismiss()
+                App.close(this@SplashActivity)
+            }
+            .setCancelable(false).show()
+
+    }
+
+
+    private fun disconnectFromHost(cloneData: Boolean) = lifecycleScope.launch(IO) {
+        updateUi(getString(R.string.Por_favor_aguarde))
+        val result = UserRepository.disconnectFromHost(SyncAccount(false, "_", hostEmail!!, "_", false), cloneData)
+
+        if (result.isSuccess) {
+            openApp()
+            Vibrator.success()
+        } else {
+            Vibrator.error()
+            Snackbar.make(binding.root, getString(R.string.Algo_deu_errado_tente_novamente_mais_tarde), Snackbar.LENGTH_LONG)
+                .show()
+            Log.d("USUK", "SplashActivity.cloneDatabase: ${result.exceptionOrNull()}")
+        }
     }
 
     private fun openApp() {
@@ -106,7 +144,6 @@ class SplashActivity : AppCompatActivity() {
         )
         this@SplashActivity.finishAffinity()
     }
-
 
     private suspend fun updateUi(msg: String) = withContext(Main) {
         binding.tvInfo.visibility = VISIBLE

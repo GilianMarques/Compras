@@ -101,7 +101,7 @@
                 android:layout_marginBottom="48dp"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
-                android:text="@string/X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar"
+                tools:text="info"
                 android:textAlignment="center"
                 app:layout_constraintBottom_toTopOf="@id/fab_accept"
                 app:layout_constraintEnd_toEndOf="parent"

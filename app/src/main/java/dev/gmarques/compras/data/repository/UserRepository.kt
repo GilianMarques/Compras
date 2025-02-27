@@ -3,15 +3,10 @@ package dev.gmarques.compras.data.repository
 import android.content.Context
 import android.util.Log
 import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
-import dev.gmarques.compras.App
-import dev.gmarques.compras.R
-import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.firestore.FirebaseCloneDatabase
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.LastLogin
@@ -118,22 +113,21 @@ object UserRepository {
      * @param email do usuario que recebera o convite
      * @throws IllegalStateException se o usuario alvo nao existir no DB
      * */
-    suspend fun sendSyncInvite(email: String): Boolean {
+    suspend fun sendSyncInvite(email: String, mergeData: Boolean): Boolean {
 
         if (!checkIfUserExists(email)) throw IllegalStateException("O usuario alvo nao existe, é necessario verificar isso quando o usuario (local) insere o email (do alvo) na interface")
 
         try {
-            Log.d("USUK", "UserRepository.".plus("sendSyncInvite() email = $email 0 "))
             val myUser = getUser()!!
 
             // salvo os dados do convidado na seçao de convidados do local, isso permite o convidado modificar o banco de dados do usuario local
-            Firestore.guestsCollection().document(email).set(SyncAccount("", email, "", false))
+            Firestore.guestsCollection().document(email)
+                .set(SyncAccount(mergeData, "", email, "", false))
                 .await()
-            Log.d("USUK", "UserRepository.".plus("sendSyncInvite() email = $email 1 "))
 
             Firestore.syncInvitesCollection(email).document(myUser.email!!).set(
                 SyncAccount(
-                    myUser.displayName!!, myUser.email!!, myUser.photoUrl.toString(), true
+                    mergeData, myUser.displayName!!, myUser.email!!, myUser.photoUrl.toString(), true
                 ),
             ).await()
 
@@ -144,6 +138,7 @@ object UserRepository {
         }
     }
 
+
     suspend fun acceptInvite(invite: SyncAccount): Boolean {
 
         return try {
@@ -153,18 +148,22 @@ object UserRepository {
             Firestore.guestsCollection(invite.email).document(localUser.email!!)
                 .set(
                     SyncAccount(
+                        false,
                         localUser.displayName!!,
                         localUser.email!!,
                         localUser.photoUrl.toString(),
                         true
                     )
                 )
-
-            // Apago o conviteque ja foi aceito
+            // Apago o convite que ja foi aceito
             Firestore.syncInvitesCollection().document(invite.email).delete().await()
 
             // Salvo os dados do anfitriao na seçao host do local
             Firestore.hostDocument().set(invite)
+
+            if (invite.mergeData) {
+                FirebaseCloneDatabase(localUser.email!!, invite.email, false).beginCloning()
+            }
 
             true
         } catch (e: Exception) {
@@ -210,22 +209,24 @@ object UserRepository {
 
     /**
      * Se desconeta do anfitriao, apagando as referencias das contas um dou outro e
-     * criando uma cópia do banco de dados para o convidado que esta se desconectando
+     * criando uma cópia do banco de dados para o convidado
      * @see FirebaseCloneDatabase
      * */
-    suspend fun disconnectFromHost(host: SyncAccount): Result<Boolean> {
+    suspend fun disconnectFromHost(host: SyncAccount, cloneData: Boolean): Result<Boolean> {
 
         return try {
             val localUser = getUser()!!
 
-            /* Faz uma copia do banco de dados para o convidado que esta se desconectando
-            ao fim da clonagem os dados do host sao removidos do db do usuario*/
-            FirebaseCloneDatabase(
+            /* Faz uma copia do banco de dados para o convidado */
+            if (cloneData) FirebaseCloneDatabase(
                 host.email,
                 localUser.email!!
             ).beginCloning()
 
-            // Remover dados do local da seçao guests do anfitriao
+            // Apaga os dados do host do db do convidado
+            Firestore.hostDocument().delete().await()
+
+            // Remove dados do convidado da seçao guests do host
             Firestore.guestsCollection(host.email).document(localUser.email!!).delete().await()
 
             Result.success(true)

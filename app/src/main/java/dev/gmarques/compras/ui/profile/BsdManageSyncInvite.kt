@@ -45,9 +45,9 @@ class BsdManageSyncInvite(
             fabAccept.setOnClickListener {
                 if (!canAccept) return@setOnClickListener // melhor que desativar o botao (n gosto da aparencia do botao desativado)
                 Vibrator.interaction()
-                acceptInvite()
-                fabAccept.isEnabled = false
-                pbStatus.visibility = VISIBLE
+                if (invite.mergeData) showDialogConfirmToKeepDeviceOnWhileCloningData()
+                else acceptInvite()
+
             }
 
             fabDecline.setOnClickListener {
@@ -59,10 +59,7 @@ class BsdManageSyncInvite(
 
             tvUserName.text = invite.name
             tvEmail.text = invite.email
-            tvInfo.text = targetActivity.getString(
-                R.string.X_te_enviou_uma_solicita_o_de_sincronismo_ao_aceitar,
-                invite.name
-            )
+
 
             Glide.with(root.context)
                 .load(invite.photoUrl)
@@ -77,7 +74,31 @@ class BsdManageSyncInvite(
                 pbAccept.visibility = GONE
             }
 
+            tvInfo.text =
+                if (invite.mergeData) targetActivity.getString(
+                    R.string.X_te_enviou_um_convite_para_sincronizar_dados_com_ele,
+                    invite.name
+                )
+                else targetActivity.getString(R.string.X_te_enviou_um_convite_para_a_conta_dele, invite.name)
+
         }
+
+    }
+
+    private fun showDialogConfirmToKeepDeviceOnWhileCloningData() {
+
+        val title = targetActivity.getString(R.string.Atencao)
+        val msg = targetActivity.getString(R.string.Nao_feche_o_app_ou_se_desconecte_da_internet)
+
+        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+            .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
+                dialog.dismiss()
+                acceptInvite()
+
+            }.setNegativeButton(targetActivity.getString(R.string.Cancelar)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(false).show()
 
     }
 
@@ -126,6 +147,9 @@ class BsdManageSyncInvite(
     }
 
     private fun acceptInvite() = lifecycleScope.launch {
+
+        binding.fabAccept.isEnabled = false
+        binding.pbStatus.visibility = VISIBLE
 
         val success = UserRepository.acceptInvite(invite)
         if (success) {

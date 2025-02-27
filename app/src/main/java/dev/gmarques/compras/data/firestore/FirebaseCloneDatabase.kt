@@ -13,21 +13,27 @@ import kotlinx.coroutines.tasks.await
  * que ambos os usuarios que antes compartilhavam o mesmo DB fiquem com uma copia atualizada
  * @param baseEmail o email DE onde serao copiados os dados
  * @param targetEmail o email PARA onde serao copiados os dados
+ * @param cleanTargetBeforeCloning define se o banco de dados alvo tera os dados removidos antes da inclusao de novos dados
  * */
-class FirebaseCloneDatabase(private val baseEmail: String, private val targetEmail: String) {
+class FirebaseCloneDatabase(
+    private val baseEmail: String,
+    private val targetEmail: String,
+    private val cleanTargetBeforeCloning: Boolean = true,
+) {
 
     suspend fun beginCloning() {
-        cleanDatabase()
+
+        if (cleanTargetBeforeCloning) cleanDatabase()
+
         cloneShopLists()
         cloneCategories()
         cloneProducts()
         cloneSuggestionProducts()
-        removeHostData()
     }
 
 
     /**
-     * É necessário limpar o banco de dados do usuario local antes da clonagem para evitar dados duplicados, conflitos,
+     * (Nem sempre) É necessário limpar o banco de dados do usuario alvo antes da clonagem para evitar dados duplicados, conflitos,
      * ou até mesmo erros por conta de dados antigos no database que nao foram migrados com o passar do tempo
      * */
     private suspend fun cleanDatabase() {
@@ -78,12 +84,4 @@ class FirebaseCloneDatabase(private val baseEmail: String, private val targetEma
         }
 
     }
-
-    /**
-     * Remove do banco de dados do usuario local o registro do host para que a conexao seja cortada de vez
-     * */
-    private suspend fun removeHostData() {
-        Firestore.hostDocument().delete().await()
-    }
-
 }
