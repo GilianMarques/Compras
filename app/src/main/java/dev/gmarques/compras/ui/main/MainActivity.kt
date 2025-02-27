@@ -1,26 +1,35 @@
 package dev.gmarques.compras.ui.main
 
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.model.Category
+import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.data.repository.CategoryRepository
+import dev.gmarques.compras.data.repository.ProductRepository
+import dev.gmarques.compras.data.repository.ShopListRepository
+import dev.gmarques.compras.data.repository.SuggestionProductRepository
 import dev.gmarques.compras.data.repository.UserRepository
+import dev.gmarques.compras.data.repository.model.ValidatedCategory
+import dev.gmarques.compras.data.repository.model.ValidatedProduct
+import dev.gmarques.compras.data.repository.model.ValidatedShopList
+import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.databinding.ActivityMainBinding
-import dev.gmarques.compras.domain.utils.ListenerRegister
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.ui.profile.ProfileActivity
-import dev.gmarques.compras.ui.sinc_stopped.SyncStoppedActivity
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 
@@ -29,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
     private val rvAdapter = ShopListAdapter(isDarkThemeEnabled(), ::rvItemClick, ::rvLongItemClick)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +52,30 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerView()
         setupFabAddList()
         observeListsUpdates()
-        // TODO: tester a migração de dadops quando o ususario aceita o convite ou se desconecta 
+        
+       // lifecycleScope.launch { populateForTest() }
+    }
+
+    private suspend fun populateForTest() {
+
+        val name = UserRepository.getUser()!!.email!!.split("@")[0]
+
+        val list = ShopList("lista de $name", 125)
+        val category = Category(name = "categoria de $name", color = 12345)
+        val product = Product(
+            list.id,
+            category.id,
+            "produto de $name",
+            0,
+            1.5,
+            1,
+            ""
+        )
+
+        ProductRepository.addOrUpdateProduct(ValidatedProduct(product))
+        SuggestionProductRepository.updateOrAddProductAsSuggestion(ValidatedSuggestionProduct(product))
+        ShopListRepository.addOrUpdateShopList(ValidatedShopList(list))
+        CategoryRepository.addOrUpdateCategory(ValidatedCategory(category))
     }
 
     private fun isDarkThemeEnabled(): Boolean {

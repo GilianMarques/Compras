@@ -39,7 +39,7 @@ data class ShopList(
     }
 
     @Suppress("unused") // necessario pra uso com firebase
-    constructor() : this("not_initialized", 0)
+    constructor() : this("_", 0)
 
     constructor(id: String) : this("", 0, id)
 
