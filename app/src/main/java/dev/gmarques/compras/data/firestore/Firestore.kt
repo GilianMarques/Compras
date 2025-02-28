@@ -52,7 +52,13 @@ class Firestore {
          * */
         suspend fun loadDatabasePaths(): String? {
 
-            if (host != "null") throw (IllegalStateException("Nao se deve alterar o caminho do servidor, uma vez que definido. valor atual: '$host'"))
+            if (host != "null") return null
+                .also {
+                    Log.d(
+                        "USUK",
+                        "Firestore.loadDatabasePaths: Nao se deve alterar o caminho do servidor, uma vez que definido. valor atual: '$host'"
+                    )
+                }
 
             val localUserEmail = UserRepository.getUser()!!.email!!
 
