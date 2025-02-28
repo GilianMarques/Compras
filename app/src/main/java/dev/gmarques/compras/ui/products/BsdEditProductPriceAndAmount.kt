@@ -9,6 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.model.Market
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.BsdFastEditProductDialogBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
@@ -18,6 +19,7 @@ import dev.gmarques.compras.ui.Vibrator
 
 class BsdEditProductPriceOrQuantity private constructor() {
 
+    private var currentMarket: Market? = null
     private var focusOnInfo: Boolean = false
     private var focusOnQuantity: Boolean = false
     private var focusOnPrice: Boolean = false
@@ -39,7 +41,11 @@ class BsdEditProductPriceOrQuantity private constructor() {
 
         with(binding) {
 
-            edtQuantity.setText(String.format(targetActivity.getString(R.string.un), editProduct.quantity))
+            edtQuantity.setText(
+                String.format(
+                    targetActivity.getString(R.string.un), editProduct.quantity
+                )
+            )
             edtPrice.setText(editProduct.price.toCurrency())
             edtInfo.setText(editProduct.info)
             tvTitle.text = targetActivity.getString(R.string.Editar_x, editProduct.name)
@@ -92,7 +98,11 @@ class BsdEditProductPriceOrQuantity private constructor() {
             if (!hasFocus) {
                 val term = edtTarget.text.toString().ifBlank { "0" }.onlyIntegerNumbers()
                 val result = Product.Validator.validateQuantity(term, targetActivity)
-                if (result.isSuccess) edtTarget.setText(String.format(targetActivity.getString(R.string.un), result.getOrThrow()))
+                if (result.isSuccess) edtTarget.setText(
+                    String.format(
+                        targetActivity.getString(R.string.un), result.getOrThrow()
+                    )
+                )
             }
         }
     }
@@ -140,13 +150,18 @@ class BsdEditProductPriceOrQuantity private constructor() {
     }
 
     private fun updateProductAndClose(newQuantity: Int, newPrice: Double, newInfo: String) {
-        val edited = editProduct.copy(
+        val edited = if (buyAndSave) editProduct.copy(
             quantity = newQuantity,
             price = newPrice,
             info = newInfo,
-            hasBeenBought = if (buyAndSave) true else editProduct.hasBeenBought // se não
-            // é pra comprar e salvar mantenho o status de compra original do produto
+            hasBeenBought = true,
+            boughtDate = System.currentTimeMillis(),
+            marketId = currentMarket?.id
         )
+        else editProduct.copy(
+            quantity = newQuantity, price = newPrice, info = newInfo
+        )
+
 
         onConfirmListener(edited)
         dialog.dismiss()
@@ -205,6 +220,11 @@ class BsdEditProductPriceOrQuantity private constructor() {
         fun build(): BsdEditProductPriceOrQuantity {
             instance.init()
             return instance
+        }
+
+        fun setCurrentMarket(currentMarket: Market?): Builder {
+            instance.currentMarket = currentMarket
+            return this
         }
 
 

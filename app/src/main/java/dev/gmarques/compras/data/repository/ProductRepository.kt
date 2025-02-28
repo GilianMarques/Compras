@@ -1,6 +1,5 @@
 package dev.gmarques.compras.data.repository
 
-import android.util.Log
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
@@ -52,6 +51,7 @@ object ProductRepository {
      * @return Uma lista de nomes de produtos.
      */
     suspend fun getProducts(shopListId: String): List<String> {
+        if (shopListId.isNullOrBlank()) throw IllegalArgumentException("A id buscada nao pode ser nula ou estar em branco")
         val querySnapshot: QuerySnapshot =
             Firestore.productsCollection().whereEqualTo("shopListId", shopListId).get().await()
         return querySnapshot.map { it.toObject<Product>().name }
@@ -101,7 +101,8 @@ object ProductRepository {
         shopListId: String,
         onSnapshot: (List<Product>?, Exception?) -> Any,
     ): ListenerRegister {
-        return ListenerRegister(Firestore.productsCollection().whereEqualTo("shopListId", shopListId)
+        return ListenerRegister(Firestore.productsCollection()
+            .whereEqualTo("shopListId", shopListId)
             .addSnapshotListener { querySnapshot, fbException ->
                 if (fbException != null) onSnapshot(null, fbException)
                 else querySnapshot?.let {

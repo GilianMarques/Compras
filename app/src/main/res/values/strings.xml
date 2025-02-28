@@ -193,5 +193,9 @@
     <string name="Gerenciar_mercados">Gerenciar mercados</string>
     <string name="Botao_para_adicionar_um_novo_mercado">Botão para adicionar um novo mercado</string>
     <string name="Nome_do_mercado">Nome do mercado</string>
+    <string name="Onde_est_fazendo_as_compras">Onde está fazendo as compras?</string>
+    <string name="Voce_esta_comprando_em">Você está comprando em %1$s</string>
+    <string name="Definir_mercado">Definir</string>
+    <string name="Alterar">Alterar</string>
 
 </resources>

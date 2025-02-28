@@ -6,7 +6,6 @@ import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.DatabaseVersion
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.tasks.await
 
 @Suppress("ClassName")

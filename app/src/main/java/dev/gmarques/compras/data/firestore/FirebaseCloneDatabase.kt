@@ -2,7 +2,6 @@ package dev.gmarques.compras.data.firestore
 
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.data.model.DatabaseVersion
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import kotlinx.coroutines.tasks.await

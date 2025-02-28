@@ -9,9 +9,11 @@ import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Category
+import dev.gmarques.compras.data.model.Market
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.CategoryRepository
+import dev.gmarques.compras.data.repository.MarketRepository
 import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.ShopListRepository
 import dev.gmarques.compras.data.repository.SuggestionProductRepository
@@ -31,8 +33,14 @@ import kotlinx.coroutines.withContext
 
 class ProductsActivityViewModel : ViewModel() {
 
+
     // categoria usada como filtro pelo usuario
     private var filterCategory: Category? = null
+    var currentMarket: Market? = null
+        set(value) {
+            field = value
+            _marketEvent.postValue(value)
+        }
 
     // mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo
     private var categories: HashMap<String, Category>? = null
@@ -52,6 +60,9 @@ class ProductsActivityViewModel : ViewModel() {
     private val _uiStateLD = MutableLiveData<UiState>()
     val uiStateLD: LiveData<UiState> get() = _uiStateLD
 
+    private val _marketEvent = MutableLiveData<Market?>()
+    val marketEvent: LiveData<Market?> get() = _marketEvent
+
     fun init(shopListId: String) {
 
         if (init) return
@@ -66,7 +77,9 @@ class ProductsActivityViewModel : ViewModel() {
             loadSortPreferences()
             observeCategoriesUpdates()
             loadList(shopListId)
+            loadCurrentMarket()
         }
+
     }
 
     override fun onCleared() {
@@ -251,7 +264,7 @@ class ProductsActivityViewModel : ViewModel() {
      * Essa funcionalidade se faz necessária principalmente por conta o drg and drop do rv de produtos.
      */
     private fun postDelayedData() {
-
+        // TODO: aplicar throttling automaticamente com base na frequencia de chamadas
         val delayMillis = if (throttlingJob == null) 0L else 100L
 
         throttlingJob?.cancel()
@@ -278,7 +291,12 @@ class ProductsActivityViewModel : ViewModel() {
      * Atualiza o produto com o valor recebido. Nao atualiza a sugestao de produto relativa, caso exista
      */
     fun updateProductBoughtState(product: Product, isBought: Boolean) {
-        val newProduct = product.copy(hasBeenBought = isBought)
+        val newProduct =
+            product.copy(
+                hasBeenBought = isBought,
+                boughtDate = System.currentTimeMillis(),
+                marketId = currentMarket?.id
+            )
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }
 
@@ -362,6 +380,15 @@ class ProductsActivityViewModel : ViewModel() {
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }
 
+
+    private suspend fun loadCurrentMarket() {
+
+        val lastMarketId = PreferencesHelper().getValue(PrefsKeys.LAST_MARKET_USED, "")
+        val market = if (!lastMarketId.isNullOrEmpty())
+            MarketRepository.getMarket(lastMarketId) else null
+        _marketEvent.postValue(market)
+    }
+
     data class ProductsWithPrices(
         val productsWithCategory: List<ProductWithCategory>,
         val fullPrice: Double,
@@ -379,6 +406,7 @@ class ProductsActivityViewModel : ViewModel() {
         lateinit var shopList: ShopList
         var priceFull: Double = 0.0
         var priceBought: Double = 0.0
+
     }
 
 }

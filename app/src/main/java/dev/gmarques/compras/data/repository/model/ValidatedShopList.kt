@@ -2,6 +2,7 @@ package dev.gmarques.compras.data.repository.model
 
 import dev.gmarques.compras.App
 import dev.gmarques.compras.data.model.ShopList
+import dev.gmarques.compras.data.repository.UserRepository
 
 /**
  * Autor: Gilian
@@ -9,7 +10,12 @@ import dev.gmarques.compras.data.model.ShopList
  * Valida uma Lista de compras antes que seja salva no banco de dados, garantindo
  * que apenas objetos que atendam às regras de negócio sejam salvos.
  */
-class ValidatedShopList(val shopList: ShopList) {
+class ValidatedShopList(shopList: ShopList) {
+
+    val shopList: ShopList = shopList.copy(
+        updatedBy = UserRepository.getUser()?.email
+    )
+
     init {
         shopList.selfValidate(App.getContext())
     }

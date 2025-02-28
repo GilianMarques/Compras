@@ -52,8 +52,8 @@ class AddEditMarketActivityViewModel : ViewModel() {
 
     suspend fun loadMarket() = withContext(IO) {
         marketId?.let {
-            val result = MarketRepository.getMarket(marketId!!)
-            _editingMarketLD.postValue(result.getOrThrow())
+            val market = MarketRepository.getMarket(marketId!!)
+            _editingMarketLD.postValue(market)
         }
     }
 

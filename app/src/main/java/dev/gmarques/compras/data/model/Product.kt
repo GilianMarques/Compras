@@ -12,16 +12,19 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.removeSpaces
 import java.util.Locale
 import java.util.UUID
 
+// isBought estava dando problema com o firebase
 data class Product(
-    val shopListId: String,
-    val categoryId: String,
     val name: String,
-    val position: Int = -1,
     val price: Double,
     val quantity: Int,
     val info: String,
-    val hasBeenBought: Boolean = false, // isBought estava dando problema com o firebase
+    val hasBeenBought: Boolean = false,
+    val shopListId: String,
+    val categoryId: String,
+    val position: Int = -1,
+    val marketId: String? = null,
     val id: String = getNewId(),
+    val boughtDate: Long = System.currentTimeMillis(),
     val creationDate: Long = System.currentTimeMillis(),
     val removed: Boolean = false,
     val createdBy: String = UserRepository.getUser()!!.email!!,
@@ -29,9 +32,23 @@ data class Product(
 
     ) {
 
-    @Suppress("unused")  // necessario pra uso com firebase
-    constructor() : this("", "", "not_initialized", -1, 0.0, 0, "not_initialized", false)
-
+    @Suppress("unused")  // Necessário para uso com Firebase
+    constructor() : this(
+        name = "",
+        price = 0.0,
+        quantity = 1,
+        info = "",
+        hasBeenBought = false,
+        shopListId = "",
+        categoryId = "",
+        position = -1,
+        id = "",
+        boughtDate = 0L,
+        creationDate = 0L,
+        removed = false,
+        createdBy = "",
+        updatedBy = null
+    )
 
     /**
      * Garante que nenhum produto entre no banco de dados sem atender às regras de negócio

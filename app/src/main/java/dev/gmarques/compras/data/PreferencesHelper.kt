@@ -45,16 +45,17 @@ class PreferencesHelper {
      * @param defaultValue Valor padrão retornado caso a chave não exista.
      * @return O valor associado à chave ou o valor padrão se não encontrado.
      */
-    fun <T> getValue(key: String, defaultValue: T): T {
+    fun <T : Any> getValue(key: String, defaultValue: T): T {
         return when (defaultValue) {
-            is String -> sharedPreferences.getString(key, defaultValue) as T
-            is Int -> sharedPreferences.getInt(key, defaultValue) as T
-            is Boolean -> sharedPreferences.getBoolean(key, defaultValue) as T
-            is Float -> sharedPreferences.getFloat(key, defaultValue) as T
-            is Long -> sharedPreferences.getLong(key, defaultValue) as T
-            else -> throw IllegalArgumentException("Tipo não suportado: ${defaultValue!!::class.java}")
-        }
+            is String -> sharedPreferences.getString(key, defaultValue)
+            is Int -> sharedPreferences.getInt(key, defaultValue)
+            is Boolean -> sharedPreferences.getBoolean(key, defaultValue)
+            is Float -> sharedPreferences.getFloat(key, defaultValue)
+            is Long -> sharedPreferences.getLong(key, defaultValue)
+            else -> throw IllegalArgumentException("Tipo não suportado: ${defaultValue::class.java}")
+        } as T
     }
+
 
     /**
      * Remove um valor do SharedPreferences.
@@ -78,6 +79,7 @@ class PreferencesHelper {
             const val SORT_CRITERIA = "sort_criteria"
             const val SORT_ASCENDING = "sort_ascending"
             const val BOUGHT_PRODUCTS_AT_END = "bought_products_at_end"
+            const val LAST_MARKET_USED = "last_market_used"
         }
     }
 

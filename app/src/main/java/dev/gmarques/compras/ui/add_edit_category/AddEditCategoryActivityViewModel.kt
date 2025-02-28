@@ -52,8 +52,8 @@ class AddEditCategoryActivityViewModel : ViewModel() {
 
     suspend fun loadCategory() = withContext(IO) {
         categoryId?.let {
-            val result = CategoryRepository.getCategory(categoryId!!)
-            _editingCategoryLD.postValue(result.getOrThrow())
+            val category = CategoryRepository.getCategory(categoryId!!)
+            _editingCategoryLD.postValue(category)
         }
     }
 

@@ -52,27 +52,34 @@ data class ShopList(
             private const val COLOR_LENGTH_THRESHOLD = 2
 
             fun validateName(input: String, context: Context): Result<String> {
+                val name =
+                    input.removeSpaces().replaceFirstChar { it.titlecase(Locale.getDefault()) }
+
                 return when {
-                    input.isEmpty() -> Result.failure(
+                    name.isEmpty() -> Result.failure(
                         Exception(
                             context.getString(O_nome_nao_pode_ficar_vazio)
                         )
                     )
 
-                    input.length < MIN_CHARS -> Result.failure(
+                    name.length < MIN_CHARS -> Result.failure(
                         Exception(
-                            String.format(context.getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS)
+                            String.format(
+                                context.getString(O_nome_deve_ter_no_m_nimo_x_caracteres), MIN_CHARS
+                            )
                         )
                     )
 
-                    input.length > MAX_CHARS -> Result.failure(
+                    name.length > MAX_CHARS -> Result.failure(
                         Exception(
-                            String.format(context.getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS)
+                            String.format(
+                                context.getString(O_nome_deve_ter_no_m_ximo_x_caracteres), MAX_CHARS
+                            )
                         )
                     )
 
                     else -> {
-                        Result.success(input.removeSpaces().replaceFirstChar { it.titlecase(Locale.getDefault()) })
+                        Result.success(name)
                     }
                 }
             }

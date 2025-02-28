@@ -20,13 +20,17 @@ object CategoryRepository {
         val category = validatedCategory.category
 
         val productsUsing = ProductRepository.hasAnyProductWithCategoryId(category.id)
-        val suggestionProductsUsing = SuggestionProductRepository.hasAnyProductWithCategoryId(category.id)
+        val suggestionProductsUsing =
+            SuggestionProductRepository.hasAnyProductWithCategoryId(category.id)
 
         val categoryInUse = productsUsing || suggestionProductsUsing
 
         if (categoryInUse) {
             return Result.failure(
-                Exception(App.getContext().getString(R.string.A_categoria_esta_em_uso_e_nao_pode_ser_removida))
+                Exception(
+                    App.getContext()
+                        .getString(R.string.A_categoria_esta_em_uso_e_nao_pode_ser_removida)
+                )
             )
         } else {
             Firestore.categoriesCollection().document(category.id).delete()
@@ -35,7 +39,8 @@ object CategoryRepository {
     }
 
     suspend fun getCategoryByName(name: String): Result<Category?> {
-        val querySnapshot = Firestore.categoriesCollection().whereEqualTo("name", name).limit(1).get().await()
+        val querySnapshot =
+            Firestore.categoriesCollection().whereEqualTo("name", name).limit(1).get().await()
 
         return if (!querySnapshot.isEmpty) {
             val targetCategory = querySnapshot.documents[0].toObject<Category>()
@@ -43,11 +48,13 @@ object CategoryRepository {
         } else Result.success(null)
     }
 
-    suspend fun getCategory(idCategory: String): Result<Category> { // TODO: retornar uma categoria ou null
-        val querySnapshot = Firestore.categoriesCollection().document(idCategory).get().await()
+    suspend fun getCategory(categoryId: String): Category {
+        if (categoryId.isNullOrBlank()) throw IllegalArgumentException("A id buscada nao pode ser nula ou estar em branco")
+
+        val querySnapshot = Firestore.categoriesCollection().document(categoryId).get().await()
 
         val targetCategory = querySnapshot.toObject<Category>()!!
-        return Result.success(targetCategory)
+        return targetCategory
     }
 
     /**
@@ -55,15 +62,16 @@ object CategoryRepository {
      * Lembre-se de remover o listener quando nao for mais necessario para evitar vazamentos de memoria
      * */
     fun observeCategoryUpdates(onSnapshot: (List<Category>?, Exception?) -> Any): ListenerRegister {
-        return ListenerRegister(Firestore.categoriesCollection().addSnapshotListener { querySnapshot, fbException ->
+        return ListenerRegister(
+            Firestore.categoriesCollection().addSnapshotListener { querySnapshot, fbException ->
 
-            if (fbException != null) onSnapshot(null, fbException)
-            else querySnapshot?.let {
-                val categories = arrayListOf<Category>()
-                categories.addAll(querySnapshot.map { it.toObject<Category>() })
-                onSnapshot(categories, null)
-            }
-        })
+                if (fbException != null) onSnapshot(null, fbException)
+                else querySnapshot?.let {
+                    val categories = arrayListOf<Category>()
+                    categories.addAll(querySnapshot.map { it.toObject<Category>() })
+                    onSnapshot(categories, null)
+                }
+            })
 
     }
 

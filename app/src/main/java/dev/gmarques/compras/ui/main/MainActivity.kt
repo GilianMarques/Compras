@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
@@ -29,7 +28,6 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.ui.profile.ProfileActivity
-import kotlinx.coroutines.launch
 import java.util.Calendar
 
 
@@ -52,8 +50,8 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerView()
         setupFabAddList()
         observeListsUpdates()
-        
-       // lifecycleScope.launch { populateForTest() }
+
+        // lifecycleScope.launch { populateForTest() }
     }
 
     private suspend fun populateForTest() {
@@ -63,17 +61,21 @@ class MainActivity : AppCompatActivity() {
         val list = ShopList("lista de $name", 125)
         val category = Category(name = "categoria de $name", color = 12345)
         val product = Product(
-            list.id,
-            category.id,
-            "produto de $name",
-            0,
-            1.5,
-            1,
-            ""
+            name = "produto de $name",
+            price = 1.5,
+            quantity = 1,
+            info = "",
+            shopListId = list.id,
+            categoryId = category.id,
+            position = 0
         )
 
         ProductRepository.addOrUpdateProduct(ValidatedProduct(product))
-        SuggestionProductRepository.updateOrAddProductAsSuggestion(ValidatedSuggestionProduct(product))
+        SuggestionProductRepository.updateOrAddProductAsSuggestion(
+            ValidatedSuggestionProduct(
+                product
+            )
+        )
         ShopListRepository.addOrUpdateShopList(ValidatedShopList(list))
         CategoryRepository.addOrUpdateCategory(ValidatedCategory(category))
     }

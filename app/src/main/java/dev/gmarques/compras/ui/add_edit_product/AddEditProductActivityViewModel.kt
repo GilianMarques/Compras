@@ -83,13 +83,13 @@ class AddEditProductActivityViewModel : ViewModel() {
             categoryId = validatedCategory!!.id
         )
         else Product(
-            listId,
-            validatedCategory!!.id,
-            validatedName,
-            0,
-            validatedPrice,
-            validatedQuantity,
-            validatedInfo
+            name = validatedName,
+            price = validatedPrice,
+            quantity = validatedQuantity,
+            info = validatedInfo,
+            shopListId = listId,
+            categoryId = validatedCategory!!.id,
+            position = 0
         )
 
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
@@ -114,9 +114,9 @@ class AddEditProductActivityViewModel : ViewModel() {
 
 
     fun loadCategory(categoryId: String) = viewModelScope.launch(IO) {
-        val result = CategoryRepository.getCategory(categoryId)
+        val category = CategoryRepository.getCategory(categoryId)
 
-        uiState = uiState.copy(editingCategory = result.getOrThrow())
+        uiState = uiState.copy(editingCategory = category)
     }
 
     fun loadSuggestions(term: String) = viewModelScope.launch(IO) {
@@ -146,7 +146,7 @@ class AddEditProductActivityViewModel : ViewModel() {
     }
 
     fun loadSuggestionCategory(product: Product) = viewModelScope.launch(IO) {
-        val category = CategoryRepository.getCategory(product.categoryId).getOrThrow()
+        val category = CategoryRepository.getCategory(product.categoryId)
         uiState = uiState.copy(suggestionProductAndCategory = product to category)
 
     }
