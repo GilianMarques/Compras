@@ -181,4 +181,17 @@
     <string name="Ficar_com_dados_antigos">Ficar com dados antigos</string>
     <string name="O_sincronismo_entre_contas_foi_interrompido_reinicie_">O sincronismo entre contas foi interrompido. Reinicie o app para aplicar as alterações.</string>
 
+    <string name="Mercado">Mercado</string>
+    <string name="Salvar_mercado">Salvar mercado</string>
+    <string name="Adicionar_mercado">Adicionar mercado</string>
+    <string name="Selecionar_mercado">Selecionar mercado</string>
+    <string name="Erro_ao_carregar_mercados_x">Erro ao carregar mercados %1$s</string>
+    <string name="Selecione_umo_mercado">Selecione um mercado</string>
+    <string name="Novo_mercado">Novo mercado</string>
+    <string name="O_mercado_esta_em_uso_e_nao_pode_ser_removida">O mercado está em uso e não pode ser removida</string>
+    <string name="Nao_foi_possivel_verificar_se_o_mercado_esta_em_uso">Não foi possível verificar se o mercado está em uso</string>
+    <string name="Gerenciar_mercados">Gerenciar mercados</string>
+    <string name="Botao_para_adicionar_um_novo_mercado">Botão para adicionar um novo mercado</string>
+    <string name="Nome_do_mercado">Nome do mercado</string>
+
 </resources>

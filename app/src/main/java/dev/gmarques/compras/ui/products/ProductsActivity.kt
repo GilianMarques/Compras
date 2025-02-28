@@ -36,6 +36,7 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
+import dev.gmarques.compras.ui.markets.MarketsActivity
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -280,6 +281,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             .setSuggestionListener { startActivitySuggestProduct() }
             .setRemoveListener { removeList -> confirmRemove(removeList) }
             .setManageCategoriesListener { startCategoriesActivity() }
+            .setManageMarketsListener { startMarketsActivity() }
             .build().show()
     }
 
@@ -287,6 +289,14 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
         Vibrator.interaction()
         val intent = CategoriesActivity.newIntent(this@ProductsActivity)
+        startActivity(intent)
+    }
+
+
+    private fun startMarketsActivity() {
+
+        Vibrator.interaction()
+        val intent = MarketsActivity.newIntent(this@ProductsActivity)
         startActivity(intent)
     }
 

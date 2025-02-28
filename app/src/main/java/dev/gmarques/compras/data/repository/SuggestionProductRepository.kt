@@ -42,6 +42,17 @@ object SuggestionProductRepository {
     }
 
     /**
+     * Verifica se há pelo menos um produto ou sugestão associado ao ID de mercado fornecido.
+     * @param marketId ID do mercado a ser verificada.
+     * @return Um [Result] indicando se há produtos associados.
+     */
+    suspend fun hasAnyProductWithMarketId(marketId: String): Boolean {
+        val suggestionProductsSnapshot =
+            Firestore.suggestionProductsCollection().whereEqualTo("marketId", marketId).limit(1).get().await()
+        return !suggestionProductsSnapshot.isEmpty
+    }
+
+    /**
      * Define um listener no Firestore para notificações de alterações em produtos sugeridos.
      * @param onSnapshot Função chamada ao receber atualizações ou erros.
      * @return Um [ListenerRegister] para gerenciar o listener.

@@ -28,14 +28,23 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.add_edit_shop_list.AddEditShopListActivity"
+            android:name=".ui.add_edit_category.AddEditCategoryActivity"
             android:exported="false"
             android:windowSoftInputMode="stateAlwaysVisible" />
 
         <activity
-            android:name=".ui.add_edit_category.AddEditCategoryActivity"
+            android:name=".ui.add_edit_market.AddEditMarketActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.markets.MarketsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.add_edit_shop_list.AddEditShopListActivity"
             android:exported="false"
             android:windowSoftInputMode="stateAlwaysVisible" />
+
 
         <activity
             android:name=".ui.add_edit_product.AddEditProductActivity"

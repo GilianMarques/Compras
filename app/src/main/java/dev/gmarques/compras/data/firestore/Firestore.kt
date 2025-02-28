@@ -34,6 +34,7 @@ class Firestore {
         private const val SHOP_LISTS = "shopLists"
         private const val PRODUCTS = "products"
         private const val CATEGORIES = "categories"
+        private const val MARKETS = "markets"
         private const val SUGGESTION_PRODUCT = "suggestion_products"
         private const val COLLABORATION = "collaboration"
         private const val SYNC_INVITES = "sync_invites"
@@ -89,6 +90,12 @@ class Firestore {
             return rootCollection(targetEmail)
                 .document(DATABASE)
                 .collection(CATEGORIES)
+        }
+
+        fun marketsCollection(targetEmail: String = host): CollectionReference {
+            return rootCollection(targetEmail)
+                .document(DATABASE)
+                .collection(MARKETS)
         }
 
         fun productsCollection(targetEmail: String = host): CollectionReference {
@@ -166,5 +173,6 @@ class Firestore {
                 ?.toObject<DatabaseVersion>()?.databaseVersion ?: 1
 
         }
+
     }
 }

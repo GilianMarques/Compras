@@ -78,6 +78,19 @@ object ProductRepository {
         return !productsSnapshot.isEmpty
     }
 
+
+    /**
+     * Verifica se há pelo menos um produto ou sugestão associado ao ID de mercado fornecido.
+     * @param marketId ID do mercado a ser verificada.
+     * @return Um [Result] indicando se há produtos associados.
+     */
+    suspend fun hasAnyProductWithMarketId(marketId: String): Boolean {
+        val productsSnapshot =
+            Firestore.productsCollection().whereEqualTo("marketId", marketId).limit(1).get()
+                .await()
+        return !productsSnapshot.isEmpty
+    }
+
     /**
      * Define um listener no Firestore para notificações de alterações em produtos locais e na nuvem.
      * @param shopListId ID da lista de compras.
