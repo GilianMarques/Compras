@@ -24,7 +24,8 @@
         android:paddingEnd="8dp"
         android:textAlignment="center"
         android:textColor="?colorOnPrimary"
-        android:text="-" />
+        android:text="-"
+        tools:ignore="HardcodedText" />
 
     <View
         android:id="@+id/divider1"
@@ -67,5 +68,6 @@
         android:paddingEnd="16dp"
         android:textAlignment="center"
         android:textColor="?colorOnPrimary"
-        android:text="+" />
+        android:text="+"
+        tools:ignore="HardcodedText" />
 </LinearLayout>

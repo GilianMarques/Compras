@@ -382,9 +382,8 @@ class ProductsActivityViewModel : ViewModel() {
 
 
     private suspend fun loadCurrentMarket() {
-
         val lastMarketId = PreferencesHelper().getValue(PrefsKeys.LAST_MARKET_USED, "")
-        val market = if (!lastMarketId.isNullOrEmpty())
+        val market = if (lastMarketId.isNotEmpty())
             MarketRepository.getMarket(lastMarketId) else null
         _marketEvent.postValue(market)
     }

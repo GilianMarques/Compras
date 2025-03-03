@@ -8,7 +8,6 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.BuildConfig
 import dev.gmarques.compras.data.PreferencesHelper
-import dev.gmarques.compras.data.model.DatabaseVersion
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import kotlinx.coroutines.tasks.await
@@ -172,12 +171,6 @@ class Firestore {
 
         fun databaseVersionDocument(targetEmail: String = host): DocumentReference {
             return rootCollection(targetEmail).document(DATABASE_VERSION)
-        }
-
-        suspend fun getCloudDatabaseVersion(): Int {
-            return databaseVersionDocument().get().await()
-                ?.toObject<DatabaseVersion>()?.databaseVersion ?: 1
-
         }
 
     }

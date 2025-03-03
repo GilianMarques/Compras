@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -22,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
@@ -47,6 +49,7 @@ import dev.gmarques.compras.ui.markets.MarketsActivity.Companion.SELECTED_MARKET
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,6 +69,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     // ajuda a escrolar o rv de categorias pra categoria selecionada
     private var lastAdapterPosition = 0
+
+    private var searchJob = Job()
 
     companion object {
         private const val LIST_ID = "list_id"
@@ -88,11 +93,11 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         viewModel = ViewModelProvider(this)[ProductsActivityViewModel::class.java]
         viewModel.init(shopListId)
 
-        initToolbar()
-        initRecyclerViewProducts()
-        initRecyclerViewCategories()
-        initSearch()
-        initFabAddProduct()
+        setupToolbar()
+        setupRecyclerViewProducts()
+        setupRecyclerViewCategories()
+        setupSearch()
+        setupFabAddProduct()
         observeStateChanges()
         setupOnBackPressed()
         suggestProductsIfNeeded(shopListId)
@@ -112,9 +117,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             else getString(R.string.Alterar)
 
             lifecycleScope.launch(Main) {
-                delay(1000)
+                delay(1500)
                 Vibrator.interaction()
-                Snackbar.make(binding.fabAddProduct, title, Snackbar.LENGTH_LONG)
+                Snackbar.make(binding.root, title, Snackbar.LENGTH_LONG)
                     .setAction(action) {
 
                         Vibrator.interaction()
@@ -123,7 +128,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
                         )
 
                     }.setAnimationMode(ANIMATION_MODE_SLIDE)
-                    .setDuration(if (market == null) 999999 else 4000)
+                    .setDuration(if (market == null) LENGTH_INDEFINITE else 4000)
                     .show()
             }
 
@@ -208,15 +213,19 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     }
 
-    private fun initSearch() {
+
+    private fun setupSearch() {
 
         binding.edtSearch.doOnTextChanged { text, _, _, _ ->
-
-            val term = text.toString()
-            viewModel.searchProduct(term)
-            binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
-            binding.rvCategories.visibility = if (term.isEmpty()) VISIBLE else GONE
-
+            searchJob.cancel()
+            searchJob = Job()
+            lifecycleScope.launch(searchJob) {
+                delay(500)
+                val term = text.toString()
+                viewModel.searchProduct(term)
+                binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
+                binding.rvCategories.visibility = if (term.isEmpty()) VISIBLE else GONE
+            }
         }
 
         binding.ivClearSearch.setOnClickListener {
@@ -237,7 +246,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         }
     }
 
-    private fun initToolbar() {
+    private fun setupToolbar() {
         binding.toolbar.ivGoBack.setOnClickListener { Vibrator.interaction(); this.onBackPressedDispatcher.onBackPressed() }
 
         binding.toolbar.ivMenu.setOnClickListener {
@@ -246,7 +255,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     }
 
-    private fun initRecyclerViewProducts() {
+    private fun setupRecyclerViewProducts() {
         rvAdapterProducts = ProductAdapter(isDarkThemeEnabled(), this@ProductsActivity)
 
         val dragDropHelper = ProductDragDropHelperCallback(rvAdapterProducts)
@@ -259,14 +268,14 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         binding.rvProducts.adapter = rvAdapterProducts
     }
 
-    private fun initRecyclerViewCategories() {
+    private fun setupRecyclerViewCategories() {
         rvAdapterCategories = CategoryAdapter(this@ProductsActivity, this@ProductsActivity)
         binding.rvCategories.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.rvCategories.adapter = rvAdapterCategories
     }
 
-    private fun initFabAddProduct() = binding.apply {
+    private fun setupFabAddProduct() = binding.apply {
 
         fabAddProduct.setOnClickListener {
             startActivityAddProduct()
@@ -433,10 +442,15 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         marketResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    val selectedMarket = result.data!!
-                        .getSerializableExtra(SELECTED_MARKET) as Market
+                    val selectedMarket = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        result.data!!.getSerializableExtra(SELECTED_MARKET, Market::class.java)
+                    } else
+                        @Suppress("DEPRECATION")
+                        result.data!!.getSerializableExtra(SELECTED_MARKET) as Market
 
-                    PreferencesHelper().saveValue(PrefsKeys.LAST_MARKET_USED, selectedMarket.id)
+
+
+                    PreferencesHelper().saveValue(PrefsKeys.LAST_MARKET_USED, selectedMarket!!.id)
 
                     viewModel.currentMarket = selectedMarket
                 }

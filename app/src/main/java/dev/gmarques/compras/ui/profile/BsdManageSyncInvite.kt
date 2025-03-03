@@ -19,10 +19,7 @@ import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.BsdManageSyncInviteBinding
 import dev.gmarques.compras.ui.Vibrator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class BsdManageSyncInvite(
     private val invite: SyncAccount,
@@ -177,17 +174,6 @@ class BsdManageSyncInvite(
             }
             .show()
 
-    }
-
-    private suspend fun showErrorMsg(msg: String) = withContext(Dispatchers.Main) {
-        binding.tvErrorMsg.text = msg
-        binding.tvErrorMsg.visibility = VISIBLE
-
-        Vibrator.error()
-        withContext(Dispatchers.IO) {
-            delay(3000)
-            withContext(Dispatchers.Main) { binding.tvErrorMsg.visibility = GONE }
-        }
     }
 
     fun show() {

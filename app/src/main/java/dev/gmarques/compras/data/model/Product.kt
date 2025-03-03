@@ -32,7 +32,6 @@ data class Product(
 
     ) {
 
-    @Suppress("unused")  // Necessário para uso com Firebase
     constructor() : this(
         name = "",
         price = 0.0,

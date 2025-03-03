@@ -47,7 +47,6 @@ data class Market(
         ) throw Exception("Cor do mercado é invalida: '${color}'")
     }
 
-    @Suppress("unused") // necessario pra uso com firebase
     constructor() : this("not_initialized", 0)
 
     class Validator {

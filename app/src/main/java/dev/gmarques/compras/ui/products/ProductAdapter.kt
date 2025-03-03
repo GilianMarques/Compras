@@ -25,7 +25,6 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
 
     private var itemTouchHelper: ItemTouchHelper? = null
     private val utilList = mutableListOf<ProductWithCategory>()
-    private var dragnDropEnabled: Boolean = true
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
 

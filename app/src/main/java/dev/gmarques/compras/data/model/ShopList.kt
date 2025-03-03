@@ -38,7 +38,6 @@ data class ShopList(
         return this
     }
 
-    @Suppress("unused") // necessario pra uso com firebase
     constructor() : this("_", 0)
 
     constructor(id: String) : this("", 0, id)

@@ -47,19 +47,25 @@ object Vibrator {
      *
      * @param duration A duração da vibração em milissegundos.
      */
+    @Suppress("DEPRECATION")
     private fun vibrate(duration: Long) {
         val context = App.getContext()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {  // API 31 e superior (Android 12+)
+
             val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
             val vibrationEffect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE)
             val combinedVibration = CombinedVibration.createParallel(vibrationEffect)
             vibratorManager.vibrate(combinedVibration)
+
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {  // API 26 a 30 (Android 8 a 11)
+
             val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             val vibrationEffect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE)
             vibrator.vibrate(vibrationEffect)
+
         } else {  // APIs abaixo de 26
+
             val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             vibrator.vibrate(duration)
         }

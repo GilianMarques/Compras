@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Compras</string>
     <string name="Botao_adicionar_nova_lista">Botão adicionar nova lista</string>
     <string name="title_activity_login">LoginActivity</string>
@@ -10,7 +10,7 @@
     <string name="Houveumerroaoautenticarsuacontatente">Houve um erro ao autenticar sua conta, tente novamente. Causa: {0}</string>
     <string name="BemvindoX">Bem-vindo(a) %1$s</string>
     <string name="Ologinfalhou">O login falhou. Código: %1$d \nMensagem: %2$s</string>
-    <string name="Houveumerroaocontactaraapidogoole">Houve um erro ao contactar a API do Google, verfique sua conexão e tente reiniciar o app.  Código: {%1$d}</string>
+    <string name="Houveumerroaocontactaraapidogoole">Houve um erro ao contactar a API do Google, verifique sua conexão e tente reiniciar o app.  Código: {%1$d}</string>
     <string name="Foto_de_perfil_do_usuario">Foto de perfil do usuário</string>
     <string name="Bom_dia">Bom dia</string>
     <string name="Boa_tarde">Boa tarde</string>
@@ -48,9 +48,9 @@
     <string name="Adicionar_produto">Adicionar produto</string>
     <string name="O_nome_nao_pode_ficar_vazio">O nome não pode ficar vazio</string>
     <string name="A_cor_nao_pode_ficar_vazia">A cor não pode ficar vazia</string>
-    <string name="O_nome_deve_ter_no_m_nimo_x_caracteres">O nome deve ter no mínimo %1$d caracteres</string>
-    <string name="O_nome_deve_ter_no_m_ximo_x_caracteres">O nome deve ter no máximo %1$d caracteres</string>
-    <string name="Os_detalhes_devem_ter_ate_x_caracteres">Os detalhes devem ter no máximo %1$d caracteres</string>
+    <string name="O_nome_deve_ter_no_m_nimo_x_caracteres" tools:ignore="PluralsCandidate">O nome deve ter no mínimo %1$d caracteres</string>
+    <string name="O_nome_deve_ter_no_m_ximo_x_caracteres" tools:ignore="PluralsCandidate">O nome deve ter no máximo %1$d caracteres</string>
+    <string name="Os_detalhes_devem_ter_ate_x_caracteres" tools:ignore="PluralsCandidate">Os detalhes devem ter no máximo %1$d caracteres</string>
     <string name="Edicao_rapida">Edição rápida</string>
     <string name="Outras_opcoes">Outras opções</string>
     <string name="Remover_produto">Remover produto</string>
@@ -59,8 +59,8 @@
     <string name="Fechar">Fechar</string>
     <string name="X_ja_existe_na_lista">%1$s já existe na lista</string>
     <string name="X_ja_existe">%1$s já existe</string>
-    <string name="Nao_foi_possivel_verificar_se_x_ja_existe_na_lista">Não foi possivel verificar se %1$s já existe na lista</string>
-    <string name="Nao_foi_possivel_verificar_se_x_ja_existe">Não foi possivel verificar se %1$s já existe</string>
+    <string name="Nao_foi_possivel_verificar_se_x_ja_existe_na_lista">Não foi possível verificar se %1$s já existe na lista</string>
+    <string name="Nao_foi_possivel_verificar_se_x_ja_existe">Não foi possível verificar se %1$s já existe</string>
     <string name="Salvar_produto">Salvar produto</string>
     <string name="Salvar_categoria">Salvar categoria</string>
     <string name="Data_de_criacao">Data de criação</string>
@@ -86,7 +86,7 @@
     <string name="Voce_esta_pensando_em">Você está pensando em:</string>
     <string name="Usar_banco_de_dados_de_producao">Usar banco de dados de produção</string>
     <string name="Posicao">Posição</string>
-    <string name="Como_ordenar_os_itens">Como ordenar os itens</string>
+    <string name="Como_ordenar_os_itens">Como ordenar os ítens</string>
     <string name="Gerenciar_categorias">Gerenciar categorias</string>
     <string name="Botao_para_adicionar_uma_nova_categoria">Botão para adicionar uma nova categoria</string>
     <string name="Todos_os_produtos_desta_categoria_foram_comprados">Todos os produtos desta categoria foram comprados</string>
@@ -163,7 +163,7 @@
     <string name="Aguarde_enquanto_seus_dados_s_o_migrados_de_volta_n_o_feche_o_app_ou_se_desconecte_da_internet">Aguarde enquanto migramos seus dados…</string>
     <string name="Sincronismo_entre_contas">Sincronismo entre contas</string>
     <string name="Sincronismo_entre_contas_interrompido">Sincronismo entre contas interrompido</string>
-    <string name="O_sincronismo_entre_contas_foi_interrompido">O sincronismo entre contas foi interrompido. Antes de prossseguir é necessário migrar os dados da sua conta. Não feche o app ou desconecte-se da internet durante o processo.</string>
+    <string name="O_sincronismo_entre_contas_foi_interrompido">O sincronismo entre contas foi interrompido. Antes de prosseguir é necessário migrar os dados da sua conta. Não feche o app ou desconecte-se da internet durante o processo.</string>
     <string name="Sucesso">Sucesso</string>
     <string name="Nao_feche_o_app_ou_se_desconecte_da_internet">Não feche o app ou desconecte-se da internet durante o processo.</string>
     <string name="Voce_nao_pode_convidar_um_usu_rio_para_a_sua_conta_enquanto_for_convidado_de_outra_pessoa">Você não pode convidar um usuário para a sua conta enquanto for convidado de outra pessoa.</string>
@@ -171,10 +171,10 @@
     <string name="Essa_funcao_permite_unificar_as_contas_refletindo_as_alteracoes_feitas">Essa função permite unificar as contas, refletindo as alterações feitas por um usuário na conta do outro, sem que vocês precisem compartilhar login e senha. É possível encerrar a conexão com outro usuário a qualquer momento.\n\n Nunca envie convites para desconhecidos. </string>
     <string name="Atencao">Atenção</string>
     <string name="Marcar_a_opcao_X_fara_com_que_os_dados_da_conta">Marcar a opção \"%1$s\" fará com que os dados da conta do seu convidado sejam mesclados aos seus, isso inclui listas de compra, produtos, categorias, etc… A única forma de desfazer essa alteração será removendo os dados manualmente.</string>
-    <string name="X_te_enviou_um_convite_para_sincronizar_dados_com_ele">%1$s te enviou um convite para sincronizar dados com ele(a).\n\nAo aceitar o convite, os dados de ambas as contas serão mesclados e as alterções feitas por um usuário serão refletidas na conta do outro.\n\n Não aceite convites de pessoas desconhecidas.</string>
+    <string name="X_te_enviou_um_convite_para_sincronizar_dados_com_ele">%1$s te enviou um convite para sincronizar dados com ele(a).\n\nAo aceitar o convite, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.\n\n Não aceite convites de pessoas desconhecidas.</string>
     <string name="X_te_enviou_um_convite_para_a_conta_dele">%1$s te enviou um convite para a conta dele(a).\n\nAo aceitar o convite, você terá acesso total a outra conta podendo manipular produtos, listas de compra, categorias, etc… Seus dados ficarão salvos em sua conta e não serão mesclados aos dele(a).</string>
     <string name="Algo_deu_errado_tente_novamente_mais_tarde">Algo deu errado, tente novamente mais tarde</string>
-    <string name="Voce_nao_pode_aceitar_um_convite_enquanto_houverem_usu_rios_sincroniando_dados_com_voc">Você não pode aceitar um convite enquanto houverem usuários sincroniando dados com você</string>
+    <string name="Voce_nao_pode_aceitar_um_convite_enquanto_houverem_usu_rios_sincroniando_dados_com_voc">Você não pode aceitar um convite enquanto houverem usuários sincronizando dados com você</string>
     <string name="Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta">Você gostaria de manter os dados atuais da conta ou ficar com os dados antigos que tinha antes de se conectar a %1$s?\n\nEscolha com cautela por que não é possível desfazer essa ação.</string>
     <string name="Como_deseja_prosseguir">Como deseja prosseguir?</string>
     <string name="Manter_dados_atuais">manter dados atuais</string>
@@ -197,5 +197,6 @@
     <string name="Voce_esta_comprando_em">Você está comprando em %1$s</string>
     <string name="Definir_mercado">Definir</string>
     <string name="Alterar">Alterar</string>
+    <string name="Logo_do_app">Logo do app</string>
 
 </resources>

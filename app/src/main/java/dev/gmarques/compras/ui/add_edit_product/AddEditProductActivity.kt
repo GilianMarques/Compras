@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.VectorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -49,7 +50,7 @@ class AddEditProductActivity : AppCompatActivity() {
 
     companion object {
         private const val LIST_ID = "list_id"
-        private const val PRODUCT_ID = "poduct_id"
+        private const val PRODUCT_ID = "product_id"
 
         fun newIntentAddProduct(context: Context, listId: String): Intent {
             return Intent(context, AddEditProductActivity::class.java).apply {
@@ -138,8 +139,12 @@ class AddEditProductActivity : AppCompatActivity() {
         categoryResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    val selectedCategory = result.data!!
-                        .getSerializableExtra(SELECTED_CATEGORY) as Category
+                    val selectedCategory = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        result.data!!.getSerializableExtra(SELECTED_CATEGORY, Category::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        result.data!!.getSerializableExtra(SELECTED_CATEGORY) as Category
+                    }
                     viewModel.validatedCategory = selectedCategory
                     binding.edtCategory.clearFocus()
                 }

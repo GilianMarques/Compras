@@ -46,7 +46,7 @@ class CategoryAdapter(activity: AppCompatActivity, val callback: Callback) :
     }
 
     override fun onBindViewHolder(holder: CategoryWithProductStatsViewHolder, position: Int) {
-        holder.bindData(getItem(position), selectionColor, allBoughtColor, defaultColor)
+        holder.bindData(getItem(position), selectionColor, defaultColor)
     }
 
 
@@ -55,7 +55,7 @@ class CategoryAdapter(activity: AppCompatActivity, val callback: Callback) :
         private val callback: Callback,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bindData(categoryWithStats: CategoryWithProductsStats, selectionColor: Int, allBoughtColor: Int, defaultColor: Int) {
+        fun bindData(categoryWithStats: CategoryWithProductsStats, selectionColor: Int, defaultColor: Int) {
 
             val category = categoryWithStats.category
             val strokeWidth = (1.dp() * 1.5).toInt()

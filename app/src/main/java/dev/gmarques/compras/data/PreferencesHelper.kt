@@ -45,6 +45,7 @@ class PreferencesHelper {
      * @param defaultValue Valor padrão retornado caso a chave não exista.
      * @return O valor associado à chave ou o valor padrão se não encontrado.
      */
+    @Suppress("UNCHECKED_CAST")
     fun <T : Any> getValue(key: String, defaultValue: T): T {
         return when (defaultValue) {
             is String -> sharedPreferences.getString(key, defaultValue)

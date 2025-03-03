@@ -14,6 +14,21 @@ import kotlinx.coroutines.withContext
 
 class AddEditMarketActivityViewModel : ViewModel() {
 
+    var editingMarket: Boolean = false
+    var marketId: String? = null
+    var validatedName: String = ""
+    var validatedColor: Int = -1
+
+
+    private val _editingMarketLD = MutableLiveData<Market>()
+    val editingMarketLD: LiveData<Market> get() = _editingMarketLD
+
+    private val _finishEventLD = MutableLiveData<Boolean>()
+    val finishEventLD: LiveData<Boolean> get() = _finishEventLD
+
+    private val _errorEventLD = MutableLiveData<String>()
+    val errorEventLD: LiveData<String> get() = _errorEventLD
+
     suspend fun tryAndSaveMarket() = withContext(IO) {
 
         // se adicionando mercado ou se durante a ediçao o usuario trocar o nome do mercado, preciso verificar se o novo nome ja nao existe
@@ -53,23 +68,10 @@ class AddEditMarketActivityViewModel : ViewModel() {
     suspend fun loadMarket() = withContext(IO) {
         marketId?.let {
             val market = MarketRepository.getMarket(marketId!!)
-            _editingMarketLD.postValue(market)
+            _editingMarketLD.postValue(market!!)
         }
     }
 
-    var editingMarket: Boolean = false
-    var marketId: String? = null
-    var validatedName: String = ""
-    var validatedColor: Int = -1
 
-
-    private val _editingMarketLD = MutableLiveData<Market>()
-    val editingMarketLD: LiveData<Market> get() = _editingMarketLD
-
-    private val _finishEventLD = MutableLiveData<Boolean>()
-    val finishEventLD: LiveData<Boolean> get() = _finishEventLD
-
-    private val _errorEventLD = MutableLiveData<String>()
-    val errorEventLD: LiveData<String> get() = _errorEventLD
 
 }

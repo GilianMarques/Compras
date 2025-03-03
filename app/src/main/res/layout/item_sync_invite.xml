@@ -64,6 +64,7 @@
                 android:fontFamily="@font/lexend_deca_light"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
+                android:paddingEnd="0dp"
                 android:paddingTop="4dp"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="@id/tv_name"

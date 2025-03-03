@@ -14,17 +14,33 @@ import kotlinx.coroutines.withContext
 
 class AddEditCategoryActivityViewModel : ViewModel() {
 
+
+    var editingCategory: Boolean = false
+    var categoryId: String? = null
+    var validatedName: String = ""
+    var validatedColor: Int = -1
+
+
+    private val _editingCategoryLD = MutableLiveData<Category>()
+    val editingCategoryLD: LiveData<Category> get() = _editingCategoryLD
+
+    private val _finishEventLD = MutableLiveData<Boolean>()
+    val finishEventLD: LiveData<Boolean> get() = _finishEventLD
+
+    private val _errorEventLD = MutableLiveData<String>()
+    val errorEventLD: LiveData<String> get() = _errorEventLD
+
     suspend fun tryAndSaveCategory() = withContext(IO) {
 
-        // se adicionanda categoria ou se durante a ediçao o usuario trocar o nome da categoria, preciso verificar se o novo nome ja nao existe
+        // se adicionada categoria ou se durante a edição o usuário trocar o nome da categoria, preciso verificar se o novo nome ja nao existe
         val needCheckName = !editingCategory || editingCategoryLD.value!!.name != validatedName
 
         if (needCheckName) {
             val result = CategoryRepository.getCategoryByName(validatedName)
 
-            val categoryDontExist = result.getOrNull() == null
+            val categoryDoesNotExist = result.getOrNull() == null
 
-            if (categoryDontExist) saveCategory()
+            if (categoryDoesNotExist) saveCategory()
             else {
                 val msg = String.format(App.getContext().getString(R.string.X_ja_existe), validatedName)
                 _errorEventLD.postValue(msg)
@@ -57,19 +73,5 @@ class AddEditCategoryActivityViewModel : ViewModel() {
         }
     }
 
-    var editingCategory: Boolean = false
-    var categoryId: String? = null
-    var validatedName: String = ""
-    var validatedColor: Int = -1
-
-
-    private val _editingCategoryLD = MutableLiveData<Category>()
-    val editingCategoryLD: LiveData<Category> get() = _editingCategoryLD
-
-    private val _finishEventLD = MutableLiveData<Boolean>()
-    val finishEventLD: LiveData<Boolean> get() = _finishEventLD
-
-    private val _errorEventLD = MutableLiveData<String>()
-    val errorEventLD: LiveData<String> get() = _errorEventLD
 
 }
