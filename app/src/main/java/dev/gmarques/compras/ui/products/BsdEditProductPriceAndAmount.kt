@@ -3,7 +3,6 @@ package dev.gmarques.compras.ui.products
 import android.app.Activity
 import android.view.View
 import android.view.View.VISIBLE
-import androidx.collection.intFloatMapOf
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -11,13 +10,13 @@ import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Market
 import dev.gmarques.compras.data.model.Product
-import dev.gmarques.compras.databinding.BsdFastEditProductDialogBinding
+import dev.gmarques.compras.databinding.BsdEditProductDialogBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 
-class BsdEditProductPriceOrQuantity private constructor() {
+class BsdEditProduct private constructor() {
 
     private var currentMarket: Market? = null
     private var focusOnInfo: Boolean = false
@@ -28,7 +27,7 @@ class BsdEditProductPriceOrQuantity private constructor() {
 
     private lateinit var targetActivity: Activity
     private lateinit var editProduct: Product
-    private lateinit var binding: BsdFastEditProductDialogBinding
+    private lateinit var binding: BsdEditProductDialogBinding
     private lateinit var dialog: BottomSheetDialog
     private lateinit var onConfirmListener: ((Product) -> Unit)
     private lateinit var onEditListener: ((Product) -> Unit)
@@ -36,7 +35,7 @@ class BsdEditProductPriceOrQuantity private constructor() {
 
     private fun init() {
         dialog = BottomSheetDialog(targetActivity)
-        binding = BsdFastEditProductDialogBinding.inflate(targetActivity.layoutInflater)
+        binding = BsdEditProductDialogBinding.inflate(targetActivity.layoutInflater)
         dialog.setContentView(binding.root)
 
         with(binding) {
@@ -137,7 +136,6 @@ class BsdEditProductPriceOrQuantity private constructor() {
                 showErrorSnackBar(resultPrice.exceptionOrNull()!!.message)
             }
 
-
             resultInfo.isFailure -> {
                 showErrorSnackBar(resultInfo.exceptionOrNull()!!.message)
             }
@@ -161,8 +159,6 @@ class BsdEditProductPriceOrQuantity private constructor() {
         else editProduct.copy(
             quantity = newQuantity, price = newPrice, info = newInfo
         )
-
-
         onConfirmListener(edited)
         dialog.dismiss()
     }
@@ -175,7 +171,7 @@ class BsdEditProductPriceOrQuantity private constructor() {
 
 
     class Builder {
-        private val instance = BsdEditProductPriceOrQuantity()
+        private val instance = BsdEditProduct()
 
         fun setActivity(activity: Activity): Builder {
             instance.targetActivity = activity
@@ -202,22 +198,20 @@ class BsdEditProductPriceOrQuantity private constructor() {
             return this
         }
 
-        fun focusOnPrice(): Builder {
-            instance.focusOnPrice = true
+        fun setFocus(focus: Focus?): Builder {
+
+            when (focus) {
+                Focus.PRICE -> instance.focusOnPrice = true
+                Focus.QUANTITY -> instance.focusOnQuantity = true
+                Focus.INFO -> instance.focusOnInfo = true
+                else -> {}
+            }
+
             return this
         }
 
-        fun focusOnQuantity(): Builder {
-            instance.focusOnQuantity = true
-            return this
-        }
 
-        fun focusOnInfo(): Builder {
-            instance.focusOnInfo = true
-            return this
-        }
-
-        fun build(): BsdEditProductPriceOrQuantity {
+        fun build(): BsdEditProduct {
             instance.init()
             return instance
         }
@@ -229,4 +223,9 @@ class BsdEditProductPriceOrQuantity private constructor() {
 
 
     }
+
+    enum class Focus {
+        PRICE, QUANTITY, INFO
+    }
+
 }

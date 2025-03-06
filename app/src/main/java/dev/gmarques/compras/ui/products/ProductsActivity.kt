@@ -109,8 +109,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         viewModel.marketEvent.observe(this@ProductsActivity) { market ->
             val title =
                 if (market == null) getString(R.string.Onde_est_fazendo_as_compras) else getString(
-                    R.string.Voce_esta_comprando_em,
-                    market.name
+                    R.string.Voce_esta_comprando_em, market.name
                 )
 
             val action = if (market == null) getString(R.string.Definir_mercado)
@@ -119,17 +118,15 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             lifecycleScope.launch(Main) {
                 delay(1500)
                 Vibrator.interaction()
-                Snackbar.make(binding.root, title, Snackbar.LENGTH_LONG)
-                    .setAction(action) {
+                Snackbar.make(binding.root, title, Snackbar.LENGTH_LONG).setAction(action) {
 
-                        Vibrator.interaction()
-                        marketResultLauncher.launch(
-                            MarketsActivity.newIntent(this@ProductsActivity, true)
-                        )
+                    Vibrator.interaction()
+                    marketResultLauncher.launch(
+                        MarketsActivity.newIntent(this@ProductsActivity, true)
+                    )
 
-                    }.setAnimationMode(ANIMATION_MODE_SLIDE)
-                    .setDuration(if (market == null) LENGTH_INDEFINITE else 4000)
-                    .show()
+                }.setAnimationMode(ANIMATION_MODE_SLIDE)
+                    .setDuration(if (market == null) LENGTH_INDEFINITE else 4000).show()
             }
 
 
@@ -138,9 +135,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     private fun suggestProductsIfNeeded(shopListId: String) = lifecycleScope.launch(IO) {
 
-        if (ProductRepository.getProducts(shopListId).isEmpty()
-            &&
-            SuggestionProductRepository.getSuggestions().isNotEmpty()
+        if (ProductRepository.getProducts(shopListId)
+                .isEmpty() && SuggestionProductRepository.getSuggestions().isNotEmpty()
         ) startActivitySuggestProduct()
     }
 
@@ -176,38 +172,35 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         binding.apply {
 
             ValueAnimator.ofFloat(
-                tvPriceList.text.toString().currencyToDouble().toFloat(),
-                state.priceFull.toFloat()
-            )
-                .apply {
-                    interpolator = AnticipateInterpolator()
-                    duration = 500
-                    addUpdateListener {
-                        lifecycleScope.launch {
-                            withContext(Main) {
-                                tvPriceList.text =
-                                    it.animatedValue.toString().toDouble().toCurrency()
-                            }
+                tvPriceList.text.toString().currencyToDouble().toFloat(), state.priceFull.toFloat()
+            ).apply {
+                interpolator = AnticipateInterpolator()
+                duration = 500
+                addUpdateListener {
+                    lifecycleScope.launch {
+                        withContext(Main) {
+                            tvPriceList.text =
+                                it.animatedValue.toString().toDouble().toCurrency()
                         }
                     }
-                }.start()
+                }
+            }.start()
 
             ValueAnimator.ofFloat(
                 tvPriceCart.text.toString().currencyToDouble().toFloat(),
                 state.priceBought.toFloat()
-            )
-                .apply {
-                    interpolator = AnticipateInterpolator()
-                    duration = 500
-                    addUpdateListener {
-                        lifecycleScope.launch {
-                            withContext(Main) {
-                                tvPriceCart.text =
-                                    it.animatedValue.toString().toDouble().toCurrency()
-                            }
+            ).apply {
+                interpolator = AnticipateInterpolator()
+                duration = 500
+                addUpdateListener {
+                    lifecycleScope.launch {
+                        withContext(Main) {
+                            tvPriceCart.text =
+                                it.animatedValue.toString().toDouble().toCurrency()
                         }
                     }
-                }.start()
+                }
+            }.start()
 
         }
 
@@ -288,8 +281,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
                     if (fabHidden) return
 
                     fabAddProduct.animate().translationY(fabAddProduct.height.toFloat() * 2)
-                        .alpha(0f).setStartDelay(100)
-                        .setDuration(200L).start()
+                        .alpha(0f).setStartDelay(100).setDuration(200L).start()
                     fabHidden = true
 
                 } else if (dy < 0) { // Rolando para baixo - Mostra o FAB
@@ -306,19 +298,16 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     private fun startActivityAddProduct() {
 
         Vibrator.interaction()
-        val intent =
-            AddEditProductActivity.newIntentAddProduct(
-                this@ProductsActivity,
-                uiState!!.shopList.id
-            )
+        val intent = AddEditProductActivity.newIntentAddProduct(
+            this@ProductsActivity, uiState!!.shopList.id
+        )
         startActivity(intent)
 
     }
 
     private fun startActivitySuggestProduct() {
         Vibrator.interaction()
-        val intent =
-            SuggestProductsActivity.newIntent(this@ProductsActivity, uiState!!.shopList.id)
+        val intent = SuggestProductsActivity.newIntent(this@ProductsActivity, uiState!!.shopList.id)
         startActivity(intent)
 
     }
@@ -327,9 +316,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
         Vibrator.interaction()
         val intent = AddEditProductActivity.newIntentEditProduct(
-            this@ProductsActivity,
-            uiState!!.shopList.id,
-            product.id
+            this@ProductsActivity, uiState!!.shopList.id, product.id
         )
         startActivity(intent)
     }
@@ -337,14 +324,12 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     private fun showMenuDialog() {
         Vibrator.interaction()
 
-        BsdShopListMenu.Builder(this, uiState!!.shopList)
-            .setRenameListener { editList() }
+        BsdShopListMenu.Builder(this, uiState!!.shopList).setRenameListener { editList() }
             .setSortListener { showSortProductsDialog() }
             .setSuggestionListener { startActivitySuggestProduct() }
             .setRemoveListener { removeList -> confirmRemove(removeList) }
             .setManageCategoriesListener { startCategoriesActivity() }
-            .setManageMarketsListener { startMarketsActivity() }
-            .build().show()
+            .setManageMarketsListener { startMarketsActivity() }.build().show()
     }
 
     private fun startCategoriesActivity() {
@@ -373,8 +358,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     private fun editList() {
         startActivity(
             AddEditShopListActivity.newIntentEditShopList(
-                this,
-                uiState!!.shopList.id
+                this, uiState!!.shopList.id
             )
         )
     }
@@ -384,8 +368,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
         val dialogBuilder =
             AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
-                .setMessage(msg)
-                .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
+                .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
                     tryToRemoveShopList(shopList)
                     dialog.dismiss()
                 }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
@@ -401,8 +384,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
         val dialogBuilder =
             AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
-                .setMessage(msg)
-                .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
+                .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
                     viewModel.removeProduct(product)
                     dialog.dismiss()
                 }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
@@ -442,11 +424,12 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         marketResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    val selectedMarket = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        result.data!!.getSerializableExtra(SELECTED_MARKET, Market::class.java)
-                    } else
-                        @Suppress("DEPRECATION")
-                        result.data!!.getSerializableExtra(SELECTED_MARKET) as Market
+                    val selectedMarket =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            result.data!!.getSerializableExtra(SELECTED_MARKET, Market::class.java)
+                        } else @Suppress("DEPRECATION") result.data!!.getSerializableExtra(
+                            SELECTED_MARKET
+                        ) as Market
 
 
 
@@ -462,67 +445,24 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     }
 
     override fun rvProductsOnEditItemClick(product: Product) {
-
-        BsdEditProductPriceOrQuantity
-            .Builder()
-            .setCurrentMarket(viewModel.currentMarket)
-            .setActivity(this@ProductsActivity)
-            .setProduct(product)
-            .setEditListener {
-                startActivityEditProduct(it)
-            }
-            .setRemoveListener {
-                confirmRemove(it)
-            }
-            .setConfirmListener {
-                viewModel.updateProductAsIs(it)
-            }
-            .build().show()
+        showEditProductDialog(product)
     }
 
     override fun rvProductsOnPriceClick(product: Product) {
-        BsdEditProductPriceOrQuantity
-            .Builder()
-            .setCurrentMarket(viewModel.currentMarket)
-            .setActivity(this@ProductsActivity)
-            .setProduct(product)
-            .focusOnPrice()
-            .setEditListener {
-                startActivityEditProduct(it)
-            }
-            .setRemoveListener {
-                confirmRemove(it)
-            }
-            .setConfirmListener {
-                viewModel.updateProductAsIs(it)
-            }.build().show()
+        showEditProductDialog(product, BsdEditProduct.Focus.PRICE)
     }
 
     override fun rvProductsOnQuantityClick(product: Product) {
-        BsdEditProductPriceOrQuantity
-            .Builder()
-            .setCurrentMarket(viewModel.currentMarket)
-            .setActivity(this@ProductsActivity)
-            .setProduct(product)
-            .focusOnQuantity()
-            .setEditListener {
-                startActivityEditProduct(it)
-            }
-            .setRemoveListener {
-                confirmRemove(it)
-            }
-            .setConfirmListener {
-                viewModel.updateProductAsIs(it)
-            }.build().show()
+        showEditProductDialog(product, BsdEditProduct.Focus.QUANTITY)
     }
 
     override fun rvProductsOnInfoClick(product: Product) {
-        BsdEditProductPriceOrQuantity
-            .Builder()
-            .setCurrentMarket(viewModel.currentMarket)
-            .setActivity(this@ProductsActivity)
-            .setProduct(product)
-            .focusOnInfo()
+        showEditProductDialog(product, BsdEditProduct.Focus.INFO)
+    }
+
+    private fun showEditProductDialog(product: Product, focus: BsdEditProduct.Focus? = null) {
+        BsdEditProduct.Builder().setCurrentMarket(viewModel.currentMarket)
+            .setActivity(this@ProductsActivity).setProduct(product).setFocus(focus)
             .setEditListener {
                 startActivityEditProduct(it)
             }
@@ -530,14 +470,19 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
                 confirmRemove(it)
             }
             .setConfirmListener {
-                viewModel.updateProductAsIs(it)
+
+                if (it.hasBeenBought && it.info.isEmpty()) {
+                    rvProductsOnBoughtItemClick(it, true)
+                } else viewModel.updateProductAsIs(it)
+
+
             }.build().show()
     }
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {
 
         if (product.info.isEmpty() && isBought) BsdAddProductInfo(this@ProductsActivity) { info ->
-            viewModel.updateProductBoughtState(product.copy(info = info), isBought)
+            viewModel.updateProductBoughtState(product.copy(info = info), true)
         }.show()
         else viewModel.updateProductBoughtState(product, isBought)
 
@@ -548,11 +493,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         viewModel.filterByCategory(category)
 
         (binding.rvCategories.layoutManager as LinearLayoutManager).smoothScrollToPosition(
-            binding.rvCategories,
-            null,
-            if (lastAdapterPosition < adapterPosition) min(
-                rvAdapterCategories.itemCount - 1,
-                adapterPosition + 1
+            binding.rvCategories, null, if (lastAdapterPosition < adapterPosition) min(
+                rvAdapterCategories.itemCount - 1, adapterPosition + 1
             )
             else max(0, adapterPosition - 1)
         )
