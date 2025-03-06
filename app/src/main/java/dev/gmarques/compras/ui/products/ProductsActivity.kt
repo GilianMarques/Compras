@@ -116,7 +116,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             else getString(R.string.Alterar)
 
             lifecycleScope.launch(Main) {
-                delay(1500)
+                delay(1000)
                 Vibrator.interaction()
                 Snackbar.make(binding.root, title, Snackbar.LENGTH_LONG).setAction(action) {
 
@@ -206,17 +206,17 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     }
 
-
     private fun setupSearch() {
 
         binding.edtSearch.doOnTextChanged { text, _, _, _ ->
             searchJob.cancel()
             searchJob = Job()
             lifecycleScope.launch(searchJob) {
-                delay(500)
+                delay(300)
                 val term = text.toString()
                 viewModel.searchProduct(term)
                 binding.ivClearSearch.visibility = if (term.isEmpty()) GONE else VISIBLE
+                delay(500)
                 binding.rvCategories.visibility = if (term.isEmpty()) VISIBLE else GONE
             }
         }
@@ -273,6 +273,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         fabAddProduct.setOnClickListener {
             startActivityAddProduct()
         }
+
         rvProducts.addOnScrollListener(object : OnScrollListener() {
 
 
@@ -299,7 +300,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
         Vibrator.interaction()
         val intent = AddEditProductActivity.newIntentAddProduct(
-            this@ProductsActivity, uiState!!.shopList.id
+            this@ProductsActivity, uiState!!.shopList.id, viewModel.filterCategory,viewModel.searchTerm
         )
         startActivity(intent)
 

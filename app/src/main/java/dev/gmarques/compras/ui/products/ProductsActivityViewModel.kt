@@ -35,7 +35,14 @@ class ProductsActivityViewModel : ViewModel() {
 
 
     // categoria usada como filtro pelo usuario
-    private var filterCategory: Category? = null
+    var filterCategory: Category? = null
+        private set
+
+    // termo usado como filtro pelo usuario
+    var searchTerm: String = ""
+        private set
+
+
     var currentMarket: Market? = null
         set(value) {
             field = value
@@ -45,7 +52,6 @@ class ProductsActivityViewModel : ViewModel() {
     // mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo
     private var categories: HashMap<String, Category>? = null
 
-    private var searchTerm: String = ""
 
     private lateinit var uiState: UiState
 
@@ -364,6 +370,11 @@ class ProductsActivityViewModel : ViewModel() {
         )
     }
 
+    /**
+     * Filtra os produtos com base na categoria selecionada
+     * @param category a categoria usda no filtro, caso seja igual a categoria atualmente selecionada
+     * o filtro é desativado
+     */
     fun filterByCategory(category: Category) {
 
         if (this.filterCategory == category) filterCategory = null

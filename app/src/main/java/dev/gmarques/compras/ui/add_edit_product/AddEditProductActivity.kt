@@ -20,12 +20,14 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
+import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
@@ -35,6 +37,8 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity.Companion.SELECTED_CATEGORY
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
 
 /**
  * Activity para adicionar ou editar produtos em uma lista.
@@ -51,10 +55,19 @@ class AddEditProductActivity : AppCompatActivity() {
     companion object {
         private const val LIST_ID = "list_id"
         private const val PRODUCT_ID = "product_id"
+        private const val DEF_CATEGORY = "def_categorydef_category"
+        private const val DEF_NAME = "def_name"
 
-        fun newIntentAddProduct(context: Context, listId: String): Intent {
+        fun newIntentAddProduct(
+            context: Context,
+            listId: String,
+            category: Category?,
+            searchTerm: String,
+        ): Intent {
             return Intent(context, AddEditProductActivity::class.java).apply {
                 putExtra(LIST_ID, listId)
+                putExtra(DEF_NAME, searchTerm)
+                putExtra(DEF_CATEGORY, category?.id)
             }
         }
 
@@ -84,6 +97,7 @@ class AddEditProductActivity : AppCompatActivity() {
         setupInputCategory()
         observeUiStateChanges()
         setupActivityResultLauncher()
+        setDefValuesIfAny()
 
         binding.cbSuggestProduct.postDelayed({
             binding.cbSuggestProduct.isChecked = true
@@ -91,6 +105,21 @@ class AddEditProductActivity : AppCompatActivity() {
 
         binding.edtName.showKeyboard()
 
+    }
+
+    private fun setDefValuesIfAny() = lifecycleScope.launch(Main) {
+
+        val defName = intent.getStringExtra(DEF_NAME)
+        val defCategoryId = intent.getStringExtra(DEF_CATEGORY)
+
+        defName?.let {
+            binding.edtName.setText(defName)
+        }
+
+        defCategoryId?.let {
+            viewModel.validatedCategory = CategoryRepository.getCategory(defCategoryId)
+            setCategoryName()
+        }
     }
 
     private fun observeUiStateChanges() {
@@ -139,12 +168,16 @@ class AddEditProductActivity : AppCompatActivity() {
         categoryResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    val selectedCategory = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        result.data!!.getSerializableExtra(SELECTED_CATEGORY, Category::class.java)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        result.data!!.getSerializableExtra(SELECTED_CATEGORY) as Category
-                    }
+                    val selectedCategory =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            result.data!!.getSerializableExtra(
+                                SELECTED_CATEGORY, Category::class.java
+                            )
+                        } else {
+                            @Suppress("DEPRECATION") result.data!!.getSerializableExtra(
+                                SELECTED_CATEGORY
+                            ) as Category
+                        }
                     viewModel.validatedCategory = selectedCategory
                     binding.edtCategory.clearFocus()
                 }
@@ -381,14 +414,21 @@ class AddEditProductActivity : AppCompatActivity() {
             } else {
 
                 if (viewModel.validatedCategory != null) {
-                    edtTarget.hint = viewModel.validatedCategory!!.name
-                    (edtTarget.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(viewModel.validatedCategory!!.color)
+                    setCategoryName()
                 } else {
                     showError(edtTarget, tvTarget, getString(R.string.Selecione_uma_categoria))
                 }
             }
         }
 
+    }
+
+    /**
+     * Insere no campo correspondente da ui, nome e cor da categoria no viewwmodel
+     */
+    private fun setCategoryName() = binding.apply {
+        edtCategory.hint = viewModel.validatedCategory!!.name
+        (edtCategory.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(viewModel.validatedCategory!!.color)
     }
 
     private fun resetFocus(edtTarget: AppCompatEditText, tvTarget: TextView) {
