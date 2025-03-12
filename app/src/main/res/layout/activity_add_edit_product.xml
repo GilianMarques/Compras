@@ -141,6 +141,33 @@
                     tools:visibility="visible" />
 
                 <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/edt_annotation"
+                    style="@style/Margins_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/back_addproduct_edittext"
+                    android:drawableStart="@drawable/vec_details"
+                    android:hint="@string/Faca_anotacoes_aqui"
+                    android:importantForAutofill="no"
+                    android:inputType="textCapSentences"
+                    android:maxLength="500"
+                    tools:text="algum  texto  algum  texto  algum  texto  " />
+
+                <TextView
+                    android:id="@+id/tv_annotation_error"
+                    style="@style/Margins_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-8dp"
+                    android:importantForAutofill="no"
+                    android:textColor="@color/error"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/vec_error"
+                    app:drawableTint="@color/error"
+                    tools:text="@string/Nome_do_produto_ex_macarrao_parafuso"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/edt_price"
                     style="@style/Margins_edittext"
                     android:layout_width="match_parent"

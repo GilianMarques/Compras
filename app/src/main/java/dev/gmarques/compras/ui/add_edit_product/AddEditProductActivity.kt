@@ -92,6 +92,7 @@ class AddEditProductActivity : AppCompatActivity() {
         initFabAddProduct()
         setupInputName()
         setupInputInfo()
+        setupInputAnnotations()
         setupInputPrice()
         setupInputQuantity()
         setupInputCategory()
@@ -245,6 +246,9 @@ class AddEditProductActivity : AppCompatActivity() {
                 edtInfo.setText(product.info)
                 validatedInfo = product.info
 
+                edtAnnotation.setText(product.annotations)
+                validatedInfo = product.annotations
+
                 edtPrice.setText(product.price.toCurrency())
                 validatedPrice = product.price
 
@@ -334,6 +338,29 @@ class AddEditProductActivity : AppCompatActivity() {
                     edtTarget.setText(viewModel.validatedInfo)
                 } else {
                     viewModel.validatedInfo = ""
+                    showError(edtTarget, tvTarget, result.exceptionOrNull()!!.message!!)
+                }
+            }
+        }
+
+    }
+
+    private fun setupInputAnnotations() {
+
+        val edtTarget = binding.edtAnnotation
+        val tvTarget = binding.tvAnnotationError
+
+        edtTarget.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) resetFocus(edtTarget, tvTarget)
+            else {
+                val term = edtTarget.text.toString()
+                val result = Product.Validator.validateAnnotations(term, this)
+
+                if (result.isSuccess) {
+                    viewModel.validatedAnnotation= result.getOrThrow()
+                    edtTarget.setText(viewModel.validatedAnnotation)
+                } else {
+                    viewModel.validatedAnnotation = ""
                     showError(edtTarget, tvTarget, result.exceptionOrNull()!!.message!!)
                 }
             }
@@ -451,6 +478,5 @@ class AddEditProductActivity : AppCompatActivity() {
         ivGoBack.setOnClickListener { Vibrator.interaction(); finish() }
         ivMenu.visibility = GONE
     }
-
 
 }

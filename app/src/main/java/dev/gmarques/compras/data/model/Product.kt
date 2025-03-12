@@ -1,6 +1,7 @@
 package dev.gmarques.compras.data.model
 
 import android.content.Context
+import dev.gmarques.compras.R.string.As_anotacoes_devem_ter_ate_x_caracteres
 import dev.gmarques.compras.R.string.Insira_um_preco_valido
 import dev.gmarques.compras.R.string.Insira_uma_quantidade_valida
 import dev.gmarques.compras.R.string.O_nome_deve_ter_no_m_nimo_x_caracteres
@@ -17,8 +18,8 @@ data class Product(
     val name: String,
     val price: Double,
     val quantity: Int,
-    val info: String,
-    val hasBeenBought: Boolean = false,
+    val info: String = "",
+    val annotations: String = "",
     val shopListId: String,
     val categoryId: String,
     val position: Int = -1,
@@ -29,6 +30,7 @@ data class Product(
     val removed: Boolean = false,
     val createdBy: String = UserRepository.getUser()!!.email!!,
     val updatedBy: String? = null,
+    val hasBeenBought: Boolean = false,
 
     ) {
 
@@ -37,7 +39,6 @@ data class Product(
         price = 0.0,
         quantity = 1,
         info = "",
-        hasBeenBought = false,
         shopListId = "",
         categoryId = "",
         position = -1,
@@ -46,7 +47,8 @@ data class Product(
         creationDate = 0L,
         removed = false,
         createdBy = "",
-        updatedBy = null
+        updatedBy = null,
+        hasBeenBought = false
     )
 
     /**
@@ -90,6 +92,7 @@ data class Product(
             const val MIN_QUANTITY = 1
             const val MAX_QUANTITY = 99
             private const val MAX_CHARS_INFO = 50
+            private const val MAX_CHARS_ANNOTATIOS = 500
             private const val MAX_CHARS_NAME = 30
             private const val MIN_CHARS_NAME = 3
             private const val MAX_PRICE = 9_999.99
@@ -131,9 +134,12 @@ data class Product(
 
             fun validateInfo(input: String, context: Context): Result<String> {
 
+                val info = input.removeSpaces().replace("\n", "")
+                    .replaceFirstChar { it.titlecase(Locale.getDefault()) }
+
                 return when {
 
-                    input.length > MAX_CHARS_INFO -> Result.failure(
+                    info.length > MAX_CHARS_INFO -> Result.failure(
                         Exception(
                             String.format(
                                 context.getString(Os_detalhes_devem_ter_ate_x_caracteres),
@@ -143,9 +149,31 @@ data class Product(
                     )
 
                     else -> {
-                        Result.success(
-                            input.removeSpaces()
-                                .replaceFirstChar { it.titlecase(Locale.getDefault()) })
+                        Result.success(info)
+                    }
+                }
+
+            }
+
+
+            fun validateAnnotations(input: String, context: Context): Result<String> {
+
+                val annotation = input.removeSpaces()
+                    .replaceFirstChar { it.titlecase(Locale.getDefault()) }
+
+                return when {
+
+                    annotation.length > MAX_CHARS_ANNOTATIOS -> Result.failure(
+                        Exception(
+                            String.format(
+                                context.getString(As_anotacoes_devem_ter_ate_x_caracteres),
+                                MAX_CHARS_INFO
+                            )
+                        )
+                    )
+
+                    else -> {
+                        Result.success(annotation)
                     }
                 }
 

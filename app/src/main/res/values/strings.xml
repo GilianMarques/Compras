@@ -51,6 +51,7 @@
     <string name="O_nome_deve_ter_no_m_nimo_x_caracteres" tools:ignore="PluralsCandidate">O nome deve ter no mínimo %1$d caracteres</string>
     <string name="O_nome_deve_ter_no_m_ximo_x_caracteres" tools:ignore="PluralsCandidate">O nome deve ter no máximo %1$d caracteres</string>
     <string name="Os_detalhes_devem_ter_ate_x_caracteres" tools:ignore="PluralsCandidate">Os detalhes devem ter no máximo %1$d caracteres</string>
+    <string name="As_anotacoes_devem_ter_ate_x_caracteres" tools:ignore="PluralsCandidate">As anotações devem ter no máximo %1$d caracteres</string>
     <string name="Edicao_rapida">Edição rápida</string>
     <string name="Outras_opcoes">Outras opções</string>
     <string name="Remover_produto">Remover produto</string>
@@ -198,5 +199,6 @@
     <string name="Definir_mercado">Definir</string>
     <string name="Alterar">Alterar</string>
     <string name="Logo_do_app">Logo do app</string>
+    <string name="Faca_anotacoes_aqui">Faça anotações aqui</string>
 
 </resources>

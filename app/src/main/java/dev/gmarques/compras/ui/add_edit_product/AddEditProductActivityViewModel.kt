@@ -33,6 +33,7 @@ class AddEditProductActivityViewModel : ViewModel() {
 
     var validatedName: String = ""
     var validatedInfo: String = ""
+    var validatedAnnotation: String = ""
     var validatedPrice: Double = -1.0
     var validatedQuantity: Int = -1
     var validatedCategory: Category? = null
@@ -80,13 +81,16 @@ class AddEditProductActivityViewModel : ViewModel() {
             price = validatedPrice,
             quantity = validatedQuantity,
             info = validatedInfo,
+            annotations = validatedAnnotation,
             categoryId = validatedCategory!!.id
+
         )
         else Product(
             name = validatedName,
             price = validatedPrice,
             quantity = validatedQuantity,
             info = validatedInfo,
+            annotations = validatedAnnotation,
             shopListId = listId,
             categoryId = validatedCategory!!.id,
             position = 0
