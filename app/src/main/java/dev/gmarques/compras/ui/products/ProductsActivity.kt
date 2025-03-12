@@ -107,6 +107,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     private fun observeMarketChangeEvents() {
         viewModel.marketEvent.observe(this@ProductsActivity) { market ->
+
+            binding.toolbar.tvActivitySubtitle.text = market?.name
+
             val title =
                 if (market == null) getString(R.string.Onde_est_fazendo_as_compras) else getString(
                     R.string.Voce_esta_comprando_em, market.name
@@ -300,9 +303,16 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
         Vibrator.interaction()
         val intent = AddEditProductActivity.newIntentAddProduct(
-            this@ProductsActivity, uiState!!.shopList.id, viewModel.filterCategory,viewModel.searchTerm
+            this@ProductsActivity,
+            uiState!!.shopList.id,
+            viewModel.filterCategory,
+            viewModel.searchTerm
         )
         startActivity(intent)
+
+        if (viewModel.searchTerm.isNotEmpty()) with(binding.edtSearch) {
+            postDelayed({ setText("") }, 1000)
+        }
 
     }
 

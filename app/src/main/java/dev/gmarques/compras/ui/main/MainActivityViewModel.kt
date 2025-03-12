@@ -13,18 +13,22 @@ class MainActivityViewModel : ViewModel() {
 
 
     init {
-        observeShoplists()
+        observeShopLists()
     }
 
-    private fun observeShoplists() {
+    private fun observeShopLists() {
 
         listenerRegister = ShopListRepository.observeShopListsUpdates { lists, error ->
             if (error == null) {
-                val nonNullableList = lists!!
-                _listsLiveData.postValue(nonNullableList)
+                val sortedList = sortLists(lists!!)
+                _listsLiveData.postValue(sortedList)
             } else Log.d("USUK", "ShopListRepository.getAllLists: erro obtendo snapshot e $error")
         }
 
+    }
+
+    private fun sortLists(lists: List<ShopList>): List<ShopList> {
+        return lists.sortedByDescending { it.creationDate }
     }
 
     override fun onCleared() {

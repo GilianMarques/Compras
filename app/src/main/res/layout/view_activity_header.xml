@@ -39,6 +39,19 @@
         app:layout_constraintStart_toEndOf="@id/iv_go_back"
         app:layout_constraintTop_toTopOf="@id/iv_go_back" />
 
+    <TextView
+        android:id="@+id/tv_activity_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        tools:text="@string/Adicionar_lista"
+        android:textAlignment="viewStart"
+        app:layout_constraintEnd_toStartOf="@id/iv_menu"
+        app:layout_constraintStart_toEndOf="@id/iv_go_back"
+        app:layout_constraintTop_toBottomOf="@id/tv_activity_title" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_menu"
         android:layout_width="48dp"
