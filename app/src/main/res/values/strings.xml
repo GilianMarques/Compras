@@ -39,7 +39,7 @@
     <string name="Alca_para_mudar_a_posicao_do_produto_na_lista">Alça para mudar a posição do produto na lista</string>
     <string name="Remover_lista">Remover lista</string>
     <string name="Ordenar_produtos">Ordenar produtos</string>
-    <string name="Detalhes_Ex_marca_x_ou_y_500gr_1kg">Detalhes (Ex.: Marca X, 500gr)</string>
+    <string name="Detalhes_Ex_marca_x_ou_y_500gr_1kg">Detalhes (Marca, peso)</string>
     <string name="Nome_do_produto_ex_macarrao_parafuso">Nome (Ex.: Macarrão Parafuso)</string>
     <string name="Valor_da_unidade">Valor da unidade</string>
     <string name="Quantidade_necessaria">Quantidade necessária</string>
