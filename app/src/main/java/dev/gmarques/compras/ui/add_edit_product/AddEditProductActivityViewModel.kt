@@ -116,7 +116,6 @@ class AddEditProductActivityViewModel : ViewModel() {
         }
     }
 
-
     fun loadCategory(categoryId: String) = viewModelScope.launch(IO) {
         val category = CategoryRepository.getCategory(categoryId)
 

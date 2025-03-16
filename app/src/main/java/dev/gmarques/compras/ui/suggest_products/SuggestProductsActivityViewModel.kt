@@ -190,7 +190,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
         )
     }
 
-    fun removeSuggestionProduct(product: Product) {
+    fun removeSuggestionProduct(product: Product) = viewModelScope.launch{
         SuggestionProductRepository.removeSuggestionProduct(ValidatedSuggestionProduct(product))
         reObserveProductsUpdates()
     }

@@ -1,10 +1,14 @@
 package dev.gmarques.compras.data.repository
 
+import android.provider.Settings.Global
+import android.util.Log
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.domain.utils.ListenerRegister
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 object SuggestionProductRepository {
@@ -72,10 +76,20 @@ object SuggestionProductRepository {
 
     /**
      * Remove um produto da coleção de sugestões do Firestore.
-     * @param validatedProduct Objeto contendo o produto sugerido a ser removido.
+     * @param vsp Objeto contendo o produto sugerido a ser removido.
      */
-    fun removeSuggestionProduct(vsp: ValidatedSuggestionProduct) {
-        Firestore.suggestionProductsCollection().document(vsp.suggestionProduct.id).delete()
+    suspend fun removeSuggestionProduct(vsp: ValidatedSuggestionProduct) {
+
+        //se o target nao for encontrado, é um bug ou foi removido de outro lugar na app, servidor ou de outro dispositivo vinculado à conta
+        val target = Firestore.suggestionProductsCollection()
+            .whereEqualTo("name", vsp.suggestionProduct.name)
+            .limit(1)
+            .get()
+            .await()
+            .documents[0].toObject<Product>()
+
+        Firestore.suggestionProductsCollection().document(target!!.id).delete()
+
     }
 
     /**
@@ -84,7 +98,8 @@ object SuggestionProductRepository {
      */
     suspend fun updateOrAddProductAsSuggestion(vsp: ValidatedSuggestionProduct) {
 
-        val querySnapshot = Firestore.suggestionProductsCollection().whereEqualTo("name", vsp.suggestionProduct.name).limit(1).get().await()
+        val querySnapshot =
+            Firestore.suggestionProductsCollection().whereEqualTo("name", vsp.suggestionProduct.name).limit(1).get().await()
         val suggestionProduct = if (querySnapshot.isEmpty) vsp.suggestionProduct
         else {
             val oldProduct = querySnapshot.documents[0].toObject<Product>()!!
