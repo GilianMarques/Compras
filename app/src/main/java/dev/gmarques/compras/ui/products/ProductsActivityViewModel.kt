@@ -44,10 +44,10 @@ class ProductsActivityViewModel : ViewModel() {
 
 
     var currentMarket: Market? = null
-        set(value) {
-            field = value
-            _marketEvent.postValue(value)
-        }
+        private set
+
+    //pra saber se o usuario ja confirmou onde esta comprando
+    var marketConfirmed = false
 
     // mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo
     private var categories: HashMap<String, Category>? = null
@@ -392,11 +392,10 @@ class ProductsActivityViewModel : ViewModel() {
     }
 
 
-    private suspend fun loadCurrentMarket() {
+    suspend fun loadCurrentMarket() {
         val lastMarketId = PreferencesHelper().getValue(PrefsKeys.LAST_MARKET_USED, "")
-        val market = if (lastMarketId.isNotEmpty())
-            MarketRepository.getMarket(lastMarketId) else null
-        _marketEvent.postValue(market)
+        currentMarket = if (lastMarketId.isNotEmpty()) MarketRepository.getMarket(lastMarketId) else null
+        _marketEvent.postValue(currentMarket)
     }
 
     data class ProductsWithPrices(

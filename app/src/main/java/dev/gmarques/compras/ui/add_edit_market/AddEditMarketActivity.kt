@@ -22,7 +22,7 @@ import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
 
 /**
- * Activity para adicionar ou editar mercados em uma lista.
+ * Activity para adicionar ou editar estabelecimentos em uma lista.
  * Implementada seguindo o padrão MVVM e princípios de Clean Code e SOLID.
  */
 class AddEditMarketActivity : AppCompatActivity() {
@@ -102,13 +102,13 @@ class AddEditMarketActivity : AppCompatActivity() {
             changeEditDrawableTextColor()
 
             toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), market.name)
-            fabSave.text = getString(R.string.Salvar_mercado)
+            fabSave.text = getString(R.string.Salvar_estabelecimento)
 
         }
     }
 
     /**
-     * Configura o botão de salvar mercado (FAB).
+     * Configura o botão de salvar estabelecimento (FAB).
      */
     private fun initFabAddMarket() = binding.apply {
         fabSave.setOnClickListener {
@@ -207,7 +207,7 @@ class AddEditMarketActivity : AppCompatActivity() {
      * Configura a toolbar da activity.
      */
     private fun setupToolbar() = binding.toolbar.apply {
-        tvActivityTitle.text = getString(R.string.Adicionar_mercado)
+        tvActivityTitle.text = getString(R.string.Adicionar_estabelecimento)
         ivGoBack.setOnClickListener { Vibrator.interaction();finish() }
         ivMenu.visibility = GONE
     }

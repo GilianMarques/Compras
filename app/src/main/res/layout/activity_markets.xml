@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:contentDescription="@string/Botao_para_adicionar_um_novo_mercado"
+            android:contentDescription="@string/Botao_para_adicionar_um_novo_estabelecimento"
             android:textColor="?colorPrimary"
             android:src="@drawable/vec_add"
             android:layout_margin="16dp"

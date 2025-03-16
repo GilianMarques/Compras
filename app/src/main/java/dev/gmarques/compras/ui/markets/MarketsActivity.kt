@@ -60,7 +60,7 @@ class MarketsActivity : AppCompatActivity(), MarketAdapter.Callback {
      */
     private fun setupToolbar() = binding.toolbar.apply {
         tvActivityTitle.text =
-            if (selectionMode) getString(R.string.Selecionar_mercado) else getString(R.string.Gerenciar_mercados)
+            if (selectionMode) getString(R.string.Selecionar_estabelecimento) else getString(R.string.Gerenciar_estabelecimentos)
         ivGoBack.setOnClickListener { Vibrator.interaction();finish() }
         ivMenu.visibility = GONE
     }

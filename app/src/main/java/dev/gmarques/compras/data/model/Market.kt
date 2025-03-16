@@ -31,7 +31,7 @@ data class Market(
     }
 
     /**
-     * Garante que nenhum mercado entre no banco de dados sem atender às regras de negócio
+     * Garante que nenhum estabelecimento entre no banco de dados sem atender às regras de negócio
      */
     fun selfValidate(context: Context) {
 
@@ -39,12 +39,12 @@ data class Market(
                 name,
                 context
             ).isFailure
-        ) throw Exception("Nome do mercado é invalido: '${name}'")
+        ) throw Exception("Nome do estabelecimento é invalido: '${name}'")
         if (Validator.validateColor(
                 color,
                 context
             ).isFailure
-        ) throw Exception("Cor do mercado é invalida: '${color}'")
+        ) throw Exception("Cor do estabelecimento é invalida: '${color}'")
     }
 
     constructor() : this("not_initialized", 0)

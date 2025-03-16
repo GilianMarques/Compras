@@ -31,7 +31,7 @@ class AddEditMarketActivityViewModel : ViewModel() {
 
     suspend fun tryAndSaveMarket() = withContext(IO) {
 
-        // se adicionando mercado ou se durante a ediçao o usuario trocar o nome do mercado, preciso verificar se o novo nome ja nao existe
+        // se adicionando estabelecimento ou se durante a ediçao o usuario trocar o nome do estabelecimento, preciso verificar se o novo nome ja nao existe
         val needCheckName = !editingMarket || editingMarketLD.value!!.name != validatedName
 
         if (needCheckName) {

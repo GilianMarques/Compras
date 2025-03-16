@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/back_addproduct_edittext"
                     android:drawableStart="@drawable/vec_name"
-                    android:hint="@string/Nome_do_mercado"
+                    android:hint="@string/Nome_do_estabelecimento"
                     android:importantForAutofill="no"
                     android:inputType="textCapSentences" />
 
@@ -111,7 +111,7 @@
         android:elevation="2dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:text="@string/Adicionar_mercado"
+        android:text="@string/Adicionar_estabelecimento"
         android:textColor="?colorPrimary"
         app:icon="@drawable/vec_check"
         app:layout_constraintBottom_toBottomOf="@id/parent"

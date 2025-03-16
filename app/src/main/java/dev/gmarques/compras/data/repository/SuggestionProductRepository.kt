@@ -42,8 +42,8 @@ object SuggestionProductRepository {
     }
 
     /**
-     * Verifica se há pelo menos um produto ou sugestão associado ao ID de mercado fornecido.
-     * @param marketId ID do mercado a ser verificada.
+     * Verifica se há pelo menos um produto ou sugestão associado ao ID de estabelecimento fornecido.
+     * @param marketId ID do estabelecimento a ser verificada.
      * @return Um [Result] indicando se há produtos associados.
      */
     suspend fun hasAnyProductWithMarketId(marketId: String): Boolean {

@@ -107,33 +107,37 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     private fun observeMarketChangeEvents() {
         viewModel.marketEvent.observe(this@ProductsActivity) { market ->
-
-            binding.toolbar.tvActivitySubtitle.text = market?.name
-
-            val title =
-                if (market == null) getString(R.string.Onde_est_fazendo_as_compras) else getString(
-                    R.string.Voce_esta_comprando_em, market.name
+            if (market != null) {
+                binding.toolbar.tvActivitySubtitle.text = getString(
+                    R.string.Comprando_em, market.name
                 )
-
-            val action = if (market == null) getString(R.string.Definir_mercado)
-            else getString(R.string.Alterar)
-
-            lifecycleScope.launch(Main) {
-                delay(1000)
-                Vibrator.interaction()
-                Snackbar.make(binding.root, title, Snackbar.LENGTH_LONG).setAction(action) {
-
-                    Vibrator.interaction()
-                    marketResultLauncher.launch(
-                        MarketsActivity.newIntent(this@ProductsActivity, true)
-                    )
-
-                }.setAnimationMode(ANIMATION_MODE_SLIDE)
-                    .setDuration(if (market == null) LENGTH_INDEFINITE else 4000).show()
             }
-
-
         }
+    }
+
+    private fun confirmMarket() = with(viewModel) {
+
+        val title =
+            if (currentMarket == null) getString(R.string.Onde_est_fazendo_as_compras) else getString(
+                R.string.Voce_esta_comprando_em, currentMarket!!.name
+            )
+
+        val action = if (currentMarket == null) getString(R.string.Definir_estabelecimento)
+        else getString(R.string.Alterar)
+
+        Vibrator.interaction()
+        Snackbar.make(binding.root, title, Snackbar.LENGTH_LONG).setAction(action) {
+
+            Vibrator.interaction()
+            marketResultLauncher.launch(
+                MarketsActivity.newIntent(this@ProductsActivity, true)
+            )
+
+        }.setAnimationMode(ANIMATION_MODE_SLIDE)
+            .setDuration(if (currentMarket == null) LENGTH_INDEFINITE else 4000).show()
+
+        viewModel.marketConfirmed = true
+
     }
 
     private fun suggestProductsIfNeeded(shopListId: String) = lifecycleScope.launch(IO) {
@@ -442,11 +446,8 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
                             SELECTED_MARKET
                         ) as Market
 
-
-
                     PreferencesHelper().saveValue(PrefsKeys.LAST_MARKET_USED, selectedMarket!!.id)
-
-                    viewModel.currentMarket = selectedMarket
+                    lifecycleScope.launch { viewModel.loadCurrentMarket() }
                 }
             }
     }
@@ -492,7 +493,14 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {
 
-        if (product.info.isEmpty() && isBought) BsdAddProductInfo(this@ProductsActivity) { info ->
+        if (isBought && !viewModel.marketConfirmed) {
+
+            confirmMarket()
+            // se o estabelecimento nao foi definido, atualizo o produto no db, assim a view do recyclerview é atualizada, desmarcando
+            // o checkbox do produto
+            viewModel.updateProductBoughtState(product, product.hasBeenBought)
+
+        } else if (product.info.isEmpty() && isBought) BsdAddProductInfo(this@ProductsActivity) { info ->
             viewModel.updateProductBoughtState(product.copy(info = info), true)
         }.show()
         else viewModel.updateProductBoughtState(product, isBought)

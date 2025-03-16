@@ -39,7 +39,7 @@ class ActivityMarketsViewModel : ViewModel() {
                 val sorted = markets!!.sortedWith(compareBy { it.name }).sortedWith(compareBy { it.position })
                 _marketsLd.postValue(sorted)
 
-            } else _errorEventLD.postValue(App.getContext().getString(R.string.Erro_ao_carregar_mercados_x, error.message))
+            } else _errorEventLD.postValue(App.getContext().getString(R.string.Erro_ao_carregar_estabelecimentos_x, error.message))
 
         }
     }
