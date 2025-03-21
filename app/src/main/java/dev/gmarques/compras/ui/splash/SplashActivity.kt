@@ -59,6 +59,7 @@ class SplashActivity : AppCompatActivity() {
         else setupDatabase()
     }
 
+    // TODO: remover a splash screen e usar o koleton. quando necessario migrar o db, abrir uma activity separada
     private fun setupDatabase() = lifecycleScope.launch(IO) {
 
         // TODO: tratar o retorno dessa forma nao ta legal, refatora isso

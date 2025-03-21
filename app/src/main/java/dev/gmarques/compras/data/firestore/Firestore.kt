@@ -28,6 +28,7 @@ class Firestore {
         private val environment =
             if (BuildConfig.DEBUG && !useProductionDb) "debug" else "production"
 
+        // TODO: o usuario vai ter o banco local e dentro dele, o shareable
         private const val USERS = "users"
         private const val DATABASE = "v2" // TODO: voltar ao padrao e usar versao nos objetos
         private const val SHOP_LISTS = "shopLists"

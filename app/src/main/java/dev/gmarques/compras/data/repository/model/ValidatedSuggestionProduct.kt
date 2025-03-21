@@ -15,6 +15,7 @@ class ValidatedSuggestionProduct(product: Product) {
     val suggestionProduct: Product
 
     init {
+        // TODO: separar o produto de sugestao em uma classe diferente
         //defino uma id de lista arbitraria pra evitar uma exceção ao avaliar essa propriedade, uma vez que
         // produtos de sugestão nao devem ter id de lista ja que nao pertencem a nenhuma.
         product.copy(shopListId = "suggestion_product").selfValidate(App.getContext())
