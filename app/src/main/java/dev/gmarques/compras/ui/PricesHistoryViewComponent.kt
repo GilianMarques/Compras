@@ -120,7 +120,6 @@ class PricesHistoryViewComponent(
                 binding.tvListName.text = item.price.toCurrency()
 
                 if (item.color != -1) {
-                    binding.ivPriceIcon.drawable?.mutate()?.setTint(item.color)
 
                     val saturatedColor = item.color.adjustSaturation(0.25f)
                     binding.ivPriceIcon.background?.mutate()?.apply {

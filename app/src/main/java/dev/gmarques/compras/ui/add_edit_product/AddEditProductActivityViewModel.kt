@@ -1,5 +1,6 @@
 package dev.gmarques.compras.ui.add_edit_product
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -132,9 +133,13 @@ class AddEditProductActivityViewModel : ViewModel() {
 
         val sub = filteredSuggestions.subList(0, min(filteredSuggestions.size, maxSuggestions))
 
-        uiState = uiState.copy(productsAndNamesSuggestions = sub.ifEmpty {
-            productNameSuggestion.getSuggestion(term, maxSuggestions).sortedBy { it.length }
-        })
+        try {
+            uiState = uiState.copy(productsAndNamesSuggestions = sub.ifEmpty {
+                productNameSuggestion.getSuggestion(term, maxSuggestions).sortedBy { it.length }
+            })
+        } catch (exception: Exception) {
+            Log.d("USUK", "AddEditProductActivityViewModel.".plus("loadSuggestions() erro: $exception"))
+        }
 
     }
 

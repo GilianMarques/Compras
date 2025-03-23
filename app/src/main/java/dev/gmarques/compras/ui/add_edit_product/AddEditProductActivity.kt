@@ -118,6 +118,7 @@ class AddEditProductActivity : AppCompatActivity() {
         val onPriceClick: (PriceHistory) -> Unit = { priceItem ->
             binding.edtPrice.requestFocus()
             binding.edtPrice.setText(priceItem.price.toCurrency())
+
         }
 
         val pricesHistory = PricesHistoryViewComponent(

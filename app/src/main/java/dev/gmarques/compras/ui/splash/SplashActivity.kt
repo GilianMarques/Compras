@@ -16,7 +16,9 @@ import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.firestore.migration.Migration_1_2
+import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.SyncAccount
+import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivitySplashBinding
 import dev.gmarques.compras.ui.Vibrator

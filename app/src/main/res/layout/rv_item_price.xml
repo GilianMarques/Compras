@@ -29,8 +29,8 @@
 
                 <ImageView
                 android:id="@+id/iv_price_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/back_list_icon"
                 android:importantForAccessibility="no"
@@ -38,7 +38,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/vec_price"
                  />
 
             <TextView

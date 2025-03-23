@@ -175,45 +175,35 @@ class ProfileActivity : AppCompatActivity() {
 
         binding.tvLogOff.setOnClickListener {
             Vibrator.interaction()
-            showDialog(
-                getString(R.string.Por_favor_confirme),
-                getString(R.string.Voce_sera_desconectado_a_e_todos_os_dados_locais_ser_o_removidos_deseja_mesmo_continuar),
-                getString(R.string.Sair)
-            ) {
-                lifecycleScope.launch {
-                    UserRepository.logOff(this@ProfileActivity) { error ->
-                        if (error == null) {
-                            Firebase.firestore.clearPersistence()
-                            Vibrator.success()
-                            App.close(this@ProfileActivity)
 
-                        } else {
-                            Vibrator.error()
-                            Snackbar.make(
-                                binding.root,
-                                getString(R.string.Erro_fazendo_logoff_tente_novamente_mais_tarde),
-                                Snackbar.LENGTH_LONG
-                            ).show()
+
+            MaterialAlertDialogBuilder(this@ProfileActivity)
+                .setTitle(getString(R.string.Por_favor_confirme))
+                .setMessage(getString(R.string.Voce_sera_desconectado_a_e_todos_os_dados_locais_ser_o_removidos_deseja_mesmo_continuar))
+                .setCancelable(true)
+                .setPositiveButton(getString(R.string.Sair)) { dialog, _ ->
+                    lifecycleScope.launch {
+                        UserRepository.logOff(this@ProfileActivity) { error ->
+                            if (error == null) {
+                                Firebase.firestore.clearPersistence()
+                                PreferencesHelper().clearAll()
+                                Vibrator.success()
+                                App.close(this@ProfileActivity)
+
+                            } else {
+                                Vibrator.error()
+                                Snackbar.make(
+                                    binding.root,
+                                    getString(R.string.Erro_fazendo_logoff_tente_novamente_mais_tarde),
+                                    Snackbar.LENGTH_LONG
+                                ).show()
+                            }
                         }
                     }
-                }
-            }
+                }.show()
         }
     }
 
-    /**
-     * Mostra um alertdialog com conteudo dianmico
-     * */
-    private fun showDialog(title: String, msg: String, confirm: String, callback: () -> Any) {
-        MaterialAlertDialogBuilder(this@ProfileActivity)
-            .setTitle(title)
-            .setMessage(msg)
-            .setCancelable(false)
-            .setPositiveButton(confirm) { dialog, _ ->
-                dialog.dismiss()
-                callback()
-            }.show()
-    }
 
     private fun setupSendInvite() {
         binding.tvSendInvite.setOnClickListener {
@@ -225,11 +215,14 @@ class ProfileActivity : AppCompatActivity() {
                 BsdSendSyncInvite(this, lifecycleScope, accountsInSync).show()
             } else {
                 Vibrator.error()
-                showDialog(
-                    getString(R.string.Erro),
-                    getString(R.string.Voce_nao_pode_convidar_um_usu_rio_para_a_sua_conta_enquanto_for_convidado_de_outra_pessoa),
-                    getString(R.string.Entendi)
-                ) {}
+                MaterialAlertDialogBuilder(this@ProfileActivity)
+                    .setTitle(getString(R.string.Erro))
+                    .setMessage(getString(R.string.Voce_nao_pode_convidar_um_usu_rio_para_a_sua_conta_enquanto_for_convidado_de_outra_pessoa))
+                    .setPositiveButton(getString(R.string.Entendi)) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .setCancelable(false)
+                    .show()
             }
         }
 
