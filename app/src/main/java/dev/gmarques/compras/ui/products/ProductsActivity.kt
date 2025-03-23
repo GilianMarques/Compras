@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
 import com.google.android.material.snackbar.Snackbar
@@ -30,7 +31,7 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.data.model.Market
+import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.ProductRepository
@@ -44,8 +45,8 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
-import dev.gmarques.compras.ui.markets.MarketsActivity
-import dev.gmarques.compras.ui.markets.MarketsActivity.Companion.SELECTED_MARKET
+import dev.gmarques.compras.ui.stablishments.EstablishmentsActivity
+import dev.gmarques.compras.ui.stablishments.EstablishmentsActivity.Companion.SELECTED_MARKET
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -59,7 +60,7 @@ import kotlin.math.min
 class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
 
     private var uiState: ProductsActivityViewModel.UiState? = null
-    private lateinit var marketResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var establishmentResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var viewModel: ProductsActivityViewModel
     private lateinit var binding: ActivityProductsBinding
@@ -101,42 +102,42 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         observeStateChanges()
         setupOnBackPressed()
         suggestProductsIfNeeded(shopListId)
-        observeMarketChangeEvents()
+        observeEstablishmentChangeEvents()
         setupActivityResultLauncher()
     }
 
-    private fun observeMarketChangeEvents() {
-        viewModel.marketEvent.observe(this@ProductsActivity) { market ->
-            if (market != null) {
+    private fun observeEstablishmentChangeEvents() {
+        viewModel.establishmentEvent.observe(this@ProductsActivity) { establishment ->
+            if (establishment != null) {
                 binding.toolbar.tvActivitySubtitle.text = getString(
-                    R.string.Comprando_em, market.name
+                    R.string.Comprando_em, establishment.name
                 )
             }
         }
     }
 
-    private fun confirmMarket() = with(viewModel) {
+    private fun confirmEstablishment() = with(viewModel) {
 
         val title =
-            if (currentMarket == null) getString(R.string.Onde_est_fazendo_as_compras) else getString(
-                R.string.Voce_esta_comprando_em, currentMarket!!.name
+            if (currentEstablishment == null) getString(R.string.Onde_est_fazendo_as_compras) else getString(
+                R.string.Voce_esta_comprando_em, currentEstablishment!!.name
             )
 
-        val action = if (currentMarket == null) getString(R.string.Definir_estabelecimento)
+        val action = if (currentEstablishment == null) getString(R.string.Definir_estabelecimento)
         else getString(R.string.Alterar)
 
         Vibrator.interaction()
         Snackbar.make(binding.root, title, Snackbar.LENGTH_LONG).setAction(action) {
 
             Vibrator.interaction()
-            marketResultLauncher.launch(
-                MarketsActivity.newIntent(this@ProductsActivity, true)
+            establishmentResultLauncher.launch(
+                EstablishmentsActivity.newIntent(this@ProductsActivity, true)
             )
 
         }.setAnimationMode(ANIMATION_MODE_SLIDE)
-            .setDuration(if (currentMarket == null) LENGTH_INDEFINITE else 4000).show()
+            .setDuration(if (currentEstablishment == null) LENGTH_INDEFINITE else 4000).show()
 
-        viewModel.marketConfirmed = true
+        viewModel.establishmentConfirmed = true
 
     }
 
@@ -344,7 +345,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
             .setSuggestionListener { startActivitySuggestProduct() }
             .setRemoveListener { removeList -> confirmRemove(removeList) }
             .setManageCategoriesListener { startCategoriesActivity() }
-            .setManageMarketsListener { startMarketsActivity() }.build().show()
+            .setManageEstablishmentsListener { startEstablishmentsActivity() }.build().show()
     }
 
     private fun startCategoriesActivity() {
@@ -354,10 +355,10 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         startActivity(intent)
     }
 
-    private fun startMarketsActivity() {
+    private fun startEstablishmentsActivity() {
 
         Vibrator.interaction()
-        val intent = MarketsActivity.newIntent(this@ProductsActivity)
+        val intent = EstablishmentsActivity.newIntent(this@ProductsActivity)
         startActivity(intent)
     }
 
@@ -382,7 +383,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         val msg = String.format(getString(R.string.Deseja_mesmo_remover_x), shopList.name)
 
         val dialogBuilder =
-            AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
+            MaterialAlertDialogBuilder(this).setTitle(getString(R.string.Por_favor_confirme))
                 .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
                     tryToRemoveShopList(shopList)
                     dialog.dismiss()
@@ -398,7 +399,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         val msg = String.format(getString(R.string.Deseja_mesmo_remover_x), product.name)
 
         val dialogBuilder =
-            AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme))
+            MaterialAlertDialogBuilder(this).setTitle(getString(R.string.Por_favor_confirme))
                 .setMessage(msg).setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
                     viewModel.removeProduct(product)
                     dialog.dismiss()
@@ -436,18 +437,18 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     private fun setupActivityResultLauncher() {
 
-        marketResultLauncher =
+        establishmentResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    val selectedMarket =
+                    val selectedEstablishment =
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            result.data!!.getSerializableExtra(SELECTED_MARKET, Market::class.java)
+                            result.data!!.getSerializableExtra(SELECTED_MARKET, Establishment::class.java)
                         } else @Suppress("DEPRECATION") result.data!!.getSerializableExtra(
                             SELECTED_MARKET
-                        ) as Market
+                        ) as Establishment
 
-                    PreferencesHelper().saveValue(PrefsKeys.LAST_MARKET_USED, selectedMarket!!.id)
-                    lifecycleScope.launch { viewModel.loadCurrentMarket() }
+                    PreferencesHelper().saveValue(PrefsKeys.LAST_MARKET_USED, selectedEstablishment!!.id)
+                    lifecycleScope.launch { viewModel.loadCurrentEstablishment() }
                 }
             }
     }
@@ -473,7 +474,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     }
 
     private fun showEditProductDialog(product: Product, focus: BsdEditProduct.Focus? = null) {
-        BsdEditProduct.Builder().setCurrentMarket(viewModel.currentMarket)
+        BsdEditProduct.Builder().setCurrentEstablishment(viewModel.currentEstablishment)
             .setActivity(this@ProductsActivity).setProduct(product).setFocus(focus)
             .setEditListener {
                 startActivityEditProduct(it)
@@ -493,9 +494,9 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {
 
-        if (isBought && !viewModel.marketConfirmed) {
+        if (isBought && !viewModel.establishmentConfirmed) {
 
-            confirmMarket()
+            confirmEstablishment()
             // se o estabelecimento nao foi definido, atualizo o produto no db, assim a view do recyclerview é atualizada, desmarcando
             // o checkbox do produto
             viewModel.updateProductBoughtState(product, product.hasBeenBought)
@@ -505,6 +506,16 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         }.show()
         else viewModel.updateProductBoughtState(product, isBought)
 
+    }
+
+    override fun rvProductsOnAnnotationsClick(product: Product) {
+        MaterialAlertDialogBuilder(this@ProductsActivity)
+            .setTitle(getString(R.string.Anotacoes_do_produto))
+            .setMessage(product.annotations)
+            .setCancelable(true)
+            .setPositiveButton(getString(R.string.Ok)) { dialog, _ ->
+                dialog.dismiss()
+            }.show()
     }
 
     override fun rvCategoriesOnSelect(category: Category, adapterPosition: Int) {

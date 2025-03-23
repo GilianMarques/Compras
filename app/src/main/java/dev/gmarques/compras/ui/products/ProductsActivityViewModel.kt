@@ -9,11 +9,11 @@ import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.data.model.Market
+import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.CategoryRepository
-import dev.gmarques.compras.data.repository.MarketRepository
+import dev.gmarques.compras.data.repository.EstablishmentRepository
 import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.ShopListRepository
 import dev.gmarques.compras.data.repository.SuggestionProductRepository
@@ -43,11 +43,11 @@ class ProductsActivityViewModel : ViewModel() {
         private set
 
 
-    var currentMarket: Market? = null
+    var currentEstablishment: Establishment? = null
         private set
 
     //pra saber se o usuario ja confirmou onde esta comprando
-    var marketConfirmed = false
+    var establishmentConfirmed = false
 
     // mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo
     private var categories: HashMap<String, Category>? = null
@@ -66,8 +66,8 @@ class ProductsActivityViewModel : ViewModel() {
     private val _uiStateLD = MutableLiveData<UiState>()
     val uiStateLD: LiveData<UiState> get() = _uiStateLD
 
-    private val _marketEvent = MutableLiveData<Market?>()
-    val marketEvent: LiveData<Market?> get() = _marketEvent
+    private val _establishmentEvent = MutableLiveData<Establishment?>()
+    val establishmentEvent: LiveData<Establishment?> get() = _establishmentEvent
 
     fun init(shopListId: String) {
 
@@ -83,7 +83,7 @@ class ProductsActivityViewModel : ViewModel() {
             loadSortPreferences()
             observeCategoriesUpdates()
             loadList(shopListId)
-            loadCurrentMarket()
+            loadCurrentEstablishment()
         }
 
     }
@@ -301,7 +301,7 @@ class ProductsActivityViewModel : ViewModel() {
             product.copy(
                 hasBeenBought = isBought,
                 boughtDate = System.currentTimeMillis(),
-                marketId = currentMarket?.id
+                marketId = currentEstablishment?.id
             )
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }
@@ -392,10 +392,10 @@ class ProductsActivityViewModel : ViewModel() {
     }
 
 
-    suspend fun loadCurrentMarket() {
-        val lastMarketId = PreferencesHelper().getValue(PrefsKeys.LAST_MARKET_USED, "")
-        currentMarket = if (lastMarketId.isNotEmpty()) MarketRepository.getMarket(lastMarketId) else null
-        _marketEvent.postValue(currentMarket)
+    suspend fun loadCurrentEstablishment() {
+        val lastEstablishmentId = PreferencesHelper().getValue(PrefsKeys.LAST_MARKET_USED, "")
+        currentEstablishment = if (lastEstablishmentId.isNotEmpty()) EstablishmentRepository.getEstablishment(lastEstablishmentId) else null
+        _establishmentEvent.postValue(currentEstablishment)
     }
 
     data class ProductsWithPrices(

@@ -9,7 +9,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.FirebaseCloneDatabase
 import dev.gmarques.compras.data.firestore.Firestore
-import dev.gmarques.compras.data.model.LastLogin
+import dev.gmarques.compras.data.model.LastAccess
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.tasks.await
@@ -39,7 +39,7 @@ object UserRepository {
      */
     suspend fun checkIfUserExists(targetEmail: String): Boolean {
         return Firestore.rootCollection(targetEmail)
-            .document(Firestore.LAST_LOGIN)
+            .document(Firestore.LAST_ACCESS)
             .get()
             .await().exists()
     }
@@ -48,8 +48,8 @@ object UserRepository {
      * Salva dados na raiz do banco do usuario para permitir que ele seja descoberto no caso de algum outro
      * usuario querer enviar um syncinvite
      * */
-    suspend fun updateDatabaseMetadata() {
-        Firestore.lastLoginDocument().set(LastLogin()).await()
+    suspend fun updateLastAccessInfo() {
+        Firestore.lastAccessDocument().set(LastAccess()).await()
     }
 
     fun observeSyncInvites(callback: (MutableList<SyncAccount>) -> Any): ListenerRegister {
@@ -211,7 +211,7 @@ object UserRepository {
 
     /**
      * Se desconeta do anfitriao, apagando as referencias das contas um dou outro e
-     * criando uma cópia do banco de dados para o convidado
+     * criando uma cópia do banco de dados para o convidado se solicitado
      * @see FirebaseCloneDatabase
      * */
     suspend fun disconnectFromHost(host: SyncAccount, cloneData: Boolean): Result<Boolean> {
@@ -220,10 +220,7 @@ object UserRepository {
             val localUser = getUser()!!
 
             /* Faz uma copia do banco de dados para o convidado */
-            if (cloneData) FirebaseCloneDatabase(
-                host.email,
-                localUser.email!!
-            ).beginCloning()
+            if (cloneData) FirebaseCloneDatabase(host.email, localUser.email!!).beginCloning()
 
             // Apaga os dados do host do db do convidado
             Firestore.hostDocument().delete().await()
@@ -243,14 +240,13 @@ object UserRepository {
      * Observa o status de convidado do usuario atual, para que caso ele seja convidado de outro usuario
      * e seja desconectado pelo anfitriao, o app possa prosseguir com o procedimento de desconexão
      * imediatamente e nao apenas no proximo boot
-     *
-     * */
+     */
     fun observeGuestStatus(callback: () -> Any): ListenerRegister? {
 
         val localUserEmail = getUser()!!.email!!
 
-        if (!Firestore.imIGuest) return null
-        val listenerRegistration = Firestore.guestsCollection().document(localUserEmail)
+        if (!Firestore.amIaGuest) return null
+        val listenerRegistration = Firestore.guestsCollection(Firestore.dataHostEmail).document(localUserEmail)
             .addSnapshotListener { snap, _ ->
                 snap?.let { if (!snap.exists()) callback() }
             }

@@ -13,6 +13,10 @@
         <item name="profileActivityAppBarColor">?attr/colorPrimaryContainer</item>
     </style>
 
+    <style name="Splash.Activity" parent="Base.Theme.Compras">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
 
     <style name="Login.Activity" parent="Base.Theme.Compras">
         <item name="android:statusBarColor">?android:attr/windowBackground</item>

@@ -19,7 +19,7 @@ object Vibrator {
      * Realiza uma vibração de duração moderada.
      */
     fun error() {
-        vibrate(300)
+        vibrate(200)
     }
 
     /**
@@ -28,8 +28,8 @@ object Vibrator {
      */
     fun success() {
         for (i in 1..3) {
-            vibrate(50)
-            Thread.sleep(110)
+            vibrate(25)
+            Thread.sleep(75)
         }
     }
 
@@ -38,7 +38,7 @@ object Vibrator {
      * Realiza uma vibração curta.
      */
     fun interaction() {
-        vibrate(50) // Duração curta
+        vibrate(25) // Duração curta
     }
 
     /**

@@ -124,7 +124,7 @@
 
 
                 <TextView
-                    android:id="@+id/tv_manage_markets"
+                    android:id="@+id/tv_manage_establishments"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/Margins_edittext"
@@ -136,7 +136,7 @@
                     android:paddingEnd="16dp"
                     android:text="@string/Gerenciar_estabelecimentos"
                     android:textColor="?attr/colorPrimaryVariant"
-                    app:drawableStartCompat="@drawable/vec_market"
+                    app:drawableStartCompat="@drawable/vec_establishment"
                     app:drawableTint="?attr/colorPrimaryVariant"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

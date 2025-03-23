@@ -11,6 +11,11 @@ import dev.gmarques.compras.domain.utils.ListenerRegister
 
 class MainActivityViewModel : ViewModel() {
 
+    private var listenerRegister: ListenerRegister? = null
+
+    private val _listsLiveData = MutableLiveData<List<ShopList>>()
+    val listsLiveData: LiveData<List<ShopList>> get() = _listsLiveData
+
 
     init {
         observeShopLists()
@@ -36,8 +41,5 @@ class MainActivityViewModel : ViewModel() {
         super.onCleared()
     }
 
-    private var listenerRegister: ListenerRegister? = null
-    private val _listsLiveData = MutableLiveData<List<ShopList>>()
-    val listsLiveData: LiveData<List<ShopList>> get() = _listsLiveData
 
 }

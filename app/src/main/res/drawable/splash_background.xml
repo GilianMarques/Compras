@@ -1,0 +1,18 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Cor de fundo da Splash Screen -->
+    <item android:drawable="@color/white" />
+
+    <!-- Ícone centralizado -->
+    <item
+        android:width="108dp"
+        android:height="108dp"
+        android:drawable="@drawable/back_round_splash"
+        android:gravity="center"/>
+
+    <item
+        android:width="64dp"
+        android:height="64dp"
+        android:drawable="@drawable/vec_product_splash"
+        android:gravity="center"/>
+
+</layer-list>

@@ -51,6 +51,23 @@ data class Product(
         hasBeenBought = false
     )
 
+    constructor(name:String) : this(
+        name = name,
+        price = 0.0,
+        quantity = 1,
+        info = "",
+        shopListId = "",
+        categoryId = "",
+        position = -1,
+        id = "",
+        boughtDate = 0L,
+        creationDate = 0L,
+        removed = false,
+        createdBy = "",
+        updatedBy = null,
+        hasBeenBought = false
+    )
+
     /**
      * Garante que nenhum produto entre no banco de dados sem atender às regras de negócio
      */

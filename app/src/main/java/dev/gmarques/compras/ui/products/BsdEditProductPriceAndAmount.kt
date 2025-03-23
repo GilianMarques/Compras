@@ -1,5 +1,6 @@
 package dev.gmarques.compras.ui.products
 
+import dev.gmarques.compras.ui.PricesHistoryViewComponent
 import android.app.Activity
 import android.view.View
 import android.view.View.VISIBLE
@@ -8,17 +9,21 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.model.Market
+import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.BsdEditProductDialogBinding
+import dev.gmarques.compras.domain.model.PriceHistory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.cancel
 
 class BsdEditProduct private constructor() {
 
-    private var currentMarket: Market? = null
+    private var currentEstablishment: Establishment? = null
     private var focusOnInfo: Boolean = false
     private var focusOnQuantity: Boolean = false
     private var focusOnPrice: Boolean = false
@@ -26,17 +31,23 @@ class BsdEditProduct private constructor() {
     private var buyAndSave: Boolean = false
 
     private lateinit var targetActivity: Activity
+
     private lateinit var editProduct: Product
+
     private lateinit var binding: BsdEditProductDialogBinding
     private lateinit var dialog: BottomSheetDialog
+
     private lateinit var onConfirmListener: ((Product) -> Unit)
     private lateinit var onEditListener: ((Product) -> Unit)
     private lateinit var onRemoveListener: ((Product) -> Unit)
+
+    private val scope = CoroutineScope(IO)
 
     private fun init() {
         dialog = BottomSheetDialog(targetActivity)
         binding = BsdEditProductDialogBinding.inflate(targetActivity.layoutInflater)
         dialog.setContentView(binding.root)
+        dialog.setOnDismissListener { scope.cancel("Dialog dismissed") }
 
         with(binding) {
 
@@ -69,7 +80,24 @@ class BsdEditProduct private constructor() {
         setupInputQuantityFocusListener()
         setupInputInfoFocusListener()
         setupAdditionalOptions()
+        setupPriceHistory()
 
+    }
+
+    private fun setupPriceHistory() {
+
+        val onPriceClick: (PriceHistory) -> Unit = { priceItem ->
+            binding.edtPrice.requestFocus()
+            binding.edtPrice.setText(priceItem.price.toCurrency())
+        }
+
+        val pricesHistory = PricesHistoryViewComponent(
+            targetActivity.layoutInflater,
+            scope,
+            editProduct,
+            onPriceClick
+        )
+        binding.fragment.addView(pricesHistory.view)
     }
 
     private fun setupAdditionalOptions() = binding.apply {
@@ -154,7 +182,7 @@ class BsdEditProduct private constructor() {
             info = newInfo,
             hasBeenBought = true,
             boughtDate = System.currentTimeMillis(),
-            marketId = currentMarket?.id
+            marketId = currentEstablishment?.id
         )
         else editProduct.copy(
             quantity = newQuantity, price = newPrice, info = newInfo
@@ -216,8 +244,8 @@ class BsdEditProduct private constructor() {
             return instance
         }
 
-        fun setCurrentMarket(currentMarket: Market?): Builder {
-            instance.currentMarket = currentMarket
+        fun setCurrentEstablishment(currentEstablishment: Establishment?): Builder {
+            instance.currentEstablishment = currentEstablishment
             return this
         }
 

@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dev.gmarques.compras.App
 import dev.gmarques.compras.BuildConfig
 import dev.gmarques.compras.R
@@ -23,11 +24,11 @@ import kotlinx.coroutines.launch
 
 class BsdManageSyncInvite(
     private val invite: SyncAccount,
+    private val canAcceptInvite: Boolean,
     private val targetActivity: Activity,
     private val lifecycleScope: LifecycleCoroutineScope,
 ) {
 
-    private var canAccept: Boolean = false
     private var binding = BsdManageSyncInviteBinding.inflate(targetActivity.layoutInflater)
     private val dialog: BottomSheetDialog = BottomSheetDialog(targetActivity)
 
@@ -38,11 +39,9 @@ class BsdManageSyncInvite(
         binding.apply {
 
             fabAccept.setOnClickListener {
-                if (!canAccept) return@setOnClickListener // melhor que desativar o botao (n gosto da aparencia do botao desativado)
                 Vibrator.interaction()
                 if (invite.mergeData) showDialogConfirmToKeepDeviceOnWhileCloningData()
                 else acceptInvite()
-
             }
 
             fabDecline.setOnClickListener {
@@ -64,20 +63,18 @@ class BsdManageSyncInvite(
 
 
             startProgressAnimation(pbAccept) {
-                canAccept = true
+                binding.fabAccept.isEnabled = canAcceptInvite
                 fabAccept.visibility = VISIBLE
                 pbAccept.visibility = GONE
             }
 
-            tvInfo.text =
-                if (invite.mergeData) targetActivity.getString(
-                    R.string.X_te_enviou_um_convite_para_sincronizar_dados_com_ele,
-                    invite.name
-                )
-                else targetActivity.getString(R.string.X_te_enviou_um_convite_para_a_conta_dele, invite.name)
+            tvInfo.text = if (!canAcceptInvite) {
+                targetActivity.getString(R.string.Voce_nao_pode_aceitar_um_convite_enquanto)
+            } else if (invite.mergeData) {
+                targetActivity.getString(R.string.X_te_enviou_um_convite_para_sincronizar_dados_com_ele, invite.name)
+            } else targetActivity.getString(R.string.X_te_enviou_um_convite_para_a_conta_dele, invite.name)
 
         }
-
     }
 
     private fun showDialogConfirmToKeepDeviceOnWhileCloningData() {
@@ -85,7 +82,7 @@ class BsdManageSyncInvite(
         val title = targetActivity.getString(R.string.Atencao)
         val msg = targetActivity.getString(R.string.Nao_feche_o_app_ou_se_desconecte_da_internet)
 
-        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+        MaterialAlertDialogBuilder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
                 acceptInvite()
@@ -99,7 +96,7 @@ class BsdManageSyncInvite(
 
     private fun startProgressAnimation(
         pbAccept: ProgressBar,
-        duration: Long = if (BuildConfig.DEBUG) 1L else 5000L,
+        duration: Long = if (BuildConfig.DEBUG || !canAcceptInvite) 1L else 5000L,
         onComplete: () -> Unit,
     ) {
         ValueAnimator.ofInt(0, 100).apply {
@@ -130,8 +127,9 @@ class BsdManageSyncInvite(
                 else R.string.Erro_ao_recusar_solicita_o
             )
 
-        AlertDialog.Builder(targetActivity)
+        MaterialAlertDialogBuilder(targetActivity)
             .setTitle(title)
+            .setCancelable(false)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
                 binding.root.postDelayed({
@@ -164,7 +162,7 @@ class BsdManageSyncInvite(
                 else R.string.Nao_foi_poss_vel_aceitar_a_solicita_o_tente_novamente_mais_tarde
             )
 
-        AlertDialog.Builder(targetActivity)
+        MaterialAlertDialogBuilder(targetActivity)
             .setTitle(title)
             .setMessage(msg)
             .setCancelable(false)

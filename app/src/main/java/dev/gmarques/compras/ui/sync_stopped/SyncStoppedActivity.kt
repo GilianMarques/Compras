@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.sinc_stopped
+package dev.gmarques.compras.ui.sync_stopped
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback

@@ -9,6 +9,7 @@ import android.view.View.VISIBLE
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.SyncAccount
 import dev.gmarques.compras.data.repository.UserRepository
@@ -52,7 +53,7 @@ class BsdSendSyncInvite(
             targetActivity.getString(R.string.Mesclar_dados_das_duas_contas)
         )
 
-        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+        MaterialAlertDialogBuilder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
 
             }.setNegativeButton(targetActivity.getString(R.string.Cancelar)) { dialog, _ ->
@@ -111,7 +112,7 @@ class BsdSendSyncInvite(
                 else R.string.Houve_um_erro_ao_enviar_a_solicitacao
             )
 
-        AlertDialog.Builder(targetActivity)
+        MaterialAlertDialogBuilder(targetActivity)
             .setTitle(title)
             .setMessage(msg)
             .setCancelable(false)

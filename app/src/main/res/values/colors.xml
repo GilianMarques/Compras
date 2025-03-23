@@ -33,11 +33,6 @@
         <item>#FFECBC</item> <!-- Lemon Chiffon -->
         <item>#FFCAE2</item> <!-- Off White -->
     </string-array>
-
-
-
-
-
     <string-array name="vivid_colors">
         <item>#E792FF</item> <!-- Vivid Violet -->
         <item>#FF3380</item> <!-- Vivid Raspberry -->

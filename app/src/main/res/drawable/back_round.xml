@@ -5,7 +5,5 @@
         android:width="1dp"
         android:color="@color/rv_product_item_background" />
 
-    <size
-        android:width="16dp"
-        android:height="16dp" />
+
 </shape>

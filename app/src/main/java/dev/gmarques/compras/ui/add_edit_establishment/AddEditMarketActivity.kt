@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.add_edit_market
+package dev.gmarques.compras.ui.add_edit_establishment
 
 import android.content.Context
 import android.content.Intent
@@ -14,8 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.model.Market
-import dev.gmarques.compras.databinding.ActivityAddEditMarketBinding
+import dev.gmarques.compras.data.model.Establishment
+import dev.gmarques.compras.databinding.ActivityAddEditEstablishmentBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.ui.BsdSelectColor
 import dev.gmarques.compras.ui.Vibrator
@@ -25,22 +25,22 @@ import kotlinx.coroutines.launch
  * Activity para adicionar ou editar estabelecimentos em uma lista.
  * Implementada seguindo o padrão MVVM e princípios de Clean Code e SOLID.
  */
-class AddEditMarketActivity : AppCompatActivity() {
+class AddEditEstablishmentActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAddEditMarketBinding
-    private lateinit var viewModel: AddEditMarketActivityViewModel
+    private lateinit var binding: ActivityAddEditEstablishmentBinding
+    private lateinit var viewModel: AddEditEstablishmentActivityViewModel
 
     companion object {
-        private const val MARKET_ID = "market_id"
+        private const val MARKET_ID = "establishment_id"
 
-        fun newIntentAddMarket(context: Context): Intent {
-            return Intent(context, AddEditMarketActivity::class.java).apply {
+        fun newIntentAddEstablishment(context: Context): Intent {
+            return Intent(context, AddEditEstablishmentActivity::class.java).apply {
             }
         }
 
-        fun newIntentEditMarket(context: Context, marketId: String): Intent {
-            return Intent(context, AddEditMarketActivity::class.java).apply {
-                putExtra(MARKET_ID, marketId)
+        fun newIntentEditEstablishment(context: Context, establishmentId: String): Intent {
+            return Intent(context, AddEditEstablishmentActivity::class.java).apply {
+                putExtra(MARKET_ID, establishmentId)
             }
         }
     }
@@ -48,18 +48,18 @@ class AddEditMarketActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityAddEditMarketBinding.inflate(layoutInflater)
+        binding = ActivityAddEditEstablishmentBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[AddEditMarketActivityViewModel::class.java]
-        viewModel.marketId = intent.getStringExtra(MARKET_ID)
+        viewModel = ViewModelProvider(this)[AddEditEstablishmentActivityViewModel::class.java]
+        viewModel.establishmentId = intent.getStringExtra(MARKET_ID)
 
 
         setupToolbar()
-        initFabAddMarket()
+        initFabAddEstablishment()
         setupInputName()
         setupInputColor()
-        observeMarket()
+        observeEstablishment()
         observeViewmodelErrorMessages()
         observeViewmodelFinishEvent()
 
@@ -68,40 +68,40 @@ class AddEditMarketActivity : AppCompatActivity() {
     }
 
     private fun observeViewmodelErrorMessages() = lifecycleScope.launch {
-        viewModel.errorEventLD.observe(this@AddEditMarketActivity) { event ->
+        viewModel.errorEventLD.observe(this@AddEditEstablishmentActivity) { event ->
             Snackbar.make(binding.root, event, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
         }
     }
 
     private fun observeViewmodelFinishEvent() = lifecycleScope.launch {
-        viewModel.finishEventLD.observe(this@AddEditMarketActivity) {
+        viewModel.finishEventLD.observe(this@AddEditEstablishmentActivity) {
             finish()
         }
     }
 
-    private fun observeMarket() = lifecycleScope.launch {
-        viewModel.loadMarket()
-        viewModel.editingMarketLD.observe(this@AddEditMarketActivity) {
+    private fun observeEstablishment() = lifecycleScope.launch {
+        viewModel.loadEstablishment()
+        viewModel.editingEstablishmentLD.observe(this@AddEditEstablishmentActivity) {
 
             it?.let {
-                viewModel.editingMarket = true
-                updateViewModelAndUiWithEditableMarket(it)
+                viewModel.editingEstablishment = true
+                updateViewModelAndUiWithEditableEstablishment(it)
             }
         }
     }
 
-    private fun updateViewModelAndUiWithEditableMarket(market: Market) = binding.apply {
+    private fun updateViewModelAndUiWithEditableEstablishment(establishment: Establishment) = binding.apply {
         viewModel.apply {
 
-            edtName.setText(market.name)
-            validatedName = market.name
+            edtName.setText(establishment.name)
+            validatedName = establishment.name
 
             edtColor.hint = getString(R.string.Clique_aqui_para_alterar_a_cor)
-            validatedColor = market.color
+            validatedColor = establishment.color
             changeEditDrawableTextColor()
 
-            toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), market.name)
+            toolbar.tvActivityTitle.text = String.format(getString(R.string.Editar_x), establishment.name)
             fabSave.text = getString(R.string.Salvar_estabelecimento)
 
         }
@@ -110,7 +110,7 @@ class AddEditMarketActivity : AppCompatActivity() {
     /**
      * Configura o botão de salvar estabelecimento (FAB).
      */
-    private fun initFabAddMarket() = binding.apply {
+    private fun initFabAddEstablishment() = binding.apply {
         fabSave.setOnClickListener {
             root.clearFocus()
 
@@ -121,7 +121,7 @@ class AddEditMarketActivity : AppCompatActivity() {
                     edtColor.requestFocus()
                 } else {
                     root.clearFocus()
-                    lifecycleScope.launch { tryAndSaveMarket() }
+                    lifecycleScope.launch { tryAndSaveEstablishment() }
                 }
 
             }
@@ -137,7 +137,7 @@ class AddEditMarketActivity : AppCompatActivity() {
             if (hasFocus) resetFocus(edtTarget, tvTarget)
             else {
                 val term = edtTarget.text.toString()
-                val result = Market.Validator.validateName(term,this)
+                val result = Establishment.Validator.validateName(term,this)
 
                 if (result.isSuccess) {
                     viewModel.validatedName = result.getOrThrow()
@@ -161,7 +161,7 @@ class AddEditMarketActivity : AppCompatActivity() {
                 resetFocus(edtTarget, tvTarget)
                 showColorDialog()
             } else {
-                val result = Market.Validator.validateColor(viewModel.validatedColor, this)
+                val result = Establishment.Validator.validateColor(viewModel.validatedColor, this)
 
                 if (result.isSuccess) {
                     edtTarget.hint = getString(R.string.Cor_selecionada)

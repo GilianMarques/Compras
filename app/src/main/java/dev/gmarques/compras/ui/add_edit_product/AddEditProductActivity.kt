@@ -29,11 +29,13 @@ import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
+import dev.gmarques.compras.domain.model.PriceHistory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
+import dev.gmarques.compras.ui.PricesHistoryViewComponent
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity.Companion.SELECTED_CATEGORY
@@ -55,7 +57,7 @@ class AddEditProductActivity : AppCompatActivity() {
     companion object {
         private const val LIST_ID = "list_id"
         private const val PRODUCT_ID = "product_id"
-        private const val DEF_CATEGORY = "def_categorydef_category"
+        private const val DEF_CATEGORY = "def_category"
         private const val DEF_NAME = "def_name"
 
         fun newIntentAddProduct(
@@ -108,6 +110,25 @@ class AddEditProductActivity : AppCompatActivity() {
 
     }
 
+    private fun showPriceHistory(name: String) {
+        binding.priceHistoryContainer.removeAllViews()
+
+        val product = Product(name)
+
+        val onPriceClick: (PriceHistory) -> Unit = { priceItem ->
+            binding.edtPrice.requestFocus()
+            binding.edtPrice.setText(priceItem.price.toCurrency())
+        }
+
+        val pricesHistory = PricesHistoryViewComponent(
+            layoutInflater,
+            lifecycleScope,
+            product,
+            onPriceClick
+        )
+        binding.priceHistoryContainer.addView(pricesHistory.view)
+    }
+
     private fun setDefValuesIfAny() = lifecycleScope.launch(Main) {
 
         val defName = intent.getStringExtra(DEF_NAME)
@@ -129,6 +150,7 @@ class AddEditProductActivity : AppCompatActivity() {
             newState.editingProduct?.let {
                 if (it == currentState?.editingProduct) return@let
                 viewModel.loadCategory(it.categoryId)
+                showPriceHistory(it.name)
             }
 
             newState.editingCategory?.let {
@@ -216,12 +238,15 @@ class AddEditProductActivity : AppCompatActivity() {
 
                 if (suggestion is Product) {
                     viewModel.loadSuggestionCategory(suggestion)
+                    showPriceHistory(suggestion.name)
                 } else {
                     val nameSuggestion = suggestion as String
                     viewModel.canLoadSuggestion = false
                     binding.edtName.setText(nameSuggestion)
                     viewModel.canLoadSuggestion = true
                     binding.edtInfo.requestFocus()
+
+                    showPriceHistory(nameSuggestion)
                 }
 
             }
@@ -357,7 +382,7 @@ class AddEditProductActivity : AppCompatActivity() {
                 val result = Product.Validator.validateAnnotations(term, this)
 
                 if (result.isSuccess) {
-                    viewModel.validatedAnnotation= result.getOrThrow()
+                    viewModel.validatedAnnotation = result.getOrThrow()
                     edtTarget.setText(viewModel.validatedAnnotation)
                 } else {
                     viewModel.validatedAnnotation = ""

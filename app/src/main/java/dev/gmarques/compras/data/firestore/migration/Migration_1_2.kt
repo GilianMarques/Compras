@@ -1,9 +1,9 @@
 package dev.gmarques.compras.data.firestore.migration
 
+import android.util.Log
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.data.model.DatabaseVersion
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import kotlinx.coroutines.tasks.await
@@ -17,11 +17,10 @@ class Migration_1_2 {
         migrateCategories()
         migrateProducts()
         migrateSuggestionProducts()
-        updateDatabaseVersion()
+        migrateEstablishments()
     }
 
     private suspend fun migrateProducts() {
-
         Firestore.productsCollection().get().await().forEach {
             val obj = it.toObject<Product>()
             Firestore.productsCollection().document(obj.id).set(obj).await()
@@ -51,8 +50,15 @@ class Migration_1_2 {
 
     }
 
-    private suspend fun updateDatabaseVersion() {
-        Firestore.databaseVersionDocument().set(DatabaseVersion()).await()
+    private suspend fun migrateEstablishments() {
+        Log.d("USUK", "Migration_1_2.".plus("migrateEstablishments() "))
+        Firestore.establishmentsCollection().get().await().forEach {
+            Log.d("USUK", "Migration_1_2.migrateEstablishments: $it")
+            val obj = it.toObject<Category>()
+            Firestore.establishmentsCollection().document(obj.id).set(obj).await()
+        }
+
     }
+
 
 }

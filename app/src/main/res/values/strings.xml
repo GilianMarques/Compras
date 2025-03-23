@@ -166,7 +166,7 @@
     <string name="Sincronismo_entre_contas_interrompido">Sincronismo entre contas interrompido</string>
     <string name="O_sincronismo_entre_contas_foi_interrompido">O sincronismo entre contas foi interrompido. Antes de prosseguir é necessário migrar os dados da sua conta. Não feche o app ou desconecte-se da internet durante o processo.</string>
     <string name="Sucesso">Sucesso</string>
-    <string name="Nao_feche_o_app_ou_se_desconecte_da_internet">Não feche o app ou desconecte-se da internet durante o processo.</string>
+    <string name="Nao_feche_o_app_ou_se_desconecte_da_internet">Aguarde enquanto migramos seus dados. Não feche o app ou desconecte-se da internet durante o processo.</string>
     <string name="Voce_nao_pode_convidar_um_usu_rio_para_a_sua_conta_enquanto_for_convidado_de_outra_pessoa">Você não pode convidar um usuário para a sua conta enquanto for convidado de outra pessoa.</string>
     <string name="Mesclar_dados_das_duas_contas">Mesclar dados das contas</string>
     <string name="Essa_funcao_permite_unificar_as_contas_refletindo_as_alteracoes_feitas">Essa função permite unificar as contas, refletindo as alterações feitas por um usuário na conta do outro, sem que vocês precisem compartilhar login e senha. É possível encerrar a conexão com outro usuário a qualquer momento.\n\n Nunca envie convites para desconhecidos. </string>
@@ -175,7 +175,7 @@
     <string name="X_te_enviou_um_convite_para_sincronizar_dados_com_ele">%1$s te enviou um convite para sincronizar dados com ele(a).\n\nAo aceitar o convite, os dados de ambas as contas serão mesclados e as alterações feitas por um usuário serão refletidas na conta do outro.\n\n Não aceite convites de pessoas desconhecidas.</string>
     <string name="X_te_enviou_um_convite_para_a_conta_dele">%1$s te enviou um convite para a conta dele(a).\n\nAo aceitar o convite, você terá acesso total a outra conta podendo manipular produtos, listas de compra, categorias, etc… Seus dados ficarão salvos em sua conta e não serão mesclados aos dele(a).</string>
     <string name="Algo_deu_errado_tente_novamente_mais_tarde">Algo deu errado, tente novamente mais tarde</string>
-    <string name="Voce_nao_pode_aceitar_um_convite_enquanto_houverem_usu_rios_sincroniando_dados_com_voc">Você não pode aceitar um convite enquanto houverem usuários sincronizando dados com você</string>
+    <string name="Voce_nao_pode_aceitar_um_convite_enquanto">Você não pode aceitar um convite enquanto estiver conectado a outra conta como convidado ou anfitrião.</string>
     <string name="Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta">Você gostaria de manter os dados atuais da conta ou ficar com os dados antigos que tinha antes de se conectar a %1$s?\n\nEscolha com cautela por que não é possível desfazer essa ação.</string>
     <string name="Como_deseja_prosseguir">Como deseja prosseguir?</string>
     <string name="Manter_dados_atuais">manter dados atuais</string>
@@ -201,5 +201,12 @@
     <string name="Alterar">Alterar</string>
     <string name="Logo_do_app">Logo do app</string>
     <string name="Faca_anotacoes_aqui">Faça anotações aqui</string>
+    <string name="Convidado">Convidado</string>
+    <string name="Anfitriao">Anfitrião</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Nulo">nulo</string>
+    <string name="Anotacoes_do_produto">Anotações do produto</string>
+    <string name="Ok">Ok</string>
 
 </resources>

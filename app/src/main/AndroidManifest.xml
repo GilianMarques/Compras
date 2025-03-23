@@ -33,11 +33,11 @@
             android:windowSoftInputMode="stateAlwaysVisible" />
 
         <activity
-            android:name=".ui.add_edit_market.AddEditMarketActivity"
+            android:name=".ui.add_edit_establishment.AddEditEstablishmentActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.markets.MarketsActivity"
+            android:name=".ui.stablishments.EstablishmentsActivity"
             android:exported="false" />
 
         <activity
@@ -65,11 +65,12 @@
             android:name=".ui.main.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.sinc_stopped.SyncStoppedActivity"
+            android:name=".ui.sync_stopped.SyncStoppedActivity"
             android:exported="false" />
 
         <activity
             android:name=".ui.splash.SplashActivity"
+            android:theme="@style/Splash.Activity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -74,6 +74,22 @@
                 app:layout_constraintStart_toStartOf="@id/tv_product_name"
                 app:layout_constraintTop_toTopOf="@id/cb_bought">
 
+                <ImageView
+                    android:id="@+id/iv_annotations"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/back_round"
+                    android:contentDescription="@string/Anotacoes_do_produto"
+                    android:padding="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/vec_annotation" />
+
+
                 <TextView
                     android:id="@+id/tv_product_info"
                     android:layout_width="wrap_content"

@@ -5,9 +5,10 @@ import android.app.Application
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.util.Log
+import com.google.android.material.color.DynamicColors
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.domain.utils.ListenerRegister
-import dev.gmarques.compras.ui.sinc_stopped.SyncStoppedActivity
+import dev.gmarques.compras.ui.sync_stopped.SyncStoppedActivity
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
@@ -41,15 +42,16 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
     }
 
     /**Define um listener que observa o status de convidado do ususario atual caso ele seja um convidado de outro usuario
      * Caso o listener ja tenha sido definido, nao faz nada */
     private fun observeGuestStatus() {
         if (guestsObserverListener != null) return
-
+        Log.d("USUK", "App.observeGuestStatus: observing if local will be disconnected from host")
         guestsObserverListener = UserRepository.observeGuestStatus {
-            Log.d("USUK", "App.observeGuestStatus: gust disconnected")
+            Log.d("USUK", "App.observeGuestStatus: guest disconnected")
             startActivity(
                 Intent(
                     this,
@@ -59,7 +61,7 @@ class App : Application() {
     }
 
     /**
-     * Habilita ou desabilita  o listener que observa se o ususario local foi desconectado
+     * Habilita ou desabilita  o listener que observa se o usuario local foi desconectado
      * de um sincronismo entre contas pelo host. Ao desabilitar o listener a activity que impede o uso
      * do app, forçando a reiniciar para separar as contas nao será exibida.
      *

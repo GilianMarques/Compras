@@ -36,7 +36,7 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bindData(darkModeEnabled, getItem(position))
+        holder.bindData(getItem(position))
     }
 
     fun moveProduct(fromPosition: Int, toPosition: Int) {
@@ -86,7 +86,7 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
         private val itemTouchHelper: ItemTouchHelper,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bindData(darkModeEnabled: Boolean, productWithCategory: ProductWithCategory) {
+        fun bindData(productWithCategory: ProductWithCategory) {
             clearListener()
 
             val product = productWithCategory.product
@@ -99,6 +99,7 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
                 cbBought.isChecked = product.hasBeenBought
                 tvCategoryName.text = productWithCategory.category.name
                 tvProductInfo.visibility = if (product.info.isNotEmpty()) VISIBLE else GONE
+                ivAnnotations.visibility = if (product.annotations.isNotEmpty()) VISIBLE else GONE
             }
 
             setListeners(binding, product)
@@ -144,6 +145,7 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
             tvProductPrice.setOnClickListener { Vibrator.interaction(); callback.rvProductsOnPriceClick(product) }
             tvProductQuantity.setOnClickListener { Vibrator.interaction(); callback.rvProductsOnQuantityClick(product) }
             tvProductInfo.setOnClickListener { Vibrator.interaction(); callback.rvProductsOnInfoClick(product) }
+            ivAnnotations.setOnClickListener { Vibrator.interaction(); callback.rvProductsOnAnnotationsClick(product) }
 
         }
     }
@@ -170,6 +172,7 @@ class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callbac
         fun rvProductsOnQuantityClick(product: Product)
         fun rvProductsOnInfoClick(product: Product)
         fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean)
+        fun rvProductsOnAnnotationsClick(product: Product)
     }
 
 }

@@ -1,7 +1,7 @@
 package dev.gmarques.compras.data.repository.model
 
 import dev.gmarques.compras.App
-import dev.gmarques.compras.data.model.Market
+import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.UserRepository
 
@@ -11,14 +11,14 @@ import dev.gmarques.compras.data.repository.UserRepository
  * Valida um estabelecimento antes que seja salva no banco de dados, garantindo
  * que apenas objetos que atendam às regras de negócio sejam salvos.
  */
-class ValidatedMarket(market: Market) {
+class ValidatedEstablishment(establishment: Establishment) {
 
-    val market: Market = market.copy(
+    val establishment: Establishment = establishment.copy(
         updatedBy = UserRepository.getUser()?.email
     )
 
     init {
-        market.selfValidate(App.getContext())
+        establishment.selfValidate(App.getContext())
     }
 }
 

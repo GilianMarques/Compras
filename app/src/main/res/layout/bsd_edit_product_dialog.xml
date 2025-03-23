@@ -83,28 +83,10 @@
                 android:theme="@style/Theme.EditText.Dialog" />
 
 
-            <LinearLayout
-                android:id="@+id/ll_price_history"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="8dp">
-
-                <TextView
-                    android:id="@+id/tv_price_history"
-                    style="@style/Margins_edittext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/back_textview_price_history"
-                    android:drawablePadding="8dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="center_vertical"
-                    android:textColor="?attr/colorPrimaryVariant"
-                    app:drawableStartCompat="@drawable/vec_price"
-                    app:drawableTint="?attr/colorPrimaryVariant"
-                    tools:text="R$45,99 (Ramos)" />
-            </LinearLayout>
-
+            <FrameLayout
+                android:id="@+id/fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/edt_quantity"

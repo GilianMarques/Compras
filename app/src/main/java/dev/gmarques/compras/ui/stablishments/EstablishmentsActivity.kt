@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.markets
+package dev.gmarques.compras.ui.stablishments
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -12,29 +12,29 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.model.Market
-import dev.gmarques.compras.databinding.ActivityMarketsBinding
-
+import dev.gmarques.compras.data.model.Establishment
+import dev.gmarques.compras.databinding.ActivityEstablishmentsBinding
 import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.add_edit_market.AddEditMarketActivity
+import dev.gmarques.compras.ui.add_edit_establishment.AddEditEstablishmentActivity
 
-class MarketsActivity : AppCompatActivity(), MarketAdapter.Callback {
+class EstablishmentsActivity : AppCompatActivity(), EstablishmentAdapter.Callback {
 
     private var fabHidden: Boolean = false
     private var selectionMode: Boolean = false
-    private lateinit var binding: ActivityMarketsBinding
-    private lateinit var viewModel: ActivityMarketsViewModel
-    private lateinit var adapter: MarketAdapter
+    private lateinit var binding: ActivityEstablishmentsBinding
+    private lateinit var viewModel: ActivityEstablishmentsViewModel
+    private lateinit var adapter: EstablishmentAdapter
 
     companion object {
 
         const val SELECTION_MODE = "selection_mode"
-        const val SELECTED_MARKET = "selected_market"
+        const val SELECTED_MARKET = "selected_establishment"
 
         fun newIntent(context: Context, selectionMode: Boolean = false): Intent {
-            return Intent(context, MarketsActivity::class.java).apply {
+            return Intent(context, EstablishmentsActivity::class.java).apply {
                 putExtra(SELECTION_MODE, selectionMode)
             }
         }
@@ -43,15 +43,15 @@ class MarketsActivity : AppCompatActivity(), MarketAdapter.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMarketsBinding.inflate(layoutInflater)
+        binding = ActivityEstablishmentsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[ActivityMarketsViewModel::class.java]
+        viewModel = ViewModelProvider(this)[ActivityEstablishmentsViewModel::class.java]
         selectionMode = intent.getBooleanExtra(SELECTION_MODE, false)
         setupToolbar()
         setupRecyclerview()
-        observeMarkets()
-        setupFabAddMarket()
+        observeEstablishments()
+        setupFabAddEstablishment()
         observeViewmodelErrorMessages()
     }
 
@@ -65,9 +65,9 @@ class MarketsActivity : AppCompatActivity(), MarketAdapter.Callback {
         ivMenu.visibility = GONE
     }
 
-    private fun setupFabAddMarket() = binding.apply {
+    private fun setupFabAddEstablishment() = binding.apply {
         fabAdd.setOnClickListener {
-            startActivityAddMarket()
+            startActivityAddEstablishment()
         }
 
 
@@ -93,68 +93,68 @@ class MarketsActivity : AppCompatActivity(), MarketAdapter.Callback {
         })
     }
 
-    private fun observeMarkets() {
-        viewModel.marketsLd.observe(this) {
+    private fun observeEstablishments() {
+        viewModel.establishmentsLd.observe(this) {
             adapter.submitList(it)
         }
     }
 
     private fun setupRecyclerview() {
 
-        adapter = MarketAdapter(this)
+        adapter = EstablishmentAdapter(this)
 
-        val dragDropHelper = MarketDragDropHelperCallback(adapter)
+        val dragDropHelper = EstablishmentDragDropHelperCallback(adapter)
         val touchHelper = ItemTouchHelper(dragDropHelper)
         adapter.attachItemTouchHelper(touchHelper)
 
         touchHelper.attachToRecyclerView(binding.rv)
 
         binding.rv.adapter = adapter
-        binding.rv.layoutManager = LinearLayoutManager(this@MarketsActivity)
+        binding.rv.layoutManager = LinearLayoutManager(this@EstablishmentsActivity)
 
 
     }
 
     private fun observeViewmodelErrorMessages() {
-        viewModel.errorEventLD.observe(this@MarketsActivity) { event ->
+        viewModel.errorEventLD.observe(this@EstablishmentsActivity) { event ->
             Snackbar.make(binding.root, event, Snackbar.LENGTH_LONG).show()
             Vibrator.error()
         }
     }
 
-    private fun startActivityAddMarket() {
+    private fun startActivityAddEstablishment() {
 
         Vibrator.interaction()
-        val intent = AddEditMarketActivity.newIntentAddMarket(this@MarketsActivity)
+        val intent = AddEditEstablishmentActivity.newIntentAddEstablishment(this@EstablishmentsActivity)
         startActivity(intent)
     }
 
 
-    override fun rvMarketsOnDragAndDrop(toPosition: Int, market: Market) {
-        viewModel.updateMarketPosition(market,toPosition)
+    override fun rvEstablishmentsOnDragAndDrop(toPosition: Int, establishment: Establishment) {
+        viewModel.updateEstablishmentPosition(establishment,toPosition)
     }
 
-    override fun rvMarketsOnEditItemClick(market: Market) {
+    override fun rvEstablishmentsOnEditItemClick(establishment: Establishment) {
         Vibrator.interaction()
-        val intent = AddEditMarketActivity.newIntentEditMarket(this@MarketsActivity, market.id)
+        val intent = AddEditEstablishmentActivity.newIntentEditEstablishment(this@EstablishmentsActivity, establishment.id)
         startActivity(intent)
     }
 
-    override fun rvMarketsOnSelect(market: Market) {
+    override fun rvEstablishmentsOnSelect(establishment: Establishment) {
         if (!selectionMode) return
         Vibrator.interaction()
 
-        val resultIntent = Intent().apply { putExtra(SELECTED_MARKET, market) }
+        val resultIntent = Intent().apply { putExtra(SELECTED_MARKET, establishment) }
         setResult(Activity.RESULT_OK, resultIntent)
         finish()
     }
 
-    override fun rvMarketsOnRemove(market: Market) {
-        val msg = String.format(getString(R.string.Deseja_mesmo_remover_x), market.name)
+    override fun rvEstablishmentsOnRemove(establishment: Establishment) {
+        val msg = String.format(getString(R.string.Deseja_mesmo_remover_x), establishment.name)
 
-        val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
+        val dialogBuilder = MaterialAlertDialogBuilder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
             .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
-                viewModel.removeMarket(market)
+                viewModel.removeEstablishment(establishment)
                 dialog.dismiss()
             }.setNegativeButton(getString(R.string.Cancelar)) { dialog, _ ->
                 dialog.dismiss()

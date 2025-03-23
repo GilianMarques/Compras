@@ -187,6 +187,10 @@
                     app:drawableTint="@color/error"
                     tools:text="@string/Nome_do_produto_ex_macarrao_parafuso"
                     tools:visibility="visible" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/price_history_container"/>
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/edt_quantity"

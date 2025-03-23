@@ -1,9 +1,9 @@
-package dev.gmarques.compras.ui.markets
+package dev.gmarques.compras.ui.stablishments
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class MarketDragDropHelperCallback(private val adapter: MarketAdapter) : ItemTouchHelper.Callback() {
+class EstablishmentDragDropHelperCallback(private val adapter: EstablishmentAdapter) : ItemTouchHelper.Callback() {
     override fun isLongPressDragEnabled(): Boolean = false
 
     override fun getMovementFlags(
@@ -21,7 +21,7 @@ class MarketDragDropHelperCallback(private val adapter: MarketAdapter) : ItemTou
         target: RecyclerView.ViewHolder,
     ): Boolean {
 
-        adapter.moveMarket(viewHolder.adapterPosition, target.adapterPosition)
+        adapter.moveEstablishment(viewHolder.adapterPosition, target.adapterPosition)
         return true
     }
 
@@ -31,7 +31,7 @@ class MarketDragDropHelperCallback(private val adapter: MarketAdapter) : ItemTou
      */
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
 
-        adapter.updateDraggedMarkets()
+        adapter.updateDraggedEstablishments()
 
         super.clearView(recyclerView, viewHolder)
     }

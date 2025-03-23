@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.firestore.migration.Migration_1_2
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
@@ -28,6 +30,8 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.ui.profile.ProfileActivity
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
 
@@ -51,10 +55,10 @@ class MainActivity : AppCompatActivity() {
         setupFabAddList()
         observeListsUpdates()
 
-        // lifecycleScope.launch { populateForTest() }
+        //   lifecycleScope.launch { populateForTest() }
     }
 
-    private suspend fun populateForTest() {
+    private suspend fun populateForTest() = repeat(5) {
 
         val name = UserRepository.getUser()!!.email!!.split("@")[0]
 
@@ -69,13 +73,14 @@ class MainActivity : AppCompatActivity() {
             categoryId = category.id,
             position = 0
         )
-
-        ProductRepository.addOrUpdateProduct(ValidatedProduct(product))
-        SuggestionProductRepository.updateOrAddProductAsSuggestion(
-            ValidatedSuggestionProduct(
-                product
+        repeat(100) {
+            ProductRepository.addOrUpdateProduct(ValidatedProduct(product.withNewId()))
+            SuggestionProductRepository.updateOrAddProductAsSuggestion(
+                ValidatedSuggestionProduct(
+                    product.withNewId()
+                )
             )
-        )
+        }
         ShopListRepository.addOrUpdateShopList(ValidatedShopList(list))
         CategoryRepository.addOrUpdateCategory(ValidatedCategory(category))
     }
@@ -127,7 +132,9 @@ class MainActivity : AppCompatActivity() {
     private fun observeListsUpdates() {
 
         viewModel.listsLiveData.observe(this@MainActivity) { newData ->
-            if (!newData.isNullOrEmpty()) rvAdapter.submitList(newData)
+            if (!newData.isNullOrEmpty()) {
+                rvAdapter.submitList(newData)
+            }
         }
     }
 

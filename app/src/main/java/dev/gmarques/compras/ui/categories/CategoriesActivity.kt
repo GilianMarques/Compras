@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Category
@@ -154,7 +155,7 @@ class CategoriesActivity : AppCompatActivity(), CategoryAdapter.Callback {
     override fun rvCategoriesOnRemove(category: Category) {
         val msg = String.format(getString(R.string.Deseja_mesmo_remover_x), category.name)
 
-        val dialogBuilder = AlertDialog.Builder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
+        val dialogBuilder = MaterialAlertDialogBuilder(this).setTitle(getString(R.string.Por_favor_confirme)).setMessage(msg)
             .setPositiveButton(getString(R.string.Remover)) { dialog, _ ->
                 viewModel.removeCategory(category)
                 dialog.dismiss()

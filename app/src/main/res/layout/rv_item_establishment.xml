@@ -57,7 +57,7 @@
                     app:tint="?colorPrimarySurface" />
 
                 <TextView
-                    android:id="@+id/tv_market_name"
+                    android:id="@+id/tv_establishment_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"

@@ -12,7 +12,7 @@ import java.util.Locale
 import java.util.UUID
 
 
-data class Market(
+data class Establishment(
     val name: String,
     val color: Int,
     val position: Int = 0,

@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.SyncAccount
@@ -57,7 +58,7 @@ class BsdDisconnectAccount(
         val title = targetActivity.getString(R.string.Por_favor_confirme)
         val msg = targetActivity.getString(R.string.Deseja_mesmo_interromper_a_conexao)
 
-        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+        MaterialAlertDialogBuilder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Interromper_conexao)) { dialog, _ ->
                 dialog.dismiss()
                 if (accountIsHost) showDialogConfirmIfCloneDataBeforeDisconnectFromHost()
@@ -80,7 +81,7 @@ class BsdDisconnectAccount(
             account.name
         )
 
-        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+        MaterialAlertDialogBuilder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Manter_dados_atuais)) { dialog, _ ->
                 dialog.dismiss()
                 showDialogConfirmToKeepDeviceOnWhileCloningData()
@@ -99,7 +100,7 @@ class BsdDisconnectAccount(
         val title = targetActivity.getString(R.string.Atencao)
         val msg = targetActivity.getString(R.string.Nao_feche_o_app_ou_se_desconecte_da_internet)
 
-        AlertDialog.Builder(targetActivity).setTitle(title).setMessage(msg)
+        MaterialAlertDialogBuilder(targetActivity).setTitle(title).setMessage(msg)
             .setPositiveButton(targetActivity.getString(R.string.Entendi)) { dialog, _ ->
                 dialog.dismiss()
                 setUiInLoadingStat()
@@ -121,7 +122,7 @@ class BsdDisconnectAccount(
 
             if (result.isSuccess) {
 
-                AlertDialog.Builder(targetActivity)
+                MaterialAlertDialogBuilder(targetActivity)
                     .setTitle(targetActivity.getString(R.string.Conta_desconectada_com_sucesso))
                     .setMessage(targetActivity.getString(R.string.Reinicie_o_app_para_aplicar_as_alteracoes))
                     .setCancelable(false)

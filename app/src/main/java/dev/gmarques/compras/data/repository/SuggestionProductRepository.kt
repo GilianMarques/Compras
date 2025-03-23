@@ -47,12 +47,12 @@ object SuggestionProductRepository {
 
     /**
      * Verifica se há pelo menos um produto ou sugestão associado ao ID de estabelecimento fornecido.
-     * @param marketId ID do estabelecimento a ser verificada.
+     * @param establishmentId ID do estabelecimento a ser verificada.
      * @return Um [Result] indicando se há produtos associados.
      */
-    suspend fun hasAnyProductWithMarketId(marketId: String): Boolean {
+    suspend fun hasAnyProductWithEstablishmentId(establishmentId: String): Boolean {
         val suggestionProductsSnapshot =
-            Firestore.suggestionProductsCollection().whereEqualTo("marketId", marketId).limit(1).get().await()
+            Firestore.suggestionProductsCollection().whereEqualTo("establishmentId", establishmentId).limit(1).get().await()
         return !suggestionProductsSnapshot.isEmpty
     }
 

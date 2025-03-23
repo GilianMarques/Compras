@@ -16,7 +16,7 @@ class BsdShopListMenu private constructor(
     private val orderListener: (() -> Unit)?,
     private val suggestionListener: (() -> Unit)?,
     private val manageCategoriesListener: (() -> Unit)?,
-    private val manageMarketsListener: (() -> Unit)?,
+    private val manageEstablishmentsListener: (() -> Unit)?,
 ) {
 
     private var binding = BsdShoplistMenuDialogBinding.inflate(targetActivity.layoutInflater)
@@ -51,8 +51,8 @@ class BsdShopListMenu private constructor(
                 dialog.dismiss()
             }
 
-            tvManageMarkets.setOnClickListener {
-                manageMarketsListener?.invoke()
+            tvManageEstablishments.setOnClickListener {
+                manageEstablishmentsListener?.invoke()
                 dialog.dismiss()
             }
 
@@ -72,7 +72,7 @@ class BsdShopListMenu private constructor(
         private var orderListener: (() -> Unit)? = null
         private var suggestionListener: (() -> Unit)? = null
         private var manageCategoriesListener: (() -> Unit)? = null
-        private var manageMarketsListener: (() -> Unit)? = null
+        private var manageEstablishmentsListener: (() -> Unit)? = null
 
         fun setRenameListener(listener: (ShopList) -> Unit) = apply {
             this.renameListener = listener
@@ -94,8 +94,8 @@ class BsdShopListMenu private constructor(
             this.manageCategoriesListener = listener
         }
 
-        fun setManageMarketsListener(listener: () -> Unit) = apply {
-            this.manageMarketsListener = listener
+        fun setManageEstablishmentsListener(listener: () -> Unit) = apply {
+            this.manageEstablishmentsListener = listener
         }
 
         fun build(): BsdShopListMenu {
@@ -105,7 +105,7 @@ class BsdShopListMenu private constructor(
             requireNotNull(orderListener) { "orderListener must be set." }
             requireNotNull(suggestionListener) { "suggestionListener must be set." }
             requireNotNull(manageCategoriesListener) { "manageCategoriesListener must be set." }
-            requireNotNull(manageMarketsListener) { "manageMarketsListener must be set." }
+            requireNotNull(manageEstablishmentsListener) { "manageEstablishmentsListener must be set." }
 
             return BsdShopListMenu(
                 targetActivity,
@@ -115,7 +115,7 @@ class BsdShopListMenu private constructor(
                 orderListener,
                 suggestionListener,
                 manageCategoriesListener,
-                manageMarketsListener
+                manageEstablishmentsListener
             )
         }
     }

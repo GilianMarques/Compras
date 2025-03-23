@@ -3,11 +3,13 @@ package dev.gmarques.compras.ui.profile
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -70,17 +72,29 @@ class ProfileActivity : AppCompatActivity() {
         viewModel.uiStateLd.observe(this) { newState ->
 
             loadInvitesViews(newState.requests)
-            loadGuestsViews(newState.guests)
-            loadHostView(newState.host)
-
+            updateUiWithSyncAccountsViews(newState.guests, newState.host)
             this.state = newState
         }
     }
 
-    /**Carrega as views de solicitações de sincronismo*/
-    private fun loadInvitesViews(
-        accountsInfo: List<SyncAccount>?,
-    ) {
+    private fun updateUiWithSyncAccountsViews(guests: List<SyncAccount>, host: List<SyncAccount>) {
+
+        // reseto o estado dos containers que comportam as views de convidado e anfitriao.
+        binding.llParentSyncAccounts.visibility = if (host.isEmpty() && guests.isEmpty()) GONE else VISIBLE
+        binding.llSyncAccounts.removeAllViews()
+
+        // oculta a seção de enviar convites caso o usuario seja um convidado, pois se for, ele nao pode convidar.
+        binding.llInvite.visibility = if (host.isEmpty()) VISIBLE else GONE
+        binding.tvSendInvite.isEnabled = host.isEmpty()
+
+        host.forEach { req -> loadSyncAccountView(req, true) }
+        guests.forEach { req -> loadSyncAccountView(req) }
+    }
+
+    /**
+     * Carrega as views de solicitações de sincronismo
+     */
+    private fun loadInvitesViews(accountsInfo: List<SyncAccount>?) {
 
 
         binding.llSyncInvites.removeAllViews()
@@ -105,59 +119,28 @@ class ProfileActivity : AppCompatActivity() {
 
     }
 
-    /**Carrega as views de guests*/
-    private fun loadGuestsViews(
-        guests: List<SyncAccount>?,
-    ) {
+    /**
+     * Carrega as views de convidados e anfitriao
+     */
+    private fun loadSyncAccountView(syncAccount: SyncAccount, host: Boolean = false) {
 
-        binding.llGuests.removeAllViews()
-        binding.llParentGuests.visibility = if (guests.isNullOrEmpty()) GONE else VISIBLE
+        val item = ItemGuestOrHostBinding.inflate(layoutInflater)
 
-        guests?.forEach { guest ->
-            val item = ItemGuestOrHostBinding.inflate(layoutInflater)
+        item.tvName.text = syncAccount.name
 
-            item.tvName.text = guest.name
+        Glide.with(binding.root.context).load(syncAccount.photoUrl).circleCrop()
+            .placeholder(R.drawable.vec_invite_user).into(item.ivProfilePicture)
 
-            Glide.with(binding.root.context).load(guest.photoUrl).circleCrop()
-                .placeholder(R.drawable.vec_invite_user).into(item.ivProfilePicture)
-
-            item.root.setOnClickListener {
-                Vibrator.interaction()
-                showDisconnectGuestDialog(guest)
-            }
-
-            binding.llGuests.addView(item.root)
+        item.root.setOnClickListener {
+            Vibrator.interaction()
+            if (host) showDisconnectFromHostDialog(syncAccount)
+            else showDisconnectGuestDialog(syncAccount)
         }
 
-    }
+        item.tvGuest.visibility = if (host) INVISIBLE else VISIBLE
+        item.tvHost.visibility = if (host) VISIBLE else INVISIBLE
 
-
-    /**Carrega a view do anfitriao*/
-    private fun loadHostView(
-        host: List<SyncAccount>?,
-    ) {
-
-        binding.llInvite.visibility = if (host.isNullOrEmpty()) VISIBLE else GONE
-        binding.tvSendInvite.isEnabled = host.isNullOrEmpty()
-
-        binding.llHost.removeAllViews()
-        binding.llParentHost.visibility = if (host.isNullOrEmpty()) GONE else VISIBLE
-
-        host?.forEach { req ->
-            val item = ItemGuestOrHostBinding.inflate(layoutInflater)
-
-            item.tvName.text = req.name
-
-            Glide.with(binding.root.context).load(req.photoUrl).circleCrop()
-                .placeholder(R.drawable.vec_invite_user).into(item.ivProfilePicture)
-
-            item.root.setOnClickListener {
-                Vibrator.interaction()
-                showDisconnectFromHostDialog(req)
-            }
-
-            binding.llHost.addView(item.root)
-        }
+        binding.llSyncAccounts.addView(item.root)
 
     }
 
@@ -165,15 +148,13 @@ class ProfileActivity : AppCompatActivity() {
      * Mostra um bottomsheet dialog que permite gerenciar um convite de sincronismo
      * */
     private fun showViewSyncInviteDialog(req: SyncAccount) {
-        if (state?.guests.isNullOrEmpty()) BsdManageSyncInvite(req, this, lifecycleScope).show()
-        else {
-            Vibrator.error()
-            showDialog(
-                getString(R.string.Erro),
-                getString(R.string.Voce_nao_pode_aceitar_um_convite_enquanto_houverem_usu_rios_sincroniando_dados_com_voc),
-                getString(R.string.Entendi)
-            ) {}
-        }
+        BsdManageSyncInvite(
+            req,
+            state?.guests.isNullOrEmpty() && state?.host.isNullOrEmpty(),
+            this,
+            lifecycleScope
+        ).show()
+
     }
 
     /**
@@ -224,7 +205,7 @@ class ProfileActivity : AppCompatActivity() {
      * Mostra um alertdialog com conteudo dianmico
      * */
     private fun showDialog(title: String, msg: String, confirm: String, callback: () -> Any) {
-        AlertDialog.Builder(this@ProfileActivity)
+        MaterialAlertDialogBuilder(this@ProfileActivity)
             .setTitle(title)
             .setMessage(msg)
             .setCancelable(false)
@@ -237,9 +218,11 @@ class ProfileActivity : AppCompatActivity() {
     private fun setupSendInvite() {
         binding.tvSendInvite.setOnClickListener {
 
+            val accountsInSync = (state?.guests.orEmpty() + state?.host.orEmpty())
+
             if (state!!.host.isEmpty()) {
                 Vibrator.interaction()
-                BsdSendSyncInvite(this, lifecycleScope, state!!.guests).show()
+                BsdSendSyncInvite(this, lifecycleScope, accountsInSync).show()
             } else {
                 Vibrator.error()
                 showDialog(

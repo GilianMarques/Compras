@@ -1,4 +1,4 @@
-package dev.gmarques.compras.ui.markets
+package dev.gmarques.compras.ui.stablishments
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.GradientDrawable
@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import dev.gmarques.compras.data.model.Market
-import dev.gmarques.compras.databinding.RvItemMarketBinding
+import dev.gmarques.compras.data.model.Establishment
+import dev.gmarques.compras.databinding.RvItemEstablishmentBinding
 import java.util.Collections
 
 /**
@@ -18,28 +18,28 @@ import java.util.Collections
  * Data de Criação: 27/02/2025
  */
 
-class MarketAdapter(val callback: Callback) :
-    ListAdapter<Market, MarketAdapter.MarketViewHolder>(MarketDiffCallback()) {
+class EstablishmentAdapter(val callback: Callback) :
+    ListAdapter<Establishment, EstablishmentAdapter.EstablishmentViewHolder>(EstablishmentDiffCallback()) {
     private lateinit var itemTouchHelper: ItemTouchHelper
-    private var utilList = mutableListOf<Market>()
+    private var utilList = mutableListOf<Establishment>()
 
-    inner class MarketViewHolder(private val binding: RvItemMarketBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class EstablishmentViewHolder(private val binding: RvItemEstablishmentBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("ClickableViewAccessibility")
-        fun bind(market: Market) {
+        fun bind(establishment: Establishment) {
             with(binding) {
-                tvMarketName.text = market.name
-                (ivListIcon.background as GradientDrawable).also { it.mutate(); it.setColor(market.color) }
+                tvEstablishmentName.text = establishment.name
+                (ivListIcon.background as GradientDrawable).also { it.mutate(); it.setColor(establishment.color) }
 
                 ivRemove.setOnClickListener {
-                    callback.rvMarketsOnRemove(market)
+                    callback.rvEstablishmentsOnRemove(establishment)
                 }
 
                 ivEdit.setOnClickListener {
-                    callback.rvMarketsOnEditItemClick(market)
+                    callback.rvEstablishmentsOnEditItemClick(establishment)
                 }
 
                 cvChild.setOnClickListener {
-                    callback.rvMarketsOnSelect(market)
+                    callback.rvEstablishmentsOnSelect(establishment)
                 }
 
                 ivHandle.setOnTouchListener { it, motionEvent ->
@@ -47,7 +47,7 @@ class MarketAdapter(val callback: Callback) :
                     when (motionEvent.action) {
                         MotionEvent.ACTION_DOWN -> {
                             // Inicia o drag and drop
-                            itemTouchHelper.startDrag(this@MarketViewHolder)
+                            itemTouchHelper.startDrag(this@EstablishmentViewHolder)
                             return@setOnTouchListener true
                         }
 
@@ -67,20 +67,20 @@ class MarketAdapter(val callback: Callback) :
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MarketViewHolder {
-        val binding = RvItemMarketBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EstablishmentViewHolder {
+        val binding = RvItemEstablishmentBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
-        return MarketViewHolder(binding)
+        return EstablishmentViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MarketViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: EstablishmentViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
     override fun getItemCount(): Int = currentList.size
 
-    override fun submitList(list: List<Market>?) {
+    override fun submitList(list: List<Establishment>?) {
         utilList.clear()
         utilList.addAll(list ?: emptyList())
         super.submitList(list)
@@ -90,34 +90,34 @@ class MarketAdapter(val callback: Callback) :
         this.itemTouchHelper = touchHelper
     }
 
-    fun moveMarket(fromPosition: Int, toPosition: Int) {
+    fun moveEstablishment(fromPosition: Int, toPosition: Int) {
         Collections.swap(utilList, fromPosition, toPosition)
         submitList(utilList.toList())
     }
 
-    fun updateDraggedMarkets() {
+    fun updateDraggedEstablishments() {
         for (i in utilList.indices) {
-            val market = utilList[i]
-            if (market.position != i) callback.rvMarketsOnDragAndDrop(i, market)
+            val establishment = utilList[i]
+            if (establishment.position != i) callback.rvEstablishmentsOnDragAndDrop(i, establishment)
         }
     }
 
-    class MarketDiffCallback : DiffUtil.ItemCallback<Market>() {
+    class EstablishmentDiffCallback : DiffUtil.ItemCallback<Establishment>() {
 
-        override fun areItemsTheSame(oldItem: Market, newItem: Market): Boolean {
+        override fun areItemsTheSame(oldItem: Establishment, newItem: Establishment): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Market, newItem: Market): Boolean {
+        override fun areContentsTheSame(oldItem: Establishment, newItem: Establishment): Boolean {
             // deve comparar toda a informação que é exibida na view pro usuario
             return oldItem == newItem
         }
     }
 
     interface Callback {
-        fun rvMarketsOnDragAndDrop(toPosition: Int, market: Market)
-        fun rvMarketsOnEditItemClick(market: Market)
-        fun rvMarketsOnSelect(market: Market)
-        fun rvMarketsOnRemove(market: Market)
+        fun rvEstablishmentsOnDragAndDrop(toPosition: Int, establishment: Establishment)
+        fun rvEstablishmentsOnEditItemClick(establishment: Establishment)
+        fun rvEstablishmentsOnSelect(establishment: Establishment)
+        fun rvEstablishmentsOnRemove(establishment: Establishment)
     }
 }

@@ -1,5 +1,6 @@
 package dev.gmarques.compras.data.repository
 
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
@@ -46,6 +47,25 @@ object ProductRepository {
     }
 
     /**
+     * Retorna uma lista de todos os produtos comprados de mesmo nome.
+     */
+    suspend fun getHistoryPricesProducts(name: String): Result<List<Product>> {
+        val querySnapShot = Firestore.productsCollection()
+            .whereEqualTo("name", name)
+            .whereEqualTo("hasBeenBought", true)
+            .get().await()
+
+        return if (querySnapShot.isEmpty) {
+            Result.success(emptyList())
+        } else {
+            val productsList = querySnapShot.documents.mapNotNull { document ->
+                document.toObject<Product>()
+            }
+            Result.success(productsList)
+        }
+    }
+
+    /**
      * Retorna os nomes dos produtos associados a uma lista de compras.
      * @param shopListId ID da lista de compras.
      * @return Uma lista de nomes de produtos.
@@ -81,12 +101,12 @@ object ProductRepository {
 
     /**
      * Verifica se há pelo menos um produto ou sugestão associado ao ID de estabelecimento fornecido.
-     * @param marketId ID do estabelecimento a ser verificada.
+     * @param establishmentId ID do estabelecimento a ser verificada.
      * @return Um [Result] indicando se há produtos associados.
      */
-    suspend fun hasAnyProductWithMarketId(marketId: String): Boolean {
+    suspend fun hasAnyProductWithEstablishmentId(establishmentId: String): Boolean {
         val productsSnapshot =
-            Firestore.productsCollection().whereEqualTo("marketId", marketId).limit(1).get()
+            Firestore.productsCollection().whereEqualTo("establishmentId", establishmentId).limit(1).get()
                 .await()
         return !productsSnapshot.isEmpty
     }
