@@ -58,7 +58,7 @@ class AddEditCategoryActivity: MyActivity() {
 
 
         setupToolbar()
-        initFabAddCategory()
+        setupFabAddCategory()
         setupInputName()
         setupInputColor()
         observeCategory()
@@ -112,7 +112,7 @@ class AddEditCategoryActivity: MyActivity() {
     /**
      * Configura o botão de salvar categoria (FAB).
      */
-    private fun initFabAddCategory() = binding.apply {
+    private fun setupFabAddCategory() = binding.apply {
         fabSave.setOnClickListener {
             root.clearFocus()
 

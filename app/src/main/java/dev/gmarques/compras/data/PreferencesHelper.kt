@@ -80,7 +80,7 @@ class PreferencesHelper {
             const val SORT_CRITERIA = "sort_criteria"
             const val SORT_ASCENDING = "sort_ascending"
             const val BOUGHT_PRODUCTS_AT_END = "bought_products_at_end"
-            const val LAST_MARKET_USED = "last_establishment_used"
+            const val LAST_ESTABLISHMENT_USED = "last_establishment_used"
         }
     }
 

@@ -1,7 +1,5 @@
 package dev.gmarques.compras.ui
 
-import android.content.res.Configuration
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import dev.gmarques.compras.App
 import dev.gmarques.compras.ui.splash.SplashActivity
@@ -14,7 +12,7 @@ abstract class MyActivity : AppCompatActivity() {
 
     override fun onResume() {
 
-        // splash nao deve ser setada como activity posi se fecha sozinha e por isso, pode ocultar alertas ao usuario
+        // splash nao deve ser setada como activity pois se fecha sozinha e por isso, pode ocultar alertas ao usuario
         if (this.localClassName != SplashActivity::class.qualifiedName) {
             App.getContext().currentActivity = this
         }

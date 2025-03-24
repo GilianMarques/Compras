@@ -2,7 +2,6 @@ package dev.gmarques.compras.data.repository.model
 
 import dev.gmarques.compras.App
 import dev.gmarques.compras.data.model.Establishment
-import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.UserRepository
 
 /**

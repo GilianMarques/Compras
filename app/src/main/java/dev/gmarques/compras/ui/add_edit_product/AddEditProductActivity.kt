@@ -91,7 +91,7 @@ class AddEditProductActivity: MyActivity() {
         viewModel.setup(intent.getStringExtra(LIST_ID)!!, intent.getStringExtra(PRODUCT_ID))
 
         setupToolbar()
-        initFabAddProduct()
+        setupFabAddProduct()
         setupInputName()
         setupInputInfo()
         setupInputAnnotations()
@@ -300,7 +300,7 @@ class AddEditProductActivity: MyActivity() {
     /**
      * Configura o botão de salvar produto (FAB).
      */
-    private fun initFabAddProduct() = binding.apply {
+    private fun setupFabAddProduct() = binding.apply {
         fabSave.setOnClickListener {
             root.clearFocus()
 

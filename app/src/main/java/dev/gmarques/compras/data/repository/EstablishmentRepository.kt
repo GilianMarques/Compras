@@ -39,8 +39,7 @@ object EstablishmentRepository {
 
     /**
      * Retorna uma lista de estabelecimentos com base no nome fornecido. O limite padrao de resultados é
-     * um numero que representa o valor maximo permitido pelo firebase, dentro do contexto da aplicação e pode ser limitado a
-     * 1 se necessário.
+     * o valor maximo permitido pelo firebase.
      */
     suspend fun getEstablishmentsByName(name: String, limit: Long = 10000): Result<List<Establishment>> {
         val querySnapshot = Firestore.establishmentsCollection().whereEqualTo("name", name)

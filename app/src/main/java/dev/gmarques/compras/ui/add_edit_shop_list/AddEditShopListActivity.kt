@@ -56,7 +56,7 @@ class AddEditShopListActivity: MyActivity() {
 
 
         setupToolbar()
-        initFabAddShopList()
+        setupFabAddShopList()
         setupInputName()
         setupInputColor()
         observeShopList()
@@ -112,7 +112,7 @@ class AddEditShopListActivity: MyActivity() {
     /**
      * Configura o botão de salvar categoria (FAB).
      */
-    private fun initFabAddShopList() = binding.apply {
+    private fun setupFabAddShopList() = binding.apply {
         fabSave.setOnClickListener {
             root.clearFocus()
 

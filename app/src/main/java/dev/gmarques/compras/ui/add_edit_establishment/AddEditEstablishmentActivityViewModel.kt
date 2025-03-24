@@ -32,16 +32,18 @@ class AddEditEstablishmentActivityViewModel : ViewModel() {
     suspend fun tryAndSaveEstablishment() = withContext(IO) {
 
         // se adicionando estabelecimento ou se durante a ediçao o usuario trocar o nome do estabelecimento, preciso verificar se o novo nome ja nao existe
-        val needCheckName = !editingEstablishment || editingEstablishmentLD.value!!.name != validatedName
+        val needCheckName =
+            !editingEstablishment || editingEstablishmentLD.value!!.name != validatedName
 
         if (needCheckName) {
-            val result = EstablishmentRepository.getEstablishmentsByName(validatedName,1)
+            val result = EstablishmentRepository.getEstablishmentsByName(validatedName, 1)
 
-            val establishmentDontExist = result.getOrNull() == null
+            val establishmentDontExist = result.getOrNull().isNullOrEmpty()
 
             if (establishmentDontExist) saveEstablishment()
             else {
-                val msg = String.format(App.getContext().getString(R.string.X_ja_existe), validatedName)
+                val msg =
+                    String.format(App.getContext().getString(R.string.X_ja_existe), validatedName)
                 _errorEventLD.postValue(msg)
             }
 
@@ -71,7 +73,6 @@ class AddEditEstablishmentActivityViewModel : ViewModel() {
             _editingEstablishmentLD.postValue(establishment!!)
         }
     }
-
 
 
 }

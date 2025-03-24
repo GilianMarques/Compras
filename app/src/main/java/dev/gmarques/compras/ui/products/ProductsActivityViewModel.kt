@@ -393,7 +393,7 @@ class ProductsActivityViewModel : ViewModel() {
 
 
     suspend fun loadCurrentEstablishment() {
-        val lastEstablishmentId = PreferencesHelper().getValue(PrefsKeys.LAST_MARKET_USED, "")
+        val lastEstablishmentId = PreferencesHelper().getValue(PrefsKeys.LAST_ESTABLISHMENT_USED, "")
         currentEstablishment = if (lastEstablishmentId.isNotEmpty()) EstablishmentRepository.getEstablishment(lastEstablishmentId) else null
         _establishmentEvent.postValue(currentEstablishment)
     }

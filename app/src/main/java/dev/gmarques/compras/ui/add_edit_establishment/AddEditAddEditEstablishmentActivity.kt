@@ -8,7 +8,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
-import dev.gmarques.compras.ui.MyActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +17,7 @@ import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.databinding.ActivityAddEditEstablishmentBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.ui.BsdSelectColor
+import dev.gmarques.compras.ui.MyActivity
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
 
@@ -31,7 +31,7 @@ class AddEditEstablishmentActivity: MyActivity() {
     private lateinit var viewModel: AddEditEstablishmentActivityViewModel
 
     companion object {
-        private const val MARKET_ID = "establishment_id"
+        private const val ESTABLISHMENT_ID = "establishment_id"
 
         fun newIntentAddEstablishment(context: Context): Intent {
             return Intent(context, AddEditEstablishmentActivity::class.java).apply {
@@ -40,10 +40,11 @@ class AddEditEstablishmentActivity: MyActivity() {
 
         fun newIntentEditEstablishment(context: Context, establishmentId: String): Intent {
             return Intent(context, AddEditEstablishmentActivity::class.java).apply {
-                putExtra(MARKET_ID, establishmentId)
+                putExtra(ESTABLISHMENT_ID, establishmentId)
             }
         }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +53,11 @@ class AddEditEstablishmentActivity: MyActivity() {
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this)[AddEditEstablishmentActivityViewModel::class.java]
-        viewModel.establishmentId = intent.getStringExtra(MARKET_ID)
+        viewModel.establishmentId = intent.getStringExtra(ESTABLISHMENT_ID)
 
 
         setupToolbar()
-        initFabAddEstablishment()
+        setupFabAddEstablishment()
         setupInputName()
         setupInputColor()
         observeEstablishment()
@@ -110,7 +111,7 @@ class AddEditEstablishmentActivity: MyActivity() {
     /**
      * Configura o botão de salvar estabelecimento (FAB).
      */
-    private fun initFabAddEstablishment() = binding.apply {
+    private fun setupFabAddEstablishment() = binding.apply {
         fabSave.setOnClickListener {
             root.clearFocus()
 
@@ -189,7 +190,6 @@ class AddEditEstablishmentActivity: MyActivity() {
                 binding.edtColor.clearFocus()
             }.build().show()
     }
-
 
     private fun resetFocus(edtTarget: AppCompatEditText, tvTarget: TextView) {
         edtTarget.setBackgroundResource(R.drawable.back_addproduct_edittext)

@@ -43,7 +43,7 @@ import dev.gmarques.compras.ui.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.categories.CategoriesActivity
 import dev.gmarques.compras.ui.stablishments.EstablishmentsActivity
-import dev.gmarques.compras.ui.stablishments.EstablishmentsActivity.Companion.SELECTED_MARKET
+import dev.gmarques.compras.ui.stablishments.EstablishmentsActivity.Companion.SELECTED_ESTABLISHMENT
 import dev.gmarques.compras.ui.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -434,12 +434,12 @@ class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.C
                 if (result.resultCode == Activity.RESULT_OK) {
                     val selectedEstablishment =
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            result.data!!.getSerializableExtra(SELECTED_MARKET, Establishment::class.java)
+                            result.data!!.getSerializableExtra(SELECTED_ESTABLISHMENT, Establishment::class.java)
                         } else @Suppress("DEPRECATION") result.data!!.getSerializableExtra(
-                            SELECTED_MARKET
+                            SELECTED_ESTABLISHMENT
                         ) as Establishment
 
-                    PreferencesHelper().saveValue(PrefsKeys.LAST_MARKET_USED, selectedEstablishment!!.id)
+                    PreferencesHelper().saveValue(PrefsKeys.LAST_ESTABLISHMENT_USED, selectedEstablishment!!.id)
                     lifecycleScope.launch { viewModel.loadCurrentEstablishment() }
                 }
             }

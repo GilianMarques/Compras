@@ -1,7 +1,6 @@
 package dev.gmarques.compras.ui.stablishments
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -31,7 +30,7 @@ class EstablishmentsActivity: MyActivity(), EstablishmentAdapter.Callback {
     companion object {
 
         const val SELECTION_MODE = "selection_mode"
-        const val SELECTED_MARKET = "selected_establishment"
+        const val SELECTED_ESTABLISHMENT = "selected_establishment"
 
         fun newIntent(context: Context, selectionMode: Boolean = false): Intent {
             return Intent(context, EstablishmentsActivity::class.java).apply {
@@ -144,7 +143,7 @@ class EstablishmentsActivity: MyActivity(), EstablishmentAdapter.Callback {
         if (!selectionMode) return
         Vibrator.interaction()
 
-        val resultIntent = Intent().apply { putExtra(SELECTED_MARKET, establishment) }
+        val resultIntent = Intent().apply { putExtra(SELECTED_ESTABLISHMENT, establishment) }
         setResult(Activity.RESULT_OK, resultIntent)
         finish()
     }
