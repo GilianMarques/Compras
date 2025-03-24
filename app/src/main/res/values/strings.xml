@@ -178,7 +178,7 @@
     <string name="Voce_nao_pode_aceitar_um_convite_enquanto">Você não pode aceitar um convite enquanto estiver conectado a outra conta como convidado ou anfitrião.</string>
     <string name="Voce_gostaria_de_manter_os_dados_atuais_na_sua_conta">Você gostaria de manter os dados atuais da conta ou ficar com os dados antigos que tinha antes de se conectar a %1$s?\n\nEscolha com cautela por que não é possível desfazer essa ação.</string>
     <string name="Como_deseja_prosseguir">Como deseja prosseguir?</string>
-    <string name="Manter_dados_atuais">manter dados atuais</string>
+    <string name="Manter_dados_atuais">Manter dados atuais</string>
     <string name="Ficar_com_dados_antigos">Ficar com dados antigos</string>
     <string name="O_sincronismo_entre_contas_foi_interrompido_reinicie_">O sincronismo entre contas foi interrompido. Reinicie o app para aplicar as alterações.</string>
 
@@ -208,5 +208,9 @@
     <string name="Nulo">nulo</string>
     <string name="Anotacoes_do_produto">Anotações do produto</string>
     <string name="Ok">Ok</string>
+    <string name="Esta_versao_do_app_foi_bloqueada_verifique_atualiza_es_na_play_store">Esta versão do app %1$s foi bloqueada, verifique atualizações na play store</string>
+    <string name="Ir_a_loja">Ir a loja</string>
+    <string name="Nova_versao_disponivel">Nova versão disponível</string>
+    <string name="Uma_nova_vers_o_do_app_est_dispon_vel_na_loja">Uma nova versão do app está disponível na loja!</string>
 
 </resources>

@@ -1,6 +1,5 @@
 package dev.gmarques.compras.data.repository
 
-import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
@@ -98,7 +97,6 @@ object ProductRepository {
         return !productsSnapshot.isEmpty
     }
 
-
     /**
      * Verifica se há pelo menos um produto ou sugestão associado ao ID de estabelecimento fornecido.
      * @param establishmentId ID do estabelecimento a ser verificada.
@@ -132,7 +130,6 @@ object ProductRepository {
                 }
             })
     }
-
 
     /**
      * Remove todos os produtos associados a uma lista de compras do Firestore.

@@ -1,6 +1,7 @@
 package dev.gmarques.compras.data.firestore.migration
 
 import android.util.Log
+import com.google.firebase.firestore.getField
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Category
@@ -18,7 +19,9 @@ class Migration_1_2 {
         migrateProducts()
         migrateSuggestionProducts()
         migrateEstablishments()
+
     }
+
 
     private suspend fun migrateProducts() {
         Firestore.productsCollection().get().await().forEach {

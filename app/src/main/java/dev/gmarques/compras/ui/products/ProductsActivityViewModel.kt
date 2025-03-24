@@ -301,7 +301,7 @@ class ProductsActivityViewModel : ViewModel() {
             product.copy(
                 hasBeenBought = isBought,
                 boughtDate = System.currentTimeMillis(),
-                marketId = currentEstablishment?.id
+                establishmentId = currentEstablishment?.id
             )
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }

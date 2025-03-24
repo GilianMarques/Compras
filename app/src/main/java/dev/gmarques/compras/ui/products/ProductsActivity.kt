@@ -2,10 +2,8 @@ package dev.gmarques.compras.ui.products
 
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View.GONE
@@ -14,7 +12,7 @@ import android.view.animation.AnticipateInterpolator
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -26,7 +24,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.ANIMATION_MODE_SLIDE
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
 import com.google.android.material.snackbar.Snackbar
-import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
@@ -57,7 +54,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.max
 import kotlin.math.min
 
-class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
+class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
 
     private var uiState: ProductsActivityViewModel.UiState? = null
     private lateinit var establishmentResultLauncher: ActivityResultLauncher<Intent>
@@ -257,7 +254,7 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
     }
 
     private fun setupRecyclerViewProducts() {
-        rvAdapterProducts = ProductAdapter(isDarkThemeEnabled(), this@ProductsActivity)
+        rvAdapterProducts = ProductAdapter(this@ProductsActivity)
 
         val dragDropHelper = ProductDragDropHelperCallback(rvAdapterProducts)
         val touchHelper = ItemTouchHelper(dragDropHelper)
@@ -429,11 +426,6 @@ class ProductsActivity : AppCompatActivity(), ProductAdapter.Callback, CategoryA
         }
     }
 
-    private fun isDarkThemeEnabled(): Boolean {
-        val nightModeFlags =
-            App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
-    }
 
     private fun setupActivityResultLauncher() {
 

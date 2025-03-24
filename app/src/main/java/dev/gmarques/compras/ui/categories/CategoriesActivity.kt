@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Spanned
 import android.view.View.GONE
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +23,7 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_category.AddEditCategoryActivity
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 
-class CategoriesActivity : AppCompatActivity(), CategoryAdapter.Callback {
+class CategoriesActivity: MyActivity(), CategoryAdapter.Callback {
 
     private var fabHidden: Boolean = false
     private var selectionMode: Boolean = false

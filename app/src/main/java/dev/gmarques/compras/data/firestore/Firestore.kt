@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.BuildConfig
@@ -73,9 +74,7 @@ class Firestore {
         suspend fun wasLocalUserDisconnectedFromHost(): Boolean {
             if (!amIaGuest) return false
             // verifico no db do anfitriao se existe algum convidado com o email do usuario local
-            return !guestsCollection(dataHostEmail)
-                .document(localUserEmail).get().await()
-                .exists()
+            return !guestsCollection(dataHostEmail).document(localUserEmail).get().await().exists()
         }
 
         // Raiz do banco de dados
@@ -86,9 +85,7 @@ class Firestore {
          * */
         fun rootCollection(targetEmail: String = localUserEmail): CollectionReference {
 
-            return Firebase.firestore.collection(environment)
-                .document(USERS)
-                .collection(targetEmail)
+            return Firebase.firestore.collection(environment).document(USERS).collection(targetEmail)
         }
 
         // dados compartilhaveis
@@ -101,9 +98,7 @@ class Firestore {
          * dados do usuario local ou de seu anfitriao caso haja algum
          */
         fun shopListsCollection(targetEmail: String = this.dataHostEmail): CollectionReference {
-            return rootCollection(targetEmail)
-                .document(USER_DATA)
-                .collection(SHOP_LISTS)
+            return rootCollection(targetEmail).document(USER_DATA).collection(SHOP_LISTS)
         }
 
         /**
@@ -115,9 +110,7 @@ class Firestore {
          * dados do usuario local ou de seu anfitriao caso haja algum
          */
         fun categoriesCollection(targetEmail: String = this.dataHostEmail): CollectionReference {
-            return rootCollection(targetEmail)
-                .document(USER_DATA)
-                .collection(CATEGORIES)
+            return rootCollection(targetEmail).document(USER_DATA).collection(CATEGORIES)
         }
 
         /**
@@ -129,9 +122,7 @@ class Firestore {
          * dados do usuario local ou de seu anfitriao caso haja algum
          */
         fun establishmentsCollection(targetEmail: String = this.dataHostEmail): CollectionReference {
-            return rootCollection(targetEmail)
-                .document(USER_DATA)
-                .collection(ESTABLISHMENTS)
+            return rootCollection(targetEmail).document(USER_DATA).collection(ESTABLISHMENTS)
         }
 
         /**
@@ -143,9 +134,7 @@ class Firestore {
          * dados do usuario local ou de seu anfitriao caso haja algum
          */
         fun productsCollection(targetEmail: String = this.dataHostEmail): CollectionReference {
-            return rootCollection(targetEmail)
-                .document(USER_DATA)
-                .collection(PRODUCTS)
+            return rootCollection(targetEmail).document(USER_DATA).collection(PRODUCTS)
         }
 
         /**
@@ -157,8 +146,7 @@ class Firestore {
          * dados do usuario local ou de seu anfitriao caso haja algum
          */
         fun suggestionProductsCollection(targetEmail: String = this.dataHostEmail): CollectionReference {
-            return rootCollection(targetEmail).document(USER_DATA)
-                .collection(SUGGESTION_PRODUCTS)
+            return rootCollection(targetEmail).document(USER_DATA).collection(SUGGESTION_PRODUCTS)
         }
 
         // dados de colaboração
@@ -169,8 +157,7 @@ class Firestore {
          * @param targetEmail o endereço de email do banco de dados do usuario que receberá o convite.
          * */
         fun syncInvitesCollection(targetEmail: String = this.localUserEmail): CollectionReference {
-            return Firebase.firestore.collection(environment).document(USERS)
-                .collection(targetEmail).document(COLLABORATION)
+            return Firebase.firestore.collection(environment).document(USERS).collection(targetEmail).document(COLLABORATION)
                 .collection(SYNC_INVITES)
         }
 
@@ -179,9 +166,7 @@ class Firestore {
          * @param targetEmail o endereço de email do usuario alvo
          */
         fun guestsCollection(targetEmail: String = this.localUserEmail): CollectionReference {
-            return rootCollection(targetEmail)
-                .document(COLLABORATION)
-                .collection(GUESTS)
+            return rootCollection(targetEmail).document(COLLABORATION).collection(GUESTS)
 
         }
 
@@ -191,17 +176,14 @@ class Firestore {
          * observar alterações no documento de anfitriao.
          */
         fun hostCollection(): CollectionReference {
-            return rootCollection()
-                .document(COLLABORATION)
-                .collection(HOST)
+            return rootCollection().document(COLLABORATION).collection(HOST)
         }
 
         /**
          * Referencia ao documento no db do usuario local, onde ficam os dados do anfitriao do qual o usuario local é convidado.
          */
         fun hostDocument(): DocumentReference {
-            return hostCollection()
-                .document(HOST_DATA)
+            return hostCollection().document(HOST_DATA)
         }
 
         // dados privados do usuario

@@ -3,8 +3,8 @@ package dev.gmarques.compras.ui.main
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
+import dev.gmarques.compras.data.firestore.FirebaseCloneDatabase
 import dev.gmarques.compras.data.firestore.migration.Migration_1_2
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
@@ -26,21 +27,22 @@ import dev.gmarques.compras.data.repository.model.ValidatedProduct
 import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.databinding.ActivityMainBinding
+import dev.gmarques.compras.ui.MyActivity
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.products.ProductsActivity
 import dev.gmarques.compras.ui.profile.ProfileActivity
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : MyActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
-    private val rvAdapter = ShopListAdapter(isDarkThemeEnabled(), ::rvItemClick, ::rvLongItemClick)
-
+    private val rvAdapter = ShopListAdapter(::rvItemClick, ::rvLongItemClick)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +58,9 @@ class MainActivity : AppCompatActivity() {
         observeListsUpdates()
 
         //   lifecycleScope.launch { populateForTest() }
+        // lifecycleScope.launch { Migration_1_2().beginMigration() }
+     //   lifecycleScope.launch { FirebaseCloneDatabase("gilian762@gmail.com", "vizzualserigrafia@gmail.com").beginCloning() }
+
     }
 
     private suspend fun populateForTest() = repeat(5) {
@@ -83,12 +88,6 @@ class MainActivity : AppCompatActivity() {
         }
         ShopListRepository.addOrUpdateShopList(ValidatedShopList(list))
         CategoryRepository.addOrUpdateCategory(ValidatedCategory(category))
-    }
-
-    private fun isDarkThemeEnabled(): Boolean {
-        val nightModeFlags =
-            App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun attUiWithUserData(user: FirebaseUser) = binding.apply {

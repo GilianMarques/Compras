@@ -8,7 +8,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
  * Activity para adicionar ou editar estabelecimentos em uma lista.
  * Implementada seguindo o padrão MVVM e princípios de Clean Code e SOLID.
  */
-class AddEditEstablishmentActivity : AppCompatActivity() {
+class AddEditEstablishmentActivity: MyActivity() {
 
     private lateinit var binding: ActivityAddEditEstablishmentBinding
     private lateinit var viewModel: AddEditEstablishmentActivityViewModel

@@ -114,7 +114,7 @@ class BsdDisconnectAccount(
     }
 
     private fun disconnectFromHost(cloneData: Boolean) = lifecycleScope.launch(IO) {
-
+        binding.fabDisconnect.isEnabled = false
         App.getContext().toggleGuestListener(false)
 
         val result = UserRepository.disconnectFromHost(account, cloneData)

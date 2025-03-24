@@ -20,7 +20,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.ui.Vibrator
 import java.util.Collections
 
-class ProductAdapter(private val darkModeEnabled: Boolean, val callback: Callback) :
+class ProductAdapter(val callback: Callback) :
     ListAdapter<ProductWithCategory, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
 
     private var itemTouchHelper: ItemTouchHelper? = null

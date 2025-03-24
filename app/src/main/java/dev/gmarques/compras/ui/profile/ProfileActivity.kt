@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -26,7 +26,7 @@ import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity: MyActivity() {
 
     private var state: ProfileActivityViewModel.UiState? = null
     private lateinit var binding: ActivityProfileBinding
@@ -203,7 +203,6 @@ class ProfileActivity : AppCompatActivity() {
                 }.show()
         }
     }
-
 
     private fun setupSendInvite() {
         binding.tvSendInvite.setOnClickListener {

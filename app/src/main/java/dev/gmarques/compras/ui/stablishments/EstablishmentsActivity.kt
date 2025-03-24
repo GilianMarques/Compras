@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View.GONE
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +20,7 @@ import dev.gmarques.compras.databinding.ActivityEstablishmentsBinding
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_establishment.AddEditEstablishmentActivity
 
-class EstablishmentsActivity : AppCompatActivity(), EstablishmentAdapter.Callback {
+class EstablishmentsActivity: MyActivity(), EstablishmentAdapter.Callback {
 
     private var fabHidden: Boolean = false
     private var selectionMode: Boolean = false

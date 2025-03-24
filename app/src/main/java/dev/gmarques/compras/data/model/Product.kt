@@ -23,7 +23,7 @@ data class Product(
     val shopListId: String,
     val categoryId: String,
     val position: Int = -1,
-    val marketId: String? = null,
+    val establishmentId: String? = null,
     val id: String = getNewId(),
     val boughtDate: Long = System.currentTimeMillis(),
     val creationDate: Long = System.currentTimeMillis(),

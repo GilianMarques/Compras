@@ -2,7 +2,7 @@ package dev.gmarques.compras.ui.login
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes.DEVELOPER_ERROR
 import com.firebase.ui.auth.ErrorCodes.NO_NETWORK
@@ -18,7 +18,7 @@ import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.splash.SplashActivity
 import java.text.MessageFormat
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity: MyActivity() {
 
     private lateinit var binding: ActivityLoginBinding
 

@@ -15,7 +15,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.doOnTextChanged
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
  * Activity para adicionar ou editar produtos em uma lista.
  * Implementada seguindo o padrão MVVM e princípios de Clean Code e SOLID.
  */
-class AddEditProductActivity : AppCompatActivity() {
+class AddEditProductActivity: MyActivity() {
 
     private var currentState: AddEditProductActivityViewModel.UiState? = null
     private lateinit var categoryResultLauncher: ActivityResultLauncher<Intent>

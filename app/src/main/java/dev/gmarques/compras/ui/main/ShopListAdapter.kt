@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.databinding.RvItemShopListBinding
@@ -15,7 +16,6 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.adjustSaturation
 import kotlin.math.min
 
 class ShopListAdapter(
-    val darkModeEnable: Boolean,
     private val onItemClick: (ShopList) -> Any,
     private val onLongItemClick: (ShopList) -> Any,
 ) :
@@ -51,7 +51,7 @@ class ShopListAdapter(
                 if (this is GradientDrawable) setColor(saturatedColor)
             }
 
-            if (!darkModeEnable) (cvChild.background as? GradientDrawable)!!.apply {
+            if (!App.getContext().darkModeEnabled) (cvChild.background as? GradientDrawable)!!.apply {
                 mutate()
                 setColor(shopList.color)
                 setStroke(0, Color.TRANSPARENT)

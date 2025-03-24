@@ -8,7 +8,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +17,7 @@ import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.databinding.ActivityAddEditCategoryBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.ui.BsdSelectColor
+import dev.gmarques.compras.ui.MyActivity
 import dev.gmarques.compras.ui.Vibrator
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.ui.add_edit_shop_list.AddEditShopListActivityViewModel
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
  * Activity para adicionar ou editar categorias em uma lista.
  * Implementada seguindo o padrão MVVM e princípios de Clean Code e SOLID.
  */
-class AddEditCategoryActivity : AppCompatActivity() {
+class AddEditCategoryActivity: MyActivity() {
 
     private lateinit var binding: ActivityAddEditCategoryBinding
     private lateinit var viewModel: AddEditCategoryActivityViewModel

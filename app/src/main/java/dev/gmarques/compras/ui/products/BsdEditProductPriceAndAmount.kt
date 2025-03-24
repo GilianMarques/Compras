@@ -182,7 +182,7 @@ class BsdEditProduct private constructor() {
             info = newInfo,
             hasBeenBought = true,
             boughtDate = System.currentTimeMillis(),
-            marketId = currentEstablishment?.id
+            establishmentId = currentEstablishment?.id
         )
         else editProduct.copy(
             quantity = newQuantity, price = newPrice, info = newInfo

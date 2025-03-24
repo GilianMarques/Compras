@@ -2,12 +2,12 @@ package dev.gmarques.compras.ui.sync_stopped
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import dev.gmarques.compras.App
 import dev.gmarques.compras.databinding.ActivitySyncStoppedBinding
 import dev.gmarques.compras.ui.Vibrator
 
-class SyncStoppedActivity : AppCompatActivity() {
+class SyncStoppedActivity: MyActivity() {
 
     private lateinit var binding: ActivitySyncStoppedBinding
 

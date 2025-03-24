@@ -1,12 +1,22 @@
 package dev.gmarques.compras.data.firestore
 
+import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.getField
 import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import kotlin.system.measureTimeMillis
 
 /**
  * Essa classe faz uma copia do banco de dados de um determinado usuario.
@@ -24,8 +34,11 @@ class FirebaseCloneDatabase(
 
     suspend fun beginCloning() {
 
+        Log.d("USUK", "FirebaseCloneDatabase.beginCloning: inicio de clonagem")
         if (cleanTargetBeforeCloning) cleanDatabase()
-        cloneDatabase()
+
+        val totalTime = measureTimeMillis { cloneDatabase() }
+        Log.d("USUK", "FirebaseCloneDatabase.beginCloning: tempo de clonagem: ${totalTime / 1000} segs")
 
 
     }
@@ -35,24 +48,29 @@ class FirebaseCloneDatabase(
      * ou até mesmo erros por conta de dados antigos no database que nao foram migrados com o passar do tempo
      * */
     private suspend fun cleanDatabase() {
-
         getTargetCollections().forEach {
             it.get().await().forEach { targetDoc ->
-                targetDoc.reference.delete().await()
-            }
-
-        }
-    }
-
-    private suspend fun cloneDatabase() {
-
-        getSetsOfCollections().forEach { (baseCollection, objClass, targetCollection) ->
-            baseCollection.get().await().forEach { baseDoc ->
-                val obj = baseDoc.toObject(objClass)
-                targetCollection.document(baseDoc.getField<String>("id")!!).set(obj).await()
+                targetDoc.reference.delete()
             }
         }
     }
+
+    private suspend fun cloneDatabase() = withContext(IO) {
+        coroutineScope { // Organizo os jobs dentro do escopo da corrotina
+
+            getSetsOfCollections().forEach { (baseCollection, objClass, targetCollection) ->
+
+                // Uso launch para clonar todas as coleções em paralelo
+                launch {
+                    baseCollection.get().await().forEach { baseDoc ->
+                        val obj = baseDoc.toObject(objClass)
+                        launch { targetCollection.document(baseDoc.getField<String>("id")!!).set(obj).await() }
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Uma lista contendo as coleções base,alvo e tipo de objeto

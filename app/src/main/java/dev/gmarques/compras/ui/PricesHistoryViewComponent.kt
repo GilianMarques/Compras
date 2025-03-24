@@ -1,7 +1,6 @@
 package dev.gmarques.compras.ui
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
@@ -59,16 +57,19 @@ class PricesHistoryViewComponent(
 
         val priceHistories = mutableListOf<PriceHistory>()
 
-        val products = async {
+        val productsJob = async {
             ProductRepository.getHistoryPricesProducts(product.name).getOrThrow().sortedBy { it.boughtDate }
-        }.await()
+        }
 
-        val establishments = async {
+        val establishmentsJob = async {
             EstablishmentRepository.getAllEstablishments().getOrThrow().associateBy { it.id }
-        }.await()
+        }
+
+        val establishments = establishmentsJob.await()
+        val products = productsJob.await()
 
         products.forEach {
-            val establishment = establishments[it.marketId]
+            val establishment = establishments[it.establishmentId]
 
             priceHistories.add(PriceHistory(it.price, establishment?.name ?: nulo, establishment?.color ?: -1))
         }

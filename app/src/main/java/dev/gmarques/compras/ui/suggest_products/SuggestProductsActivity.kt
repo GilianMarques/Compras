@@ -8,7 +8,7 @@ import android.text.Spanned
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.activity.addCallback
-import androidx.appcompat.app.AppCompatActivity
+import dev.gmarques.compras.ui.MyActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -26,7 +26,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
 
-class SuggestProductsActivity : AppCompatActivity() {
+class SuggestProductsActivity: MyActivity() {
 
     private lateinit var viewModel: SuggestProductsActivityViewModel
     private lateinit var binding: ActivitySuggestProductsBinding
