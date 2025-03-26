@@ -1,14 +1,13 @@
 package dev.gmarques.compras.ui.profile
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import dev.gmarques.compras.ui.MyActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.firebase.ui.auth.AuthUI
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
@@ -22,9 +21,11 @@ import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.databinding.ActivityProfileBinding
 import dev.gmarques.compras.databinding.ItemGuestOrHostBinding
 import dev.gmarques.compras.databinding.ItemSyncInviteBinding
+import dev.gmarques.compras.ui.MyActivity
 import dev.gmarques.compras.ui.Vibrator
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
+
 
 class ProfileActivity: MyActivity() {
 
@@ -46,7 +47,22 @@ class ProfileActivity: MyActivity() {
         setupLogOff()
         observeStateUpdates()
         setupDebugOptions()
+        setupDeleteAccount()
 
+    }
+
+    private fun setupDeleteAccount() {
+        // TODO: fazer acontecer
+
+        /*AuthUI.getInstance()
+            .delete(this)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Deletion succeeded
+                } else {
+                    // Deletion failed
+                }
+            }*/
     }
 
     private fun setupDebugOptions() = binding.apply {
