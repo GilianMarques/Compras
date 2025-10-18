@@ -94,7 +94,7 @@ class ProductAdapter(val callback: Callback) :
 
                 tvProductName.text = product.name
                 tvProductInfo.text = product.info
-                tvProductPrice.text = product.price.toCurrency()
+                tvProductPrice.text = (product.quantity * product.price).toCurrency()
                 tvProductQuantity.text = String.format(App.getContext().getString(R.string.un), product.quantity)
                 cbBought.isChecked = product.hasBeenBought
                 tvCategoryName.text = productWithCategory.category.name

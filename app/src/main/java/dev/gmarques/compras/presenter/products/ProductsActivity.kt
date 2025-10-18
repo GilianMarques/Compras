@@ -100,7 +100,7 @@ class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.C
         suggestProductsIfNeeded(shopListId)
         observeEstablishmentChangeEvents()
         setupActivityResultLauncher()
-        lifecycleScope.launch { delay(1000);confirmEstablishment() }
+        lifecycleScope.launch { delay(1000); confirmEstablishment() }
     }
 
     private fun observeEstablishmentChangeEvents() {
