@@ -245,6 +245,20 @@
                     tools:text="@string/Nome_do_produto_ex_macarrao_parafuso"
                     tools:visibility="visible" />
 
+
+                <CheckBox
+                    android:id="@+id/cb_bought"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:checked="false"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/Produto_est_comprado" />
+
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>

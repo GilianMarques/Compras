@@ -15,7 +15,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import dev.gmarques.compras.presenter.MyActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.doOnTextChanged
@@ -35,6 +34,7 @@ import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
+import dev.gmarques.compras.presenter.MyActivity
 import dev.gmarques.compras.presenter.PricesHistoryViewComponent
 import dev.gmarques.compras.presenter.Vibrator
 import dev.gmarques.compras.presenter.categories.CategoriesActivity
@@ -98,6 +98,7 @@ class AddEditProductActivity: MyActivity() {
         setupInputPrice()
         setupInputQuantity()
         setupInputCategory()
+        setupcbBought()
         observeUiStateChanges()
         setupActivityResultLauncher()
         setDefValuesIfAny()
@@ -474,6 +475,12 @@ class AddEditProductActivity: MyActivity() {
             }
         }
 
+    }
+
+    private fun setupcbBought() = with(binding) {
+        cbBought.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.productIsBought = isChecked
+        }
     }
 
     /**

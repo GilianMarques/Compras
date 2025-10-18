@@ -38,6 +38,7 @@ class AddEditProductActivityViewModel : ViewModel() {
     var validatedPrice: Double = -1.0
     var validatedQuantity: Int = -1
     var validatedCategory: Category? = null
+    var productIsBought = false
     var canLoadSuggestion: Boolean = true
 
     // objeto usado para prover sugestoes de nomes de produtos
@@ -83,7 +84,8 @@ class AddEditProductActivityViewModel : ViewModel() {
             quantity = validatedQuantity,
             info = validatedInfo,
             annotations = validatedAnnotation,
-            categoryId = validatedCategory!!.id
+            categoryId = validatedCategory!!.id,
+            hasBeenBought = productIsBought
 
         )
         else Product(
@@ -94,7 +96,8 @@ class AddEditProductActivityViewModel : ViewModel() {
             annotations = validatedAnnotation,
             shopListId = listId,
             categoryId = validatedCategory!!.id,
-            position = 0
+            position = 0,
+            hasBeenBought = productIsBought
         )
 
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
