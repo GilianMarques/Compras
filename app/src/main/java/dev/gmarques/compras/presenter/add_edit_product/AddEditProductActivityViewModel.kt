@@ -162,17 +162,14 @@ class AddEditProductActivityViewModel : ViewModel() {
 
     }
 
-
     data class UiState(
         val editingProduct: Product? = null,
         val editingCategory: Category? = null,
         val suggestionProductAndCategory: Pair<Product, Category>? = null,
         val productsAndNamesSuggestions: List<Any> = emptyList(),
         val errorMessage: String = "",
+        var productIsBought: Boolean = false,
         val finishActivity: Boolean = false,
-    ) {
-
-
-    }
+    )
 
 }

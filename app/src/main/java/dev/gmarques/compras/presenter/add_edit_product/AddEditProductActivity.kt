@@ -98,7 +98,7 @@ class AddEditProductActivity: MyActivity() {
         setupInputPrice()
         setupInputQuantity()
         setupInputCategory()
-        setupcbBought()
+        setupCbBought()
         observeUiStateChanges()
         setupActivityResultLauncher()
         setDefValuesIfAny()
@@ -284,6 +284,9 @@ class AddEditProductActivity: MyActivity() {
 
                 edtCategory.hint = category.name
                 (edtCategory.compoundDrawables[0].mutate() as? VectorDrawable)?.setTint(category.color)
+
+                cbBought.isChecked = product.hasBeenBought
+                productIsBought = product.hasBeenBought
 
                 validatedCategory = category
 
@@ -477,7 +480,7 @@ class AddEditProductActivity: MyActivity() {
 
     }
 
-    private fun setupcbBought() = with(binding) {
+    private fun setupCbBought() = with(binding) {
         cbBought.setOnCheckedChangeListener { _, isChecked ->
             viewModel.productIsBought = isChecked
         }
