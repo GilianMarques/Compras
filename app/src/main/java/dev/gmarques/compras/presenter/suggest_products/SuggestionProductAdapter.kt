@@ -87,7 +87,7 @@ class SuggestionProductAdapter(
                 }
 
                 tvPlus.setOnClickListener {
-                    if (sp.quantity <= Product.Validator.MAX_QUANTITY) {
+                    if (sp.quantity < Product.Validator.MAX_QUANTITY) {
                         sp.quantity++
                         onSelectionDataChangedListener(sp)
                         updateView()

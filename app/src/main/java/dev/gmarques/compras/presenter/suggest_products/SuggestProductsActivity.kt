@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.activity.addCallback
-import dev.gmarques.compras.presenter.MyActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -19,8 +18,9 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.ActivitySuggestProductsBinding
 import dev.gmarques.compras.domain.model.SelectableProduct
-
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
+import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
+import dev.gmarques.compras.presenter.MyActivity
 import dev.gmarques.compras.presenter.Vibrator
 import kotlinx.coroutines.launch
 
@@ -59,6 +59,7 @@ class SuggestProductsActivity: MyActivity() {
         initSearch()
         initFabIncludeProducts()
         observeProductsUpdates()
+        observeSelectionUpdates()
         observeViewmodelErrorMessages()
         setupOnBackPressed()
     }
@@ -109,7 +110,23 @@ class SuggestProductsActivity: MyActivity() {
                     false -> Vibrator.success()
                 }
             }
+
         }
+    }
+
+    private fun observeSelectionUpdates() {
+        viewModel.updatedSelectionDataLD.observe(this) { newData ->
+            updateListPrice(newData)
+        }
+    }
+
+    private fun updateListPrice(selectionData: HashMap<String, Pair<Boolean, Int>>) = with(binding) {
+        val totalPrice = selectionData.filter { it.value.first/*esta selecionado?*/ }
+            .map { entry -> viewModel.productsLD.value!!.first { it.product.id == entry.key } }
+            .sumOf { it.product.price * it.quantity }
+
+        tvPriceList.text = totalPrice.toCurrency()
+
     }
 
     private fun observeViewmodelErrorMessages() = lifecycleScope.launch {

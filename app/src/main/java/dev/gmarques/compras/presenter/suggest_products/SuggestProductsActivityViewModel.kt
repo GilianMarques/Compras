@@ -30,8 +30,9 @@ class SuggestProductsActivityViewModel : ViewModel() {
     private lateinit var shopListId: String
     private var searchTerm: String = ""
 
-    // necessario para que os dados de seleçao não se percam caso haja uma mudança de tela ou atualização no banco de dados
-    private val updatedSelectionData = HashMap<String, Pair<Boolean, Int>>()
+    /**necessario para que os dados de seleçao não se percam caso haja uma mudança de tela ou atualização no banco de dados*/
+    private val _updatedSelectionDataLD = MutableLiveData(hashMapOf<String, Pair<Boolean, Int>>())
+    val updatedSelectionDataLD: LiveData<HashMap<String, Pair<Boolean, Int>>> get() = _updatedSelectionDataLD
 
     private lateinit var productsToBePosted: List<SelectableProduct>
 
@@ -85,20 +86,19 @@ class SuggestProductsActivityViewModel : ViewModel() {
     }
 
     /**
-     * Aplica os termos de busca do usuario, caso hajam, aproveita o loop para carregar as categorias
+     * Aplica os termos de busca do usuario, caso hajam
      */
     private fun filterAndCreateSelectableProducts(lists: List<Product>?): MutableList<SelectableProduct> {
 
         val filteredProducts = mutableListOf<SelectableProduct>()
 
-        for (i in lists!!.indices) {
+        for (p in lists!!.indices) {
 
-            val product = lists[i]
+            val product = lists[p]
 
             if (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true)) {
 
-                val (selected, quantity) = updatedSelectionData[product.id]
-                    ?: (false to product.quantity)
+                val (selected, quantity) = _updatedSelectionDataLD.value!![product.id] ?: (false to product.quantity)
                 filteredProducts.add(SelectableProduct(product, selected, quantity))
             }
         }
@@ -164,21 +164,23 @@ class SuggestProductsActivityViewModel : ViewModel() {
         var repeatedProductsCount = 0
         val currentShopListProductsNames = ProductRepository.getProducts(shopListId)
 
-        updatedSelectionData.keys.forEach { key ->
-            delay(250)
-            val (selected, quantity) = updatedSelectionData[key] ?: (false to -1)
+        _updatedSelectionDataLD.value!!.keys.forEach { key ->
+            val (selected, quantity) = _updatedSelectionDataLD.value!![key] ?: (false to -1)
 
-            if (selected) {
-                val product = SuggestionProductRepository.getSuggestionProduct(key)
+            if (!selected) return@forEach
 
-                if (currentShopListProductsNames.contains(product.name)) repeatedProductsCount++
-                else {
-                    val newProduct = product.copy(
-                        shopListId = shopListId, quantity = quantity, hasBeenBought = false
-                    ).withNewId()
-                    saveProduct(product, newProduct)
-                }
+            val product = SuggestionProductRepository.getSuggestionProduct(key)
+
+            if (currentShopListProductsNames.contains(product.name)) {
+                repeatedProductsCount++
+                return@forEach
             }
+
+            val newProduct = product.copy(
+                shopListId = shopListId, quantity = quantity, hasBeenBought = false
+            ).withNewId()
+            saveProduct(product, newProduct)
+
         }
     }
 
@@ -196,7 +198,8 @@ class SuggestProductsActivityViewModel : ViewModel() {
     }
 
     fun updateSelectionData(sp: SelectableProduct) {
-        updatedSelectionData[sp.product.id] = sp.isSelected to sp.quantity
+        val x = _updatedSelectionDataLD.value!!.apply { this[sp.product.id] = sp.isSelected to sp.quantity }
+        _updatedSelectionDataLD.postValue(x)
     }
 
 }

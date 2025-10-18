@@ -22,7 +22,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 tools:context=".presenter.products.ProductsActivity">
 
                 <include
@@ -39,10 +39,7 @@
                     android:layout_width="0dp"
                     android:layout_height="42dp"
                     android:layout_gravity="center"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginBottom="32dp"
+                    android:layout_marginStart="16dp"
                     android:background="@drawable/back_round"
                     android:drawableStart="@drawable/vec_search"
                     android:drawablePadding="16dp"
@@ -52,8 +49,7 @@
                     android:inputType="textCapSentences"
                     android:paddingStart="16dp"
                     android:paddingEnd="48dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/cl_bottom_bar"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/toolbar"
                     tools:text="Pesquisa bem comprida pra preencher" />
@@ -75,6 +71,53 @@
                     app:layout_constraintEnd_toEndOf="@id/edt_search"
                     app:layout_constraintTop_toTopOf="@id/edt_search"
                     tools:visibility="visible" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_bottom_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:paddingStart="16dp"
+                    android:paddingTop="0dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="0dp"
+                    app:layout_constraintBottom_toBottomOf="@id/edt_search"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/edt_search"
+                    app:layout_constraintTop_toTopOf="@id/edt_search">
+
+                    <TextView
+                        android:id="@+id/tv_price_list_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lexend_deca"
+                        android:paddingStart="8dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="@string/Valor_da_lista"
+                        android:textAlignment="center"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toTopOf="@id/tv_price_list"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tv_price_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lexend_deca_bold"
+                        android:paddingBottom="8dp"
+                        android:textAlignment="center"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        tools:text="R$ 4.499,95" />
+                    />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <View
                     android:id="@+id/divider"
