@@ -109,7 +109,7 @@ data class Product(
             const val MIN_QUANTITY = 1
             const val MAX_QUANTITY = 99
             private const val MAX_CHARS_INFO = 50
-            private const val MAX_CHARS_ANNOTATIOS = 500
+            private const val MAX_CHARS_ANNOTATIONS = 500
             private const val MAX_CHARS_NAME = 30
             private const val MIN_CHARS_NAME = 3
             private const val MAX_PRICE = 9_999.99
@@ -180,7 +180,7 @@ data class Product(
 
                 return when {
 
-                    annotation.length > MAX_CHARS_ANNOTATIOS -> Result.failure(
+                    annotation.length > MAX_CHARS_ANNOTATIONS -> Result.failure(
                         Exception(
                             String.format(
                                 context.getString(As_anotacoes_devem_ter_ate_x_caracteres),

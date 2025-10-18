@@ -62,7 +62,7 @@ class ShopListAdapter(
             itemView.clearAnimation()
             itemView.alpha = 0f
             itemView.animate().alpha(1f).setDuration(450)
-                .setStartDelay(min(50L * adapterPosition, 500)).start()
+                .setStartDelay(min(50L * absoluteAdapterPosition, 500)).start()
         }
 
     }

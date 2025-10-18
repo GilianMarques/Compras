@@ -21,7 +21,7 @@ class CategoryDragDropHelperCallback(private val adapter: CategoryAdapter) : Ite
         target: RecyclerView.ViewHolder,
     ): Boolean {
 
-        adapter.moveCategory(viewHolder.adapterPosition, target.adapterPosition)
+        adapter.moveCategory(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition)
         return true
     }
 

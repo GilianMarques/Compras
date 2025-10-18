@@ -21,7 +21,7 @@ class ProductDragDropHelperCallback(private val adapter: ProductAdapter) : ItemT
         target: RecyclerView.ViewHolder,
     ): Boolean {
 
-        adapter.moveProduct(viewHolder.adapterPosition, target.adapterPosition)
+        adapter.moveProduct(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition)
         return true
     }
 

@@ -21,7 +21,7 @@ class EstablishmentDragDropHelperCallback(private val adapter: EstablishmentAdap
         target: RecyclerView.ViewHolder,
     ): Boolean {
 
-        adapter.moveEstablishment(viewHolder.adapterPosition, target.adapterPosition)
+        adapter.moveEstablishment(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition)
         return true
     }
 

@@ -115,8 +115,7 @@ object SuggestionProductRepository {
      * @param newValidatedSuggestion Objeto validado contendo o produto atualizado.
      */
     suspend fun updateSuggestionProduct(oldSuggestion: Product, newValidatedSuggestion: ValidatedSuggestionProduct) {
-        val documentSnapshot =
-            Firestore.suggestionProductsCollection().whereEqualTo("name", oldSuggestion.name).limit(1).get().await()
+        val documentSnapshot =   Firestore.suggestionProductsCollection().whereEqualTo("name", oldSuggestion.name).limit(1).get().await()
 
         if (!documentSnapshot.isEmpty) {
             val targetSuggestion = documentSnapshot.documents.first().toObject<Product>()!!

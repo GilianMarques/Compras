@@ -80,7 +80,7 @@ class CategoryAdapter(activity: AppCompatActivity, val callback: Callback) :
 
 
                 cvChild.setOnClickListener {
-                    callback.rvCategoriesOnSelect(category, adapterPosition)
+                    callback.rvCategoriesOnSelect(category, absoluteAdapterPosition)
                 }
 
             }

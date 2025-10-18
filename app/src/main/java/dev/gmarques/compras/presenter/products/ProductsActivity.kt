@@ -12,7 +12,6 @@ import android.view.animation.AnticipateInterpolator
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import dev.gmarques.compras.presenter.MyActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -35,9 +34,9 @@ import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.SuggestionProductRepository
 import dev.gmarques.compras.databinding.ActivityProductsBinding
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
-
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.hideKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
+import dev.gmarques.compras.presenter.MyActivity
 import dev.gmarques.compras.presenter.Vibrator
 import dev.gmarques.compras.presenter.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.presenter.add_edit_shop_list.AddEditShopListActivity
@@ -101,6 +100,7 @@ class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.C
         suggestProductsIfNeeded(shopListId)
         observeEstablishmentChangeEvents()
         setupActivityResultLauncher()
+        lifecycleScope.launch { delay(1000);confirmEstablishment() }
     }
 
     private fun observeEstablishmentChangeEvents() {
@@ -131,8 +131,8 @@ class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.C
                 EstablishmentsActivity.newIntent(this@ProductsActivity, true)
             )
 
-        }.setAnimationMode(ANIMATION_MODE_SLIDE)
-            .setDuration(if (currentEstablishment == null) LENGTH_INDEFINITE else 4000).show()
+        }.setAnimationMode(ANIMATION_MODE_SLIDE).setDuration(if (currentEstablishment == null) LENGTH_INDEFINITE else 8_000)
+            .show()
 
         viewModel.establishmentConfirmed = true
 
@@ -486,15 +486,8 @@ class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.C
 
     override fun rvProductsOnBoughtItemClick(product: Product, isBought: Boolean) {
 
-        if (isBought && !viewModel.establishmentConfirmed) {
-
-            confirmEstablishment()
-            // se o estabelecimento nao foi definido, atualizo o produto no db, assim a view do recyclerview é atualizada, desmarcando
-            // o checkbox do produto
-            viewModel.updateProductBoughtState(product, product.hasBeenBought)
-
-        } else if (product.info.isEmpty() && isBought) BsdAddProductInfo(this@ProductsActivity) { info ->
-            viewModel.updateProductBoughtState(product.copy(info = info), true)
+        if (product.info.isEmpty() && isBought) BsdAddProductInfo(this@ProductsActivity) { info ->
+            viewModel.updateProductAsIs(product.copy(info = info, hasBeenBought = true))
         }.show()
         else viewModel.updateProductBoughtState(product, isBought)
 
