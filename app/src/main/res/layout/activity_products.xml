@@ -23,7 +23,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".ui.products.ProductsActivity">
+                tools:context=".presenter.products.ProductsActivity">
 
                 <include
                     android:id="@+id/toolbar"
@@ -96,7 +96,7 @@
         android:animateLayoutChanges="true"
 
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        tools:context=".ui.products.ProductsActivity">
+        tools:context=".presenter.products.ProductsActivity">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -107,7 +107,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:animateLayoutChanges="true"
-            tools:context=".ui.products.ProductsActivity">
+            tools:context=".presenter.products.ProductsActivity">
 
             <TextView
                 android:id="@+id/tv_price_list_info"

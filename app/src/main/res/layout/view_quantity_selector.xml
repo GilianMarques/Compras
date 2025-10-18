@@ -10,7 +10,7 @@
     android:background="@drawable/back_round"
     android:backgroundTint="?colorPrimary"
     android:textAlignment="center"
-    tools:context=".ui.products.ProductsActivity">
+    tools:context=".presenter.products.ProductsActivity">
 
     <TextView
         android:id="@+id/tv_minus"

@@ -12,13 +12,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
-import dev.gmarques.compras.data.PreferencesHelper
-import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.repository.UserRepository
 import dev.gmarques.compras.domain.utils.ListenerRegister
-import dev.gmarques.compras.ui.MyActivity
-import dev.gmarques.compras.ui.Vibrator
-import dev.gmarques.compras.ui.sync_stopped.SyncStoppedActivity
+import dev.gmarques.compras.presenter.MyActivity
+import dev.gmarques.compras.presenter.Vibrator
+import dev.gmarques.compras.presenter.sync_stopped.SyncStoppedActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers.IO
@@ -241,8 +239,8 @@ class App : Application() {
      * do host, que acontece quando o usuario se desconecta do host por vontade propria atraves da tela
      * de perfil do usuario.
      *
-     * @see dev.gmarques.compras.ui.profile.BsdDisconnectAccount
-     * @see dev.gmarques.compras.ui.profile.ProfileActivity
+     * @see dev.gmarques.compras.presenter.profile.BsdDisconnectAccount
+     * @see dev.gmarques.compras.presenter.profile.ProfileActivity
      * */
     @OptIn(DelicateCoroutinesApi::class)
     fun toggleGuestListener(turnOn: Boolean) = GlobalScope.launch {

@@ -19,57 +19,57 @@
         tools:targetApi="31">
 
         <activity
-            android:name=".ui.profile.ProfileActivity"
+            android:name=".presenter.profile.ProfileActivity"
             android:exported="false"
             android:theme="@style/Profile.Activity" />
 
         <activity
-            android:name=".ui.categories.CategoriesActivity"
+            android:name=".presenter.categories.CategoriesActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.add_edit_category.AddEditCategoryActivity"
+            android:name=".presenter.add_edit_category.AddEditCategoryActivity"
             android:exported="false"
             android:windowSoftInputMode="stateAlwaysVisible" />
 
         <activity
-            android:name=".ui.add_edit_establishment.AddEditEstablishmentActivity"
+            android:name=".presenter.add_edit_establishment.AddEditEstablishmentActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.stablishments.EstablishmentsActivity"
+            android:name=".presenter.stablishments.EstablishmentsActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.add_edit_shop_list.AddEditShopListActivity"
+            android:name=".presenter.add_edit_shop_list.AddEditShopListActivity"
             android:exported="false"
             android:windowSoftInputMode="stateAlwaysVisible" />
 
 
         <activity
-            android:name=".ui.add_edit_product.AddEditProductActivity"
+            android:name=".presenter.add_edit_product.AddEditProductActivity"
             android:exported="false"
             android:windowSoftInputMode="stateAlwaysVisible" />
 
         <activity
-            android:name=".ui.products.ProductsActivity"
+            android:name=".presenter.products.ProductsActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".presenter.login.LoginActivity"
             android:exported="false"
             android:label="@string/title_activity_login"
             android:theme="@style/Login.Activity" />
 
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".presenter.main.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.sync_stopped.SyncStoppedActivity"
+            android:name=".presenter.sync_stopped.SyncStoppedActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.splash.SplashActivity"
+            android:name=".presenter.splash.SplashActivity"
             android:theme="@style/Splash.Activity"
             android:exported="true">
             <intent-filter>
@@ -80,7 +80,7 @@
         </activity>
 
         <activity
-            android:name=".ui.suggest_products.SuggestProductsActivity"
+            android:name=".presenter.suggest_products.SuggestProductsActivity"
             android:windowSoftInputMode="stateAlwaysVisible" />
 
         <meta-data

@@ -6,14 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.add_edit_shop_list.AddEditShopListActivity">
+    tools:context=".presenter.add_edit_shop_list.AddEditShopListActivity">
 
     <LinearLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.add_edit_product.AddProduct">
+        tools:context=".presenter.add_edit_product.AddProduct">
 
         <include
             android:id="@+id/toolbar"

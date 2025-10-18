@@ -23,7 +23,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".ui.products.ProductsActivity">
+                tools:context=".presenter.products.ProductsActivity">
 
                 <include
                     android:id="@+id/toolbar"
@@ -95,7 +95,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 
-        tools:context=".ui.products.ProductsActivity">
+        tools:context=".presenter.products.ProductsActivity">
 
 
 
