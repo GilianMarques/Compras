@@ -52,6 +52,7 @@
                     android:drawableStart="@drawable/vec_name"
                     android:hint="@string/Nome_ex_massas_graos"
                     android:importantForAutofill="no"
+                    android:imeOptions="actionDone"
                     android:inputType="textCapSentences" />
 
                 <TextView

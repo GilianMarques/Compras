@@ -62,8 +62,6 @@ class AddEditShopListActivity: MyActivity() {
         observeShopList()
         observeViewmodelErrorMessages()
         observeViewmodelFinishEvent()
-
-
         binding.edtName.showKeyboard()
 
     }

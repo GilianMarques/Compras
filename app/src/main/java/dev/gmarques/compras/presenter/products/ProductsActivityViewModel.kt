@@ -331,7 +331,6 @@ class ProductsActivityViewModel : ViewModel() {
 
     suspend fun tryToRemoveShopList(shopList: ShopList) = withContext(IO) {
         shopListDatabaseListener?.remove()
-// TODO: otimizar isso com coroutines 
         val productsRemoved = ProductRepository.removeAllProductsFromShopList(shopList.id)
         if (productsRemoved) {
             ShopListRepository.removeShopList(shopList)

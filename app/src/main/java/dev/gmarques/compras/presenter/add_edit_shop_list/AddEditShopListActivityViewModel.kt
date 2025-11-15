@@ -1,5 +1,6 @@
 package dev.gmarques.compras.presenter.add_edit_shop_list
 
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import dev.gmarques.compras.data.repository.ShopListRepository
 import dev.gmarques.compras.data.repository.model.ValidatedShopList
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 
 class AddEditShopListActivityViewModel : ViewModel() {
@@ -60,7 +62,11 @@ class AddEditShopListActivityViewModel : ViewModel() {
     var editingShopList: Boolean = false
     var shopListId: String? = null
     var validatedName: String = ""
-    var validatedColor: Int = -1
+    var validatedColor: Int = run {
+        val colors = App.getContext().resources.getStringArray(R.array.pastel_colors)
+            .asList().map { it.toColorInt() }
+        colors[Random.nextInt(0,colors.size-1)]
+    }
 
 
     private val _editingShopListLD = MutableLiveData<ShopList>()

@@ -18,6 +18,7 @@ import dev.gmarques.compras.domain.utils.ListenerRegister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -50,7 +51,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
     private var sortAscending = PrefsDefaultValue.SORT_ASCENDING
 
     fun init(shopListId: String) {
-        
+
         if (init) return
         else init = true
 
@@ -179,7 +180,7 @@ class SuggestProductsActivityViewModel : ViewModel() {
             val newProduct = product.copy(
                 shopListId = shopListId, quantity = quantity, hasBeenBought = false
             ).withNewId()
-            saveProduct(product, newProduct)
+            async {  saveProduct(product, newProduct)}
 
         }
     }

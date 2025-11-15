@@ -14,6 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.gmarques.compras.R
 import dev.gmarques.compras.databinding.BsdSelectColorDialogBinding
 import dev.gmarques.compras.databinding.RvItemCategoryColorBinding
+import androidx.core.graphics.toColorInt
 
 class BsdSelectColor private constructor(
     targetActivity: Activity,
@@ -61,7 +62,7 @@ class BsdSelectColor private constructor(
         private var onDismissListener: (() -> Unit)? = null
         private var colors: List<Int> =
             targetActivity.resources.getStringArray(if (colorForShopList) R.array.pastel_colors else R.array.vivid_colors)
-                .asList().map { Color.parseColor(it) }
+                .asList().map { it.toColorInt() }
 
         fun setOnConfirmListener(listener: (Int) -> Unit) = apply {
             this.onConfirmListener = listener
