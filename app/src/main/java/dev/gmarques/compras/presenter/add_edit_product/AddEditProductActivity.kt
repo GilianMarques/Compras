@@ -290,7 +290,7 @@ class AddEditProductActivity: MyActivity() {
 
                 validatedCategory = category
 
-                // essa funçao atualiza a UI em caso de ediçao de produto ou seleção de sugestão ao adicionar o produto, por iso faço a verificação
+                // essa funçao atualiza a UI em caso de ediçao de produto ou seleção de sugestão ao adicionar o produto, por isso faço a verificação
                 val editingProduct = currentState?.editingProduct != null
                 if (editingProduct) {
                     cbSuggestProduct.visibility = GONE

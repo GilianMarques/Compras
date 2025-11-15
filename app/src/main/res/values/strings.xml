@@ -212,5 +212,8 @@
     <string name="Nova_versao_disponivel">Nova versão disponível</string>
     <string name="Uma_nova_vers_o_do_app_est_dispon_vel_na_loja">Uma nova versão do app está disponível na loja!</string>
     <string name="Produto_est_comprado">Produto está comprado</string>
+    <string name="Comprado">Comprado</string>
+    <string name="Salvar_como_sugestao">Salvar como sugestão</string>
+    <string name="Valor_da_categoria">Valor da categoria</string>
 
 </resources>

@@ -34,11 +34,11 @@ import kotlinx.coroutines.withContext
 class ProductsActivityViewModel : ViewModel() {
 
 
-    // categoria usada como filtro pelo usuario
+    /** categoria usada como filtro pelo usuario*/
     var filterCategory: Category? = null
         private set
 
-    // termo usado como filtro pelo usuario
+    /** termo usado como filtro pelo usuario*/
     var searchTerm: String = ""
         private set
 
@@ -46,16 +46,17 @@ class ProductsActivityViewModel : ViewModel() {
     var currentEstablishment: Establishment? = null
         private set
 
-    //pra saber se o usuario ja confirmou onde esta comprando
+    /** pra saber se o usuario ja confirmou onde esta comprando*/
     var establishmentConfirmed = false
 
-    // mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo
+    /** mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo*/
     private var categories: HashMap<String, Category>? = null
 
 
     private lateinit var uiState: UiState
 
-    private var init = false // pra saber se o vm foi inicializado
+    /** pra saber se o vm foi inicializado*/
+    private var init = false
 
     private var throttlingJob: Job? = null
 
@@ -96,7 +97,6 @@ class ProductsActivityViewModel : ViewModel() {
 
         super.onCleared()
     }
-
 
     /**
      * Mantem na memoria (hashmap) uma copia sempre atualizada de todas as categorias do banco de dados afim
@@ -176,8 +176,9 @@ class ProductsActivityViewModel : ViewModel() {
                     val sortedProductsWithPrices = sortProducts(filteredProductsWithCategories)
 
                     uiState.apply {
-                        this.priceBought = sortedProductsWithPrices.boughtPrice
-                        this.priceFull = sortedProductsWithPrices.fullPrice
+                        this.priceBought = sortedProductsWithPrices.priceBought
+                        this.priceList = sortedProductsWithPrices.priceList
+                        this.priceCategory = sortedProductsWithPrices.priceCategory
                         this.products = sortedProductsWithPrices.productsWithCategory
                     }
 
@@ -197,22 +198,25 @@ class ProductsActivityViewModel : ViewModel() {
         val filteredProducts = mutableListOf<ProductWithCategory>()
         var fullPrice = 0.0
         var boughtPrice = 0.0
+        var categoryPrice = 0.0
 
 
         for (i in products!!.indices) {
 
             val product = products[i]
 
-            val nameContainsSearchTermOrNoSearchTermDefined =
+            val nameContainsSearchTermOrNoSearchTermSet =
                 (searchTerm.isEmpty() || product.name.removeAccents().contains(searchTerm, true))
 
             val categoryMatchesFilterOrNoCategoryFilter = if (searchTerm.isNotEmpty()) true
             else (filterCategory == null || product.categoryId == filterCategory?.id)
 
             fullPrice += product.price * product.quantity
-            if (product.hasBeenBought) boughtPrice += product.price * product.quantity
 
-            if (nameContainsSearchTermOrNoSearchTermDefined && categoryMatchesFilterOrNoCategoryFilter) {
+            if (product.hasBeenBought) boughtPrice += product.price * product.quantity
+            if (product.categoryId == filterCategory?.id) categoryPrice += product.price * product.quantity
+
+            if (nameContainsSearchTermOrNoSearchTermSet && categoryMatchesFilterOrNoCategoryFilter) {
 
                 val prodWithCat = ProductWithCategory(
                     product,
@@ -225,7 +229,7 @@ class ProductsActivityViewModel : ViewModel() {
 
         }
 
-        return ProductsWithPrices(filteredProducts, fullPrice, boughtPrice)
+        return ProductsWithPrices(filteredProducts, fullPrice, boughtPrice, categoryPrice)
     }
 
     /**
@@ -234,7 +238,7 @@ class ProductsActivityViewModel : ViewModel() {
     private fun sortProducts(filteredProductsWithPrices: ProductsWithPrices): ProductsWithPrices {
 
         val newData = filteredProductsWithPrices.productsWithCategory
-        var sorted = listOf<ProductWithCategory>()
+        var sorted: List<ProductWithCategory>
 
         when (uiState.sortCriteria) {
             SortCriteria.NAME -> {
@@ -256,8 +260,9 @@ class ProductsActivityViewModel : ViewModel() {
                     .sortedWith(compareBy { it.product.position })
             }
         }
-
-        sorted = if (!uiState.sortAscending) sorted.reversed() else sorted
+        if (uiState.sortCriteria != SortCriteria.POSITION) {
+            sorted = if (!uiState.sortAscending) sorted.reversed() else sorted
+        }
         sorted =
             sorted.sortedWith(compareBy { if (uiState.boughtProductsAtEnd) it.product.hasBeenBought else false })
 
@@ -391,17 +396,18 @@ class ProductsActivityViewModel : ViewModel() {
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }
 
-
     suspend fun loadCurrentEstablishment() {
         val lastEstablishmentId = PreferencesHelper().getValue(PrefsKeys.LAST_ESTABLISHMENT_USED, "")
-        currentEstablishment = if (lastEstablishmentId.isNotEmpty()) EstablishmentRepository.getEstablishment(lastEstablishmentId) else null
+        currentEstablishment =
+            if (lastEstablishmentId.isNotEmpty()) EstablishmentRepository.getEstablishment(lastEstablishmentId) else null
         _establishmentEvent.postValue(currentEstablishment)
     }
 
     data class ProductsWithPrices(
         val productsWithCategory: List<ProductWithCategory>,
-        val fullPrice: Double,
-        val boughtPrice: Double,
+        val priceList: Double,
+        val priceBought: Double,
+        val priceCategory: Double,
     )
 
     class UiState {
@@ -413,7 +419,8 @@ class ProductsActivityViewModel : ViewModel() {
         var products = listOf<ProductWithCategory>()
         var listCategories = listOf<CategoryWithProductsStats>()
         lateinit var shopList: ShopList
-        var priceFull: Double = 0.0
+        var priceList: Double = 0.0
+        var priceCategory: Double = 0.0
         var priceBought: Double = 0.0
 
     }

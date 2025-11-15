@@ -42,20 +42,6 @@
                 android:paddingBottom="100dp">
 
 
-                <CheckBox
-                    android:id="@+id/cb_suggest_product"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="8dp"
-                    android:checked="false"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="@string/Sugerir_produto_ao_criar_nova_lista" />
-
-
                 <TextView
                     android:id="@+id/tv_suggestion"
                     android:layout_width="wrap_content"
@@ -110,6 +96,39 @@
                     app:drawableTint="@color/error"
                     tools:text="@string/Nome_do_produto_ex_macarrao_parafuso"
                     tools:visibility="visible" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/Margins_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/back_addproduct_edittext"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/cb_suggest_product"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        app:layout_constraintHorizontal_weight="1.7"
+                        android:text="@string/Salvar_como_sugestao"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/cb_bought"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <CheckBox
+                        android:id="@+id/cb_bought"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        app:layout_constraintHorizontal_weight="1"
+                        android:text="@string/Comprado"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cb_suggest_product"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/edt_info"
@@ -187,10 +206,11 @@
                     app:drawableTint="@color/error"
                     tools:text="@string/Nome_do_produto_ex_macarrao_parafuso"
                     tools:visibility="visible" />
+
                 <FrameLayout
+                    android:id="@+id/price_history_container"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/price_history_container"/>
+                    android:layout_height="wrap_content" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/edt_quantity"
@@ -245,19 +265,6 @@
                     tools:text="@string/Nome_do_produto_ex_macarrao_parafuso"
                     tools:visibility="visible" />
 
-
-                <CheckBox
-                    android:id="@+id/cb_bought"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="8dp"
-                    android:checked="false"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="@string/Produto_est_comprado" />
 
             </LinearLayout>
 

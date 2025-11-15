@@ -53,7 +53,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.max
 import kotlin.math.min
 
-class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
+class ProductsActivity : MyActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
 
     private var uiState: ProductsActivityViewModel.UiState? = null
     private lateinit var establishmentResultLauncher: ActivityResultLauncher<Intent>
@@ -166,18 +166,26 @@ class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.C
                 }
             }
 
-            animatePrices(newState)
+            updatePrices(newState)
 
             this.uiState = newState
         }
     }
 
-    private fun animatePrices(state: ProductsActivityViewModel.UiState) {
+    private fun updatePrices(state: ProductsActivityViewModel.UiState) {
 
         binding.apply {
 
+            val showCategoryPrice = viewModel.filterCategory == null
+
+            binding.tvPriceListInfo.text = getString(
+                if (showCategoryPrice) R.string.Valor_da_lista
+                else R.string.Valor_da_categoria
+            )
+
             ValueAnimator.ofFloat(
-                tvPriceList.text.toString().currencyToDouble().toFloat(), state.priceFull.toFloat()
+                tvPriceList.text.toString().currencyToDouble().toFloat(),
+                (if (showCategoryPrice) state.priceList else state.priceCategory).toFloat()
             ).apply {
                 interpolator = AnticipateInterpolator()
                 duration = 500
@@ -425,7 +433,6 @@ class ProductsActivity: MyActivity(), ProductAdapter.Callback, CategoryAdapter.C
 
         }
     }
-
 
     private fun setupActivityResultLauncher() {
 
