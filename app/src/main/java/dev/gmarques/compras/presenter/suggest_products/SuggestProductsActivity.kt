@@ -59,7 +59,7 @@ class SuggestProductsActivity: MyActivity() {
         initSearch()
         initFabIncludeProducts()
         observeProductsUpdates()
-        observeSelectionUpdates()
+        observeTotalPriceUpdates()
         observeViewmodelErrorMessages()
         setupOnBackPressed()
     }
@@ -114,19 +114,10 @@ class SuggestProductsActivity: MyActivity() {
         }
     }
 
-    private fun observeSelectionUpdates() {
-        viewModel.updatedSelectionDataLD.observe(this) { newData ->
-            updateListPrice(newData)
+    private fun observeTotalPriceUpdates() {
+        viewModel.totalPriceLD.observe(this) { total ->
+            binding.tvPriceList.text = total.toCurrency()
         }
-    }
-
-    private fun updateListPrice(selectionData: HashMap<String, Pair<Boolean, Int>>) = with(binding) {
-        val totalPrice = selectionData.filter { it.value.first/*esta selecionado?*/ }
-            .map { entry -> viewModel.productsLD.value!!.first { it.product.id == entry.key } }
-            .sumOf { it.product.price * it.quantity }
-
-        tvPriceList.text = totalPrice.toCurrency()
-
     }
 
     private fun observeViewmodelErrorMessages() = lifecycleScope.launch {

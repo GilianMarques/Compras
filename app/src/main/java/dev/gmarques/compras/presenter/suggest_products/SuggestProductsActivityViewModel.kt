@@ -44,6 +44,11 @@ class SuggestProductsActivityViewModel : ViewModel() {
     private val _productsLD = MutableLiveData<List<SelectableProduct>>()
     val productsLD: LiveData<List<SelectableProduct>> get() = _productsLD
 
+    private val _totalPriceLD = MutableLiveData<Double>()
+    val totalPriceLD: LiveData<Double> get() = _totalPriceLD
+
+    private var allProducts: List<Product> = emptyList()
+
     private val _errorEventLD = MutableLiveData<String>()
     val errorEventLD: LiveData<String> get() = _errorEventLD
 
@@ -76,6 +81,8 @@ class SuggestProductsActivityViewModel : ViewModel() {
                 if (error != null) throw error
 
                 if (products != null) viewModelScope.launch {
+                    allProducts = products
+                    calculateTotalPrice()
 
                     val filteredProducts = filterAndCreateSelectableProducts(products)
                     val sortedProducts = sortProducts(filteredProducts)
@@ -201,6 +208,17 @@ class SuggestProductsActivityViewModel : ViewModel() {
     fun updateSelectionData(sp: SelectableProduct) {
         val x = _updatedSelectionDataLD.value!!.apply { this[sp.product.id] = sp.isSelected to sp.quantity }
         _updatedSelectionDataLD.postValue(x)
+        calculateTotalPrice()
+    }
+
+    private fun calculateTotalPrice() {
+        val selections = _updatedSelectionDataLD.value ?: return
+        var total = 0.0
+        allProducts.forEach { product ->
+            val (selected, quantity) = selections[product.id] ?: (false to product.quantity)
+            if (selected) total += product.price * quantity
+        }
+        _totalPriceLD.postValue(total)
     }
 
 }
