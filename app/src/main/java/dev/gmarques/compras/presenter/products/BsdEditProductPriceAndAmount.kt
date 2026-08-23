@@ -1,6 +1,5 @@
 package dev.gmarques.compras.presenter.products
 
-import dev.gmarques.compras.presenter.PricesHistoryViewComponent
 import android.app.Activity
 import android.view.View
 import android.view.View.VISIBLE
@@ -9,10 +8,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dev.gmarques.compras.App
 import dev.gmarques.compras.R
-import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.databinding.BsdEditProductDialogBinding
-import dev.gmarques.compras.domain.model.PriceHistory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
@@ -23,7 +20,7 @@ import kotlinx.coroutines.cancel
 
 class BsdEditProduct private constructor() {
 
-    private var currentEstablishment: Establishment? = null
+
     private var focusOnInfo: Boolean = false
     private var focusOnQuantity: Boolean = false
     private var focusOnPrice: Boolean = false
@@ -80,24 +77,7 @@ class BsdEditProduct private constructor() {
         setupInputQuantityFocusListener()
         setupInputInfoFocusListener()
         setupAdditionalOptions()
-        setupPriceHistory()
 
-    }
-
-    private fun setupPriceHistory() {
-
-        val onPriceClick: (PriceHistory) -> Unit = { priceItem ->
-            binding.edtPrice.requestFocus()
-            binding.edtPrice.setText(priceItem.price.toCurrency())
-        }
-
-        val pricesHistory = PricesHistoryViewComponent(
-            targetActivity.layoutInflater,
-            scope,
-            editProduct,
-            onPriceClick
-        )
-        binding.fragment.addView(pricesHistory.view)
     }
 
     private fun setupAdditionalOptions() = binding.apply {
@@ -181,8 +161,7 @@ class BsdEditProduct private constructor() {
             price = newPrice,
             info = newInfo,
             hasBeenBought = true,
-            boughtDate = System.currentTimeMillis(),
-            establishmentId = currentEstablishment?.id
+            boughtDate = System.currentTimeMillis()
         )
         else editProduct.copy(
             quantity = newQuantity, price = newPrice, info = newInfo
@@ -242,11 +221,6 @@ class BsdEditProduct private constructor() {
         fun build(): BsdEditProduct {
             instance.init()
             return instance
-        }
-
-        fun setCurrentEstablishment(currentEstablishment: Establishment?): Builder {
-            instance.currentEstablishment = currentEstablishment
-            return this
         }
 
 

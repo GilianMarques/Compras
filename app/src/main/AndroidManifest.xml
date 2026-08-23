@@ -32,13 +32,7 @@
             android:exported="false"
             android:windowSoftInputMode="stateAlwaysVisible" />
 
-        <activity
-            android:name=".presenter.add_edit_establishment.AddEditEstablishmentActivity"
-            android:exported="false" />
 
-        <activity
-            android:name=".presenter.stablishments.EstablishmentsActivity"
-            android:exported="false" />
 
         <activity
             android:name=".presenter.add_edit_shop_list.AddEditShopListActivity"

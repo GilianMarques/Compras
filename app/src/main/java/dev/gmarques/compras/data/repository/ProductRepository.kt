@@ -45,24 +45,7 @@ object ProductRepository {
         else Result.success(querySnapShot.documents.first().toObject<Product>())
     }
 
-    /**
-     * Retorna uma lista de todos os produtos comprados de mesmo nome.
-     */
-    suspend fun getHistoryPricesProducts(name: String): Result<List<Product>> {
-        val querySnapShot = Firestore.productsCollection()
-            .whereEqualTo("name", name)
-            .whereEqualTo("hasBeenBought", true)
-            .get().await()
 
-        return if (querySnapShot.isEmpty) {
-            Result.success(emptyList())
-        } else {
-            val productsList = querySnapShot.documents.mapNotNull { document ->
-                document.toObject<Product>()
-            }
-            Result.success(productsList)
-        }
-    }
 
     /**
      * Retorna os nomes dos produtos associados a uma lista de compras.
@@ -70,7 +53,7 @@ object ProductRepository {
      * @return Uma lista de nomes de produtos.
      */
     suspend fun getProducts(shopListId: String): List<String> {
-        if (shopListId.isNullOrBlank()) throw IllegalArgumentException("A id buscada nao pode ser nula ou estar em branco")
+        if (shopListId.isBlank()) throw IllegalArgumentException("A id buscada nao pode ser nula ou estar em branco")
         val querySnapshot: QuerySnapshot =
             Firestore.productsCollection().whereEqualTo("shopListId", shopListId).get().await()
         return querySnapshot.map { it.toObject<Product>().name }
@@ -97,17 +80,7 @@ object ProductRepository {
         return !productsSnapshot.isEmpty
     }
 
-    /**
-     * Verifica se há pelo menos um produto ou sugestão associado ao ID de estabelecimento fornecido.
-     * @param establishmentId ID do estabelecimento a ser verificada.
-     * @return Um [Result] indicando se há produtos associados.
-     */
-    suspend fun hasAnyProductWithEstablishmentId(establishmentId: String): Boolean {
-        val productsSnapshot =
-            Firestore.productsCollection().whereEqualTo("establishmentId", establishmentId).limit(1).get()
-                .await()
-        return !productsSnapshot.isEmpty
-    }
+
 
     /**
      * Define um listener no Firestore para notificações de alterações em produtos locais e na nuvem.
@@ -144,7 +117,7 @@ object ProductRepository {
             for (document in querySnapshot.documents) document.reference.delete().await()
 
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

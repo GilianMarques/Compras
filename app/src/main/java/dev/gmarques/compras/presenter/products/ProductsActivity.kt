@@ -1,17 +1,13 @@
 package dev.gmarques.compras.presenter.products
 
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.addCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -27,7 +23,6 @@ import dev.gmarques.compras.R
 import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.ProductRepository
@@ -41,8 +36,6 @@ import dev.gmarques.compras.presenter.Vibrator
 import dev.gmarques.compras.presenter.add_edit_product.AddEditProductActivity
 import dev.gmarques.compras.presenter.add_edit_shop_list.AddEditShopListActivity
 import dev.gmarques.compras.presenter.categories.CategoriesActivity
-import dev.gmarques.compras.presenter.stablishments.EstablishmentsActivity
-import dev.gmarques.compras.presenter.stablishments.EstablishmentsActivity.Companion.SELECTED_ESTABLISHMENT
 import dev.gmarques.compras.presenter.suggest_products.SuggestProductsActivity
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -56,7 +49,6 @@ import kotlin.math.min
 class ProductsActivity : MyActivity(), ProductAdapter.Callback, CategoryAdapter.Callback {
 
     private var uiState: ProductsActivityViewModel.UiState? = null
-    private lateinit var establishmentResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var viewModel: ProductsActivityViewModel
     private lateinit var binding: ActivityProductsBinding
@@ -98,44 +90,6 @@ class ProductsActivity : MyActivity(), ProductAdapter.Callback, CategoryAdapter.
         observeStateChanges()
         setupOnBackPressed()
         suggestProductsIfNeeded(shopListId)
-        observeEstablishmentChangeEvents()
-        setupActivityResultLauncher()
-        lifecycleScope.launch { delay(1000); confirmEstablishment() }
-    }
-
-    private fun observeEstablishmentChangeEvents() {
-        viewModel.establishmentEvent.observe(this@ProductsActivity) { establishment ->
-            if (establishment != null) {
-                binding.toolbar.tvActivitySubtitle.text = getString(
-                    R.string.Comprando_em, establishment.name
-                )
-            }
-        }
-    }
-
-    private fun confirmEstablishment() = with(viewModel) {
-
-        val title =
-            if (currentEstablishment == null) getString(R.string.Onde_est_fazendo_as_compras) else getString(
-                R.string.Voce_esta_comprando_em, currentEstablishment!!.name
-            )
-
-        val action = if (currentEstablishment == null) getString(R.string.Definir_estabelecimento)
-        else getString(R.string.Alterar)
-
-        Vibrator.interaction()
-        Snackbar.make(binding.root, title, Snackbar.LENGTH_LONG).setAction(action) {
-
-            Vibrator.interaction()
-            establishmentResultLauncher.launch(
-                EstablishmentsActivity.newIntent(this@ProductsActivity, true)
-            )
-
-        }.setAnimationMode(ANIMATION_MODE_SLIDE).setDuration(if (currentEstablishment == null) LENGTH_INDEFINITE else 8_000)
-            .show()
-
-        viewModel.establishmentConfirmed = true
-
     }
 
     private fun suggestProductsIfNeeded(shopListId: String) = lifecycleScope.launch(IO) {
@@ -349,21 +303,13 @@ class ProductsActivity : MyActivity(), ProductAdapter.Callback, CategoryAdapter.
             .setSortListener { showSortProductsDialog() }
             .setSuggestionListener { startActivitySuggestProduct() }
             .setRemoveListener { removeList -> confirmRemove(removeList) }
-            .setManageCategoriesListener { startCategoriesActivity() }
-            .setManageEstablishmentsListener { startEstablishmentsActivity() }.build().show()
+            .setManageCategoriesListener { startCategoriesActivity() }.build().show()
     }
 
     private fun startCategoriesActivity() {
 
         Vibrator.interaction()
         val intent = CategoriesActivity.newIntent(this@ProductsActivity)
-        startActivity(intent)
-    }
-
-    private fun startEstablishmentsActivity() {
-
-        Vibrator.interaction()
-        val intent = EstablishmentsActivity.newIntent(this@ProductsActivity)
         startActivity(intent)
     }
 
@@ -434,23 +380,7 @@ class ProductsActivity : MyActivity(), ProductAdapter.Callback, CategoryAdapter.
         }
     }
 
-    private fun setupActivityResultLauncher() {
 
-        establishmentResultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val selectedEstablishment =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            result.data!!.getSerializableExtra(SELECTED_ESTABLISHMENT, Establishment::class.java)
-                        } else @Suppress("DEPRECATION") result.data!!.getSerializableExtra(
-                            SELECTED_ESTABLISHMENT
-                        ) as Establishment
-
-                    PreferencesHelper().saveValue(PrefsKeys.LAST_ESTABLISHMENT_USED, selectedEstablishment!!.id)
-                    lifecycleScope.launch { viewModel.loadCurrentEstablishment() }
-                }
-            }
-    }
 
     override fun rvProductsOnDragAndDrop(toPosition: Int, product: Product) {
         viewModel.updateProductPosition(product, toPosition)
@@ -473,7 +403,7 @@ class ProductsActivity : MyActivity(), ProductAdapter.Callback, CategoryAdapter.
     }
 
     private fun showEditProductDialog(product: Product, focus: BsdEditProduct.Focus? = null) {
-        BsdEditProduct.Builder().setCurrentEstablishment(viewModel.currentEstablishment)
+        BsdEditProduct.Builder()
             .setActivity(this@ProductsActivity).setProduct(product).setFocus(focus)
             .setEditListener {
                 startActivityEditProduct(it)

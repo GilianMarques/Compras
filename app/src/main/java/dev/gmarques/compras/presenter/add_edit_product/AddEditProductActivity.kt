@@ -28,14 +28,12 @@ import dev.gmarques.compras.data.model.Category
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.CategoryRepository
 import dev.gmarques.compras.databinding.ActivityAddEditProductBinding
-import dev.gmarques.compras.domain.model.PriceHistory
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.currencyToDouble
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.dp
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.onlyIntegerNumbers
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.showKeyboard
 import dev.gmarques.compras.domain.utils.ExtFun.Companion.toCurrency
 import dev.gmarques.compras.presenter.MyActivity
-import dev.gmarques.compras.presenter.PricesHistoryViewComponent
 import dev.gmarques.compras.presenter.Vibrator
 import dev.gmarques.compras.presenter.categories.CategoriesActivity
 import dev.gmarques.compras.presenter.categories.CategoriesActivity.Companion.SELECTED_CATEGORY
@@ -111,25 +109,7 @@ class AddEditProductActivity: MyActivity() {
 
     }
 
-    private fun showPriceHistory(name: String) {
-        binding.priceHistoryContainer.removeAllViews()
 
-        val product = Product(name)
-
-        val onPriceClick: (PriceHistory) -> Unit = { priceItem ->
-            binding.edtPrice.requestFocus()
-            binding.edtPrice.setText(priceItem.price.toCurrency())
-
-        }
-
-        val pricesHistory = PricesHistoryViewComponent(
-            layoutInflater,
-            lifecycleScope,
-            product,
-            onPriceClick
-        )
-        binding.priceHistoryContainer.addView(pricesHistory.view)
-    }
 
     private fun setDefValuesIfAny() = lifecycleScope.launch(Main) {
 
@@ -152,7 +132,6 @@ class AddEditProductActivity: MyActivity() {
             newState.editingProduct?.let {
                 if (it == currentState?.editingProduct) return@let
                 viewModel.loadCategory(it.categoryId)
-                showPriceHistory(it.name)
             }
 
             newState.editingCategory?.let {
@@ -192,7 +171,7 @@ class AddEditProductActivity: MyActivity() {
 
         categoryResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
+                if (result.resultCode == RESULT_OK) {
                     val selectedCategory =
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             result.data!!.getSerializableExtra(
@@ -240,15 +219,12 @@ class AddEditProductActivity: MyActivity() {
 
                 if (suggestion is Product) {
                     viewModel.loadSuggestionCategory(suggestion)
-                    showPriceHistory(suggestion.name)
                 } else {
                     val nameSuggestion = suggestion as String
                     viewModel.canLoadSuggestion = false
                     binding.edtName.setText(nameSuggestion)
                     viewModel.canLoadSuggestion = true
                     binding.edtInfo.requestFocus()
-
-                    showPriceHistory(nameSuggestion)
                 }
 
             }

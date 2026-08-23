@@ -9,11 +9,9 @@ import dev.gmarques.compras.data.PreferencesHelper
 import dev.gmarques.compras.data.PreferencesHelper.PrefsDefaultValue
 import dev.gmarques.compras.data.PreferencesHelper.PrefsKeys
 import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
 import dev.gmarques.compras.data.repository.CategoryRepository
-import dev.gmarques.compras.data.repository.EstablishmentRepository
 import dev.gmarques.compras.data.repository.ProductRepository
 import dev.gmarques.compras.data.repository.ShopListRepository
 import dev.gmarques.compras.data.repository.SuggestionProductRepository
@@ -43,12 +41,6 @@ class ProductsActivityViewModel : ViewModel() {
         private set
 
 
-    var currentEstablishment: Establishment? = null
-        private set
-
-    /** pra saber se o usuario ja confirmou onde esta comprando*/
-    var establishmentConfirmed = false
-
     /** mantem uma copia sempre atualizada das categorias no banco de dados na memoria do dispositivo*/
     private var categories: HashMap<String, Category>? = null
 
@@ -67,9 +59,6 @@ class ProductsActivityViewModel : ViewModel() {
     private val _uiStateLD = MutableLiveData<UiState>()
     val uiStateLD: LiveData<UiState> get() = _uiStateLD
 
-    private val _establishmentEvent = MutableLiveData<Establishment?>()
-    val establishmentEvent: LiveData<Establishment?> get() = _establishmentEvent
-
     fun init(shopListId: String) {
 
         if (init) return
@@ -84,7 +73,6 @@ class ProductsActivityViewModel : ViewModel() {
             loadSortPreferences()
             observeCategoriesUpdates()
             loadList(shopListId)
-            loadCurrentEstablishment()
         }
 
     }
@@ -305,8 +293,7 @@ class ProductsActivityViewModel : ViewModel() {
         val newProduct =
             product.copy(
                 hasBeenBought = isBought,
-                boughtDate = System.currentTimeMillis(),
-                establishmentId = currentEstablishment?.id
+                boughtDate = System.currentTimeMillis()
             )
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }
@@ -395,12 +382,7 @@ class ProductsActivityViewModel : ViewModel() {
         ProductRepository.addOrUpdateProduct(ValidatedProduct(newProduct))
     }
 
-    suspend fun loadCurrentEstablishment() {
-        val lastEstablishmentId = PreferencesHelper().getValue(PrefsKeys.LAST_ESTABLISHMENT_USED, "")
-        currentEstablishment =
-            if (lastEstablishmentId.isNotEmpty()) EstablishmentRepository.getEstablishment(lastEstablishmentId) else null
-        _establishmentEvent.postValue(currentEstablishment)
-    }
+
 
     data class ProductsWithPrices(
         val productsWithCategory: List<ProductWithCategory>,

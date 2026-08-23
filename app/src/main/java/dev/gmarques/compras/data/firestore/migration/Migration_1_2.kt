@@ -1,7 +1,6 @@
 package dev.gmarques.compras.data.firestore.migration
 
-import android.util.Log
-import com.google.firebase.firestore.getField
+
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Category
@@ -18,7 +17,7 @@ class Migration_1_2 {
         migrateCategories()
         migrateProducts()
         migrateSuggestionProducts()
-        migrateEstablishments()
+
 
     }
 
@@ -53,15 +52,7 @@ class Migration_1_2 {
 
     }
 
-    private suspend fun migrateEstablishments() {
-        Log.d("USUK", "Migration_1_2.".plus("migrateEstablishments() "))
-        Firestore.establishmentsCollection().get().await().forEach {
-            Log.d("USUK", "Migration_1_2.migrateEstablishments: $it")
-            val obj = it.toObject<Category>()
-            Firestore.establishmentsCollection().document(obj.id).set(obj).await()
-        }
 
-    }
 
 
 }

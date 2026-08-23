@@ -1,13 +1,11 @@
 package dev.gmarques.compras.data.repository
 
-import android.provider.Settings.Global
 import android.util.Log
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.data.firestore.Firestore
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.repository.model.ValidatedSuggestionProduct
 import dev.gmarques.compras.domain.utils.ListenerRegister
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -45,16 +43,6 @@ object SuggestionProductRepository {
         return !suggestionProductsSnapshot.isEmpty
     }
 
-    /**
-     * Verifica se há pelo menos um produto ou sugestão associado ao ID de estabelecimento fornecido.
-     * @param establishmentId ID do estabelecimento a ser verificada.
-     * @return Um [Result] indicando se há produtos associados.
-     */
-    suspend fun hasAnyProductWithEstablishmentId(establishmentId: String): Boolean {
-        val suggestionProductsSnapshot =
-            Firestore.suggestionProductsCollection().whereEqualTo("establishmentId", establishmentId).limit(1).get().await()
-        return !suggestionProductsSnapshot.isEmpty
-    }
 
     /**
      * Define um listener no Firestore para notificações de alterações em produtos sugeridos.

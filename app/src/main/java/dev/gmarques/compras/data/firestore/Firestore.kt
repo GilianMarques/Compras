@@ -4,7 +4,7 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.Source
+
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import dev.gmarques.compras.BuildConfig
@@ -36,7 +36,7 @@ class Firestore {
         private const val SHOP_LISTS = "shopLists"
         private const val PRODUCTS = "products"
         private const val CATEGORIES = "categories"
-        private const val ESTABLISHMENTS = "establishments"
+
         private const val SUGGESTION_PRODUCTS = "suggestion_products"
         private const val COLLABORATION = "collaboration"
         private const val SYNC_INVITES = "sync_invites"
@@ -113,17 +113,7 @@ class Firestore {
             return rootCollection(targetEmail).document(USER_DATA).collection(CATEGORIES)
         }
 
-        /**
-         * Por padrao, retorna a coleçao de dados do usuario local. Se o local for convidado de outra conta, o caminho
-         * retornado levara aos dados do anfitriao. Caso o parametro seja preenchido, o camihno levara aos dados
-         * da conta relacionada ao email emquestao.
-         *
-         * @param targetEmail o endereço de email do banco de dados do usuario alvo. Deixe em branco para retornar os
-         * dados do usuario local ou de seu anfitriao caso haja algum
-         */
-        fun establishmentsCollection(targetEmail: String = this.dataHostEmail): CollectionReference {
-            return rootCollection(targetEmail).document(USER_DATA).collection(ESTABLISHMENTS)
-        }
+
 
         /**
          * Por padrao, retorna a coleçao de dados do usuario local. Se o local for convidado de outra conta, o caminho

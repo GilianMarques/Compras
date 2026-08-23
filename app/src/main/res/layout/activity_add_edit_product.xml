@@ -207,10 +207,7 @@
                     tools:text="@string/Nome_do_produto_ex_macarrao_parafuso"
                     tools:visibility="visible" />
 
-                <FrameLayout
-                    android:id="@+id/price_history_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/edt_quantity"

@@ -4,14 +4,9 @@ import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.getField
 import dev.gmarques.compras.data.model.Category
-import dev.gmarques.compras.data.model.Establishment
 import dev.gmarques.compras.data.model.Product
 import dev.gmarques.compras.data.model.ShopList
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -101,13 +96,6 @@ class FirebaseCloneDatabase(
             Firestore.suggestionProductsCollection(baseEmail),
             Product::class.java,
             Firestore.suggestionProductsCollection(targetEmail)
-
-        ),
-
-        Triple(
-            Firestore.establishmentsCollection(baseEmail),
-            Establishment::class.java,
-            Firestore.establishmentsCollection(targetEmail)
 
         )
     )
