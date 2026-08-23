@@ -1,25 +1,26 @@
 import java.util.Properties
 import java.io.FileInputStream
+import com.android.build.api.dsl.ApplicationExtension
 
 
 plugins {
-    id("com.android.application") version "8.13.0"
+    id("com.android.application") version "9.0.0"
     id("org.jetbrains.kotlin.android") version "2.2.20"
     id("com.google.gms.google-services") version "4.4.4"
     id("kotlin-kapt")
 }
 
 
-android {
+extensions.configure<ApplicationExtension> {
     namespace = "dev.gmarques.compras"
     compileSdk = 36
 
     defaultConfig {
         applicationId = "dev.gmarques.compras"
-        minSdk = 24
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2"
+        minSdk = 24
+        versionCode = 5
+        versionName = "0.0.2-alpha"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
