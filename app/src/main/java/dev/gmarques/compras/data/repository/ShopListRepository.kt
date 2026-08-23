@@ -60,15 +60,7 @@ object ShopListRepository {
     }
 
 
-    suspend fun getShopListByName(name: String): Result<Category?> {
-        val querySnapshot =
-            Firestore.shopListsCollection().whereEqualTo("name", name).limit(1).get().await()
 
-        return if (!querySnapshot.isEmpty) {
-            val targetCategory = querySnapshot.documents[0].toObject<Category>()
-            Result.success(targetCategory)
-        } else Result.success(null)
-    }
 
 
     suspend fun getShopList(id: String): Result<ShopList> {

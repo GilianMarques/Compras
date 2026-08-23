@@ -274,7 +274,7 @@ class AddEditProductActivity: MyActivity() {
                 validatedInfo = product.info
 
                 edtAnnotation.setText(product.annotations)
-                validatedInfo = product.annotations
+                validatedAnnotation = product.annotations
 
                 edtPrice.setText(product.price.toCurrency())
                 validatedPrice = product.price

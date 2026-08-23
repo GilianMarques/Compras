@@ -18,21 +18,7 @@ class AddEditShopListActivityViewModel : ViewModel() {
 
     suspend fun tryAndSaveShopList() = withContext(IO) {
 
-        // se adicionanda lista de compras ou se durante a ediçao o usuario trocar o nome, preciso verificar se o novo nome ja nao existe
-        val needCheckName = !editingShopList || editingShopListLD.value!!.name != validatedName
-
-        if (needCheckName) {
-            val result = ShopListRepository.getShopListByName(validatedName)
-
-            val shopListDontExist = result.getOrNull() == null
-
-            if (shopListDontExist) saveShopList()
-            else {
-                val msg = String.format(App.getContext().getString(R.string.X_ja_existe), validatedName)
-                _errorEventLD.postValue(msg)
-            }
-
-        } else saveShopList()
+        saveShopList()
 
 
     }
